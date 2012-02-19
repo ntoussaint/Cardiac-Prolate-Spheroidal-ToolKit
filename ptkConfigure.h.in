@@ -1,0 +1,11 @@
+#ifndef _ptkConfigure_h_
+#define _ptkConfigure_h_
+
+//#cmakedefine PTK_USE_VTKINRIA3D
+
+#define PTK_VERSION_MAJOR @PTK_VERSION_MAJOR@
+#define PTK_VERSION_MINOR @PTK_VERSION_MINOR@
+#define PTK_VERSION_BUILD @PTK_VERSION_BUILD@
+#define PTK_VERSION "@PTK_VERSION@"
+
+#endif
