@@ -1,26 +1,26 @@
-function(CreateCommandFactory command_name description src_list)
+function(CreateCommandFactory command_name keyword description src_list)
+  set(COMMAND_NAME  "itk${command_name}Command")
   set(FACTORY_NAME  "itk${command_name}CommandFactory")
   
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.h ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.cxx
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${COMMAND_NAME}.h ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.h ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.cxx
     COMMAND ${CMAKE_COMMAND} 
     -D SRC_DIR=${CMAKE_CURRENT_SOURCE_DIR} 
     -D MY_COMMAND_NAME=${command_name}
     -D MY_DESCRIPTION=${description} 
-    -P ${CMAKE_CURRENT_SOURCE_DIR}/CreatePTKFactory.cmake
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommandFactoryTemplate.h.in
-            ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommandFactoryTemplate.h.in)
+    -D MY_KEYWORD=${keyword}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/CreatePTKCommand.cmake
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommand.h.in
+	    ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommandFactoryTemplate.h.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommandFactoryTemplate.cxx.in
+	    )
 	  
-  set(FACTORY_SRC_NAMES "${FACTORY_SRC_NAMES}; ${FACTORY_NAME}")
   set(${src_list}
     ${${src_list}}
     ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.cxx
     PARENT_SCOPE
     )
-  message("ptk_command_srcs:"${${src_list}})
   
 endfunction()
-
-set(FACTORY_SRC_NAMES )
 
 set(PTK_COMMAND_SRCS
   itkTensorsToVTKCommand.cxx
@@ -28,10 +28,18 @@ set(PTK_COMMAND_SRCS
   itkExtractProlateInformationCommand.cxx
   )
 
-CreateCommandFactory(TensorsToVTK    "analyze"           PTK_COMMAND_SRCS)
-CreateCommandFactory(RotateProlateSpheroid "analyze"     PTK_COMMAND_SRCS)
-CreateCommandFactory(ExtractProlateInformation "analyze" PTK_COMMAND_SRCS)
-
+CreatePTKCommand(TensorsToVTK
+  "itk2vtk" ""
+  PTK_COMMAND_SRCS
+  )
+CreatePTKCommand(RotateProlateSpheroid
+  "rotate" ""
+  PTK_COMMAND_SRCS
+  )
+CreatePTKCommand(ExtractProlateInformation
+  "extract" ""
+  PTK_COMMAND_SRCS
+  )
 
 
 add_library(ptkCommands ${PTK_BUILD_TYPE}
