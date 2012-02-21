@@ -4,14 +4,14 @@ function(CreatePtkCommand command_name keyword description)
   
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${COMMAND_NAME}.h ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.h ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.cxx
     COMMAND ${CMAKE_COMMAND} 
-    -D SRC_DIR=${CMAKE_CURRENT_SOURCE_DIR} 
+    -D SRC_DIR=${CMAKE_CURRENT_SOURCE_DIR}/cmake
     -D MY_COMMAND_NAME=${command_name}
     -D MY_DESCRIPTION=${description} 
     -D MY_KEYWORD=${keyword}
-    -P ${CMAKE_CURRENT_SOURCE_DIR}/CreatePTKCommand.cmake
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommandTemplate.h.in
-	    ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommandFactoryTemplate.h.in
-            ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommandFactoryTemplate.cxx.in
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/CreatePTKCommand.cmake
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/cmake/itkPtkCommandTemplate.h.in
+	    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/itkPtkCommandFactoryTemplate.h.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/itkPtkCommandFactoryTemplate.cxx.in
 	    )
 	  
   set(PTK_COMMAND_SRCS
