@@ -89,8 +89,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PTK_REQUIRED_CXX_FLAGS}")
 
 
 
-
-
+add_subdirectory(IPF)
+add_subdirectory(Algorithms)
+add_subdirectory(Commands)
 
 
 
@@ -125,6 +126,10 @@ target_link_libraries(ptkCommands
   vtkIO
   ITKTensor
   )
+
+
+
+
 
 add_executable(ptk
   ptk.cxx
