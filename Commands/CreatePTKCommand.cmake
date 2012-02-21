@@ -11,7 +11,7 @@ function(CreatePTKCommand command_name keyword description src_dir)
   
   set(FILE_NAME  "itk${command_name}Command")
   string(TOUPPER ${FILE_NAME} HEADER_PROT)
-  configure_file(${src_dir}/itkPtkCommand.h.in
+  configure_file(${src_dir}/itkPtkCommandTemplate.h.in
     ${CMAKE_CURRENT_BINARY_DIR}/${FILE_NAME}.h @ONLY)
   
 endfunction()

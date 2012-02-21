@@ -1,4 +1,4 @@
-function(CreateCommandFactory command_name keyword description src_list)
+function(CreatePtkCommand command_name keyword description)
   set(COMMAND_NAME  "itk${command_name}Command")
   set(FACTORY_NAME  "itk${command_name}CommandFactory")
   
@@ -9,13 +9,13 @@ function(CreateCommandFactory command_name keyword description src_list)
     -D MY_DESCRIPTION=${description} 
     -D MY_KEYWORD=${keyword}
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CreatePTKCommand.cmake
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommand.h.in
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommandTemplate.h.in
 	    ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommandFactoryTemplate.h.in
             ${CMAKE_CURRENT_SOURCE_DIR}/itkPtkCommandFactoryTemplate.cxx.in
 	    )
 	  
-  set(${src_list}
-    ${${src_list}}
+  set(PTK_COMMAND_SRCS
+    ${PTK_COMMAND_SRCS}
     ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.cxx
     PARENT_SCOPE
     )
@@ -28,19 +28,16 @@ set(PTK_COMMAND_SRCS
   itkExtractProlateInformationCommand.cxx
   )
 
-CreatePTKCommand(TensorsToVTK
-  "itk2vtk" ""
-  PTK_COMMAND_SRCS
+CreatePtkCommand(
+  TensorsToVTK
+  "itk2vtk" "Convert a tensor image or a list of tensor images into a vtkUnstructuredGrid structure"
   )
-CreatePTKCommand(RotateProlateSpheroid
-  "rotate" ""
-  PTK_COMMAND_SRCS
+CreatePtkCommand(RotateProlateSpheroid
+  "rotate" "Rotate a Prolate Spheroid according to a vtk file describing the antero-posterior line"
   )
-CreatePTKCommand(ExtractProlateInformation
-  "extract" ""
-  PTK_COMMAND_SRCS
+CreatePtkCommand(ExtractProlateInformation
+  "extract" "Extract meaningful information in prolate spheroidal coordinates"
   )
-
 
 add_library(ptkCommands ${PTK_BUILD_TYPE}
   ${PTK_COMMAND_SRCS}
