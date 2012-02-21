@@ -1,16 +1,15 @@
-#ifndef _itk_ExtractProlateInformationCommandFactory_h_
-#define _itk_ExtractProlateInformationCommandFactory_h_
+#ifndef @HEADER_PROT@_H
+#define @HEADER_PROT@_H
 
 #include "itkObjectFactoryBase.h"
 
 namespace itk
 {
-  
-  class ExtractProlateInformationCommandFactory : public ObjectFactoryBase
+  class @COMMAND_NAME@CommandFactory : public ObjectFactoryBase
   {
     
   public:
-    typedef ExtractProlateInformationCommandFactory Self;
+    typedef @COMMAND_NAME@CommandFactory Self;
     typedef ObjectFactoryBase        Superclass;
     typedef SmartPointer<Self>       Pointer;
     typedef SmartPointer<const Self> ConstPointer;
@@ -21,24 +20,24 @@ namespace itk
     
     /** Method for class instantiation. */
     itkFactorylessNewMacro(Self);
-    static ExtractProlateInformationCommandFactory* FactoryNew() { return new ExtractProlateInformationCommandFactory;}
+    static @COMMAND_NAME@CommandFactory* FactoryNew() { return new @COMMAND_NAME@CommandFactory;}
     
     /** Run-time type information (and related methods). */
-    itkTypeMacro(ExtractProlateInformationCommandFactory, ObjectFactoryBase);
+    itkTypeMacro(@COMMAND_NAME@CommandFactory, ObjectFactoryBase);
     
     /** Register one factory of this type  */
     static void RegisterOneFactory(void)
     {
-      ExtractProlateInformationCommandFactory::Pointer CSFFactory = ExtractProlateInformationCommandFactory::New();
+      @COMMAND_NAME@CommandFactory::Pointer CSFFactory = @COMMAND_NAME@CommandFactory::New();
       ObjectFactoryBase::RegisterFactory( CSFFactory );
     }
     
   protected:
-    ExtractProlateInformationCommandFactory();
-    ~ExtractProlateInformationCommandFactory();
+    @COMMAND_NAME@CommandFactory();
+    ~@COMMAND_NAME@CommandFactory();
     
   private:
-    ExtractProlateInformationCommandFactory(const Self&);
+    @COMMAND_NAME@CommandFactory(const Self&);
     void operator=(const Self&);
     
   };

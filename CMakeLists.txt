@@ -11,16 +11,6 @@ mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_MINOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_BUILD)
 
-
-## #################################################################
-## Required dependencies
-## #################################################################
-
-find_package(ITK REQUIRED)
-find_package(VTK REQUIRED)
-find_package(TTK REQUIRED)
-
-
 ## ###################################################################
 ## Some packages options are required for this project. Check them now
 ## ###################################################################
@@ -34,8 +24,6 @@ if(NOT ITK_USE_REVIEW)
   message(SEND_ERROR "ITK_USE_REVIEW has not been set to on when compiling ITK. This option is mandatory for this project to build. Please recompile your ITK installation.")
 endif(NOT ITK_USE_REVIEW)
 
-
-
 # -----------------------------------------------------------------------------
 # Header file used to pass CMake settings to the source code
 # -----------------------------------------------------------------------------
@@ -47,26 +35,13 @@ if(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
       DESTINATION include)
 endif(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
 
+#-----------------------------------------------------------------------------
+# Add compiler flags PTK needs to work on this platform.  This must be
+# done AFTER the call to CMAKE_EXPORT_BUILD_SETTINGS.
 set(PTK_REQUIRED_C_FLAGS)
 set(PTK_REQUIRED_CXX_FLAGS)
-
-include(${ITK_USE_FILE})
-include(${VTK_USE_FILE})
-include(${TTK_USE_FILE})
-
-include_directories(
-  ${PROJECT_BINARY_DIR}
-)
-set(PTK_BUILD_TYPE
-STATIC
-)
-
-if (NOT WIN32)
-  if (ITK_BUILD_SHARED)
-    set (PTK_BUILD_TYPE SHARED)
-  endif (ITK_BUILD_SHARED)
-endif (NOT WIN32)
-
+SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   ${PTK_REQUIRED_C_FLAGS}")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PTK_REQUIRED_CXX_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # Set any extra compilation flags here
@@ -78,58 +53,45 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-#-----------------------------------------------------------------------------
-# Add compiler flags PTK needs to work on this platform.  This must be
-# done AFTER the call to CMAKE_EXPORT_BUILD_SETTINGS.
-SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   ${PTK_REQUIRED_C_FLAGS}")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PTK_REQUIRED_CXX_FLAGS}")
+include_directories(
+  ${PROJECT_BINARY_DIR}
+)
 
 
+## #################################################################
+## Required dependencies
+## #################################################################
+
+find_package(ITK REQUIRED)
+find_package(VTK REQUIRED)
+find_package(TTK REQUIRED)
+
+include(${ITK_USE_FILE})
+include(${VTK_USE_FILE})
+include(${TTK_USE_FILE})
+
+## #################################################################
+## BUILD TYPE
+## #################################################################
+
+set(PTK_BUILD_TYPE
+STATIC
+)
+
+if (NOT WIN32)
+  if (ITK_BUILD_SHARED)
+    set (PTK_BUILD_TYPE SHARED)
+  endif (ITK_BUILD_SHARED)
+endif (NOT WIN32)
 
 
-
+## #################################################################
+## Actual CMakeLists code
+## #################################################################
 
 add_subdirectory(IPF)
 add_subdirectory(Algorithms)
 add_subdirectory(Commands)
-
-
-
-add_library(ITKProgramFactory ${PTK_BUILD_TYPE}
-itkCommandObjectBase.cxx
-itkCommandObjectFactory.cxx
-)
-
-target_link_libraries(ITKProgramFactory
-${ITK_LIBRARIES}
-)
-
-
-
-
-set(PTK_COMMAND_SRCS
-  itkTensorsToVTKCommandFactory.cxx
-  itkRotateProlateSpheroidCommandFactory.cxx
-  itkExtractProlateInformationCommandFactory.cxx
-  itkTensorsToVTKCommand.cxx
-  itkRotateProlateSpheroidCommand.cxx
-  itkExtractProlateInformationCommand.cxx
-  )
-
-add_library(ptkCommands ${PTK_BUILD_TYPE}
-  ${PTK_COMMAND_SRCS}
-  )
-
-target_link_libraries(ptkCommands
-  ${ITK_LIBRARIES}
-  vtkCommon
-  vtkIO
-  ITKTensor
-  )
-
-
-
-
 
 add_executable(ptk
   ptk.cxx
@@ -141,22 +103,9 @@ target_link_libraries(ptk
   ${ITK_LIBRARIES}
   )
 
-
-
-
-
-
-
-
-
-
-if (NOT ${PROJECT_NAME}_INSTALL_NO_LIBRARIES)
-  install(TARGETS ITKProgramFactory
-  DESTINATION lib
-  COMPONENT RuntimeLibraries
-  )
-endif (NOT ${PROJECT_NAME}_INSTALL_NO_LIBRARIES)
-
+## #################################################################
+## Installation
+## #################################################################
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_RUNTIME)
   install(TARGETS ptk
@@ -164,15 +113,3 @@ if(NOT ${PROJECT_NAME}_INSTALL_NO_RUNTIME)
     RUNTIME DESTINATION bin
     )
 endif(NOT ${PROJECT_NAME}_INSTALL_NO_RUNTIME)
-
-
-
-if(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
-  file(GLOB __files1 "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-  file(GLOB __files2 "${CMAKE_CURRENT_SOURCE_DIR}/*.txx")
-  file(GLOB __files3 "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-  install(FILES ${__files1} ${__files2} ${__files3}
-    DESTINATION include
-    COMPONENT   Development
-  )
-endif(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)

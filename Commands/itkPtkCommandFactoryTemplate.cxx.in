@@ -1,0 +1,34 @@
+#include "itk@COMMAND_NAME@CommandFactory.h"
+#include "itkCreateObjectFunction.h"
+#include "itk@COMMAND_NAME@Command.h"
+#include "itkVersion.h"
+
+namespace itk
+{
+  
+  @COMMAND_NAME@CommandFactory::@COMMAND_NAME@CommandFactory()
+  {
+    this->RegisterOverride("itkCommandObjectBase",
+			   "itk@COMMAND_NAME@Command",
+			   "@DESCRIPTION@",
+			   1,
+			   CreateObjectFunction<@COMMAND_NAME@Command>::New());
+  }
+  
+  @COMMAND_NAME@CommandFactory::~@COMMAND_NAME@CommandFactory()
+  {
+  }
+  
+  const char* 
+  @COMMAND_NAME@CommandFactory::GetITKSourceVersion(void) const
+  {
+    return ITK_SOURCE_VERSION;
+  }
+  
+  const char* 
+  @COMMAND_NAME@CommandFactory::GetDescription(void) const
+  {
+    return "@DESCRIPTION@";
+  }
+  
+} // end namespace itk
