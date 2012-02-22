@@ -33,7 +33,7 @@ namespace itk
   {
     m_ShortDescription = "Crop an image to an AHA zone in the Prolate Spheroidal sense";
     m_LongDescription = m_ShortDescription;
-    m_LongDescription = "\n\nUsage:\n";
+    m_LongDescription += "\n\nUsage:\n";
     m_LongDescription +="-i    [input image]\n";
     m_LongDescription +="-f    [inverse displacement field (default : backward.mha)]\n";
     m_LongDescription +="-pr   [prolate transform used (default : prolate.pr)]\n";

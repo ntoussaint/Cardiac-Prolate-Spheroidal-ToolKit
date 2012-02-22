@@ -25,6 +25,8 @@
 #include "itkCreateProlateDomainCommandFactory.h"
 #include "itkTensorMeshStatisticsCommandFactory.h"
 #include "itkCreateProlateAtlasCommandFactory.h"
+#include "itkLimitImageToAHAZoneCommandFactory.h"
+#include "itkLimitTensorImageToAHAZoneCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 
@@ -44,6 +46,8 @@ int main (int narg, char *args[])
   itk::CreateProlateDomainCommandFactory::RegisterOneFactory();
   itk::TensorMeshStatisticsCommandFactory::RegisterOneFactory();
   itk::CreateProlateAtlasCommandFactory::RegisterOneFactory();
+  itk::LimitImageToAHAZoneCommandFactory::RegisterOneFactory();
+  itk::LimitTensorImageToAHAZoneCommandFactory::RegisterOneFactory();
   
   if (narg<2) {
     std::cout << "Software Prolate Spheroidal ToolKit (c)KCL 2012, version " << PTK_VERSION << "\n";

@@ -72,8 +72,10 @@ void CommandObjectFactory::PrintHelp(std::ostream &os, Indent indent)
     {
       std::string line;
       line += command->GetCommandName();
-      if (line.size() < 7) line += "\t";
-      line += "\t :: \t";
+      if (line.size() < 7)  line += "\t";
+      if (line.size() < 16) line += "\t";
+      
+      line += " :: \t";
       line += command->GetShortDescription();
       
       commandNames.push_back ( line );
