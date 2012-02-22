@@ -1,18 +1,17 @@
-add_library(itkNumericsAddOn ${PTK_BUILD_TYPE}
+add_library(PTKNumerics ${PTK_BUILD_TYPE}
   itkKaiserBesselKernelFunction.cxx
   )
-target_link_libraries(itkNumericsAddOn
+target_link_libraries(PTKNumerics
   ${ITK_LIBRARIES}
   )
-install(TARGETS itkNumericsAddOn DESTINATION lib/)
 
-add_library(TensorOptimization
+add_library(PTKOptimization ${PTK_BUILD_TYPE}
   itkTensorMeshImageHybridCostFunction3.cxx
   itkNewUoaOptimizer.cxx
   ) 
-target_link_libraries(TensorOptimization
+target_link_libraries(PTKOptimization
   ${ITK_LIBRARIES}
-  itkNumericsAddOn
+  PTKNumerics
   ITKTensor
   vtkIO
   )

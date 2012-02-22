@@ -18,7 +18,7 @@ mark_as_advanced(${PROJECT_NAME}_VERSION_BUILD)
 set(_ITKVersionString "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}.${ITK_VERSION_PATCH}" )
 math(EXPR _ITKVersionNum "${ITK_VERSION_MAJOR}*100*100 + ${ITK_VERSION_MINOR}*100 + ${ITK_VERSION_PATCH}")
 if( _ITKVersionNum LESS 30800 )
-  message(SEND_ERROR "The ITK version you want to use (${_ITKVersionString}) is not supported by this project. Please use a more recent version of ITK. The minimum required version is 3.8.0. The recommended version is 3.14.0.")
+  message(SEND_ERROR "The ITK version you want to use (${_ITKVersionString}) is not supported by this project. Please use a more recent version of ITK. The minimum required version is 3.8.0. The recommended version is 3.20.1.")
 endif( _ITKVersionNum LESS 30800 )
 if(NOT ITK_USE_REVIEW)
   message(SEND_ERROR "ITK_USE_REVIEW has not been set to on when compiling ITK. This option is mandatory for this project to build. Please recompile your ITK installation.")
@@ -99,7 +99,7 @@ add_executable(ptk
   )
 
 target_link_libraries(ptk
-  ptkCommands
+  PTKCommands
   ITKProgramFactory
   ${ITK_LIBRARIES}
   )

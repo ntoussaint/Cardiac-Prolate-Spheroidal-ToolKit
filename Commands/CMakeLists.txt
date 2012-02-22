@@ -65,20 +65,20 @@ CreatePtkCommand(LimitTensorImageToAHAZone
   "aha-tensors" "Crop a tensor image to an AHA zone in the Prolate Spheroidal sense"
   )
 
-add_library(ptkCommands ${PTK_BUILD_TYPE}
+add_library(PTKCommands ${PTK_BUILD_TYPE}
   ${PTK_COMMAND_SRCS}
   )
 
-target_link_libraries(ptkCommands
+target_link_libraries(PTKCommands
   ${ITK_LIBRARIES}
-  itkNumericsAddOn
+  PTKNumerics
   vtkCommon
   vtkIO
   ITKTensor
   )
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_LIBRARIES)
-  install(TARGETS ptkCommands
+  install(TARGETS PTKCommands
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

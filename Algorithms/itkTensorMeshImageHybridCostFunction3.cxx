@@ -153,7 +153,7 @@ TensorMeshImageHybridCostFunction3
   {
     if (it.GetCenterPixel().GetTrace() > 0.0)
     {
-      TensorType  L = it.GetCenterPixel(), gradient (0.0);
+      // TensorType  L = it.GetCenterPixel(), gradient (0.0);
       
       MeasureType squaredgradient = 0.0;
   
