@@ -5,6 +5,8 @@ add_library(PTKNumerics ${PTK_BUILD_TYPE}
   )
 target_link_libraries(PTKNumerics
   ${ITK_LIBRARIES}
+  ITKTensor
+  vtkIO
   )
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
