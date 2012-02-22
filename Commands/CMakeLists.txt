@@ -16,20 +16,16 @@ function(CreatePtkCommand command_name keyword description)
 	  
   set(PTK_COMMAND_SRCS
     ${PTK_COMMAND_SRCS}
+    ${COMMAND_NAME}.cxx
     ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.cxx
     PARENT_SCOPE
     )
   
 endfunction()
 
-set(PTK_COMMAND_SRCS
-  itkTensorsToVTKCommand.cxx
-  itkRotateProlateSpheroidCommand.cxx
-  itkExtractProlateInformationCommand.cxx
-  )
 
-CreatePtkCommand(
-  TensorsToVTK
+
+CreatePtkCommand(TensorsToVTK
   "itk2vtk" "Convert a tensor image or a list of tensor images into a vtkUnstructuredGrid structure"
   )
 CreatePtkCommand(RotateProlateSpheroid
@@ -38,6 +34,15 @@ CreatePtkCommand(RotateProlateSpheroid
 CreatePtkCommand(ExtractProlateInformation
   "extract" "Extract meaningful information in prolate spheroidal coordinates"
   )
+CreatePtkCommand(TensorImageToMesh
+  "image2mesh" "Converts a tensor image into a tensor mesh structure"
+  )
+CreatePtkCommand(TensorMeshToImage
+  "mesh2image" "Converts a tensor mesh structure into a tensor image"
+  )
+CreatePtkCommand(ExtrapolateTensorField
+  "extrapolate" "Tensor Field Dense Approximation from Sparse Data"
+  )
 
 add_library(ptkCommands ${PTK_BUILD_TYPE}
   ${PTK_COMMAND_SRCS}
@@ -45,6 +50,7 @@ add_library(ptkCommands ${PTK_BUILD_TYPE}
 
 target_link_libraries(ptkCommands
   ${ITK_LIBRARIES}
+  itkNumericsAddOn
   vtkCommon
   vtkIO
   ITKTensor

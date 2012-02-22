@@ -17,6 +17,9 @@
 #include "itkTensorsToVTKCommandFactory.h"
 #include "itkRotateProlateSpheroidCommandFactory.h"
 #include "itkExtractProlateInformationCommandFactory.h"
+#include "itkTensorImageToMeshCommandFactory.h"
+#include "itkTensorMeshToImageCommandFactory.h"
+#include "itkExtrapolateTensorFieldCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 
@@ -28,6 +31,9 @@ int main (int narg, char *args[])
   itk::TensorsToVTKCommandFactory::RegisterOneFactory();
   itk::RotateProlateSpheroidCommandFactory::RegisterOneFactory();
   itk::ExtractProlateInformationCommandFactory::RegisterOneFactory();
+  itk::TensorImageToMeshCommandFactory::RegisterOneFactory();
+  itk::TensorMeshToImageCommandFactory::RegisterOneFactory();
+  itk::ExtrapolateTensorFieldCommandFactory::RegisterOneFactory();
   
   if (narg<2) {
     std::cout << "Software Prolate Spheroidal ToolKit (c)KCL 2012, version " << PTK_VERSION << "\n";

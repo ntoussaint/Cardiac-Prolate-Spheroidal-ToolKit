@@ -55,6 +55,7 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 
 include_directories(
   ${PROJECT_BINARY_DIR}
+  ${PROJECT_BINARY_DIR}/Commands
 )
 
 
