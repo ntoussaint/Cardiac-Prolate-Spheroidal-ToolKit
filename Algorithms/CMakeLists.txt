@@ -1,5 +1,21 @@
+add_library(itkNumericsAddOn ${PTK_BUILD_TYPE}
+  itkKaiserBesselKernelFunction.cxx
+  )
+target_link_libraries(itkNumericsAddOn
+  ${ITK_LIBRARIES}
+  )
+install(TARGETS itkNumericsAddOn DESTINATION lib/)
 
-
+add_library(TensorOptimization
+  itkTensorMeshImageHybridCostFunction3.cxx
+  itkNewUoaOptimizer.cxx
+  ) 
+target_link_libraries(TensorOptimization
+  ${ITK_LIBRARIES}
+  itkNumericsAddOn
+  ITKTensor
+  vtkIO
+  )
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
   file(GLOB __files1 "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
