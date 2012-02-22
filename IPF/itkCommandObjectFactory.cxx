@@ -70,7 +70,13 @@ void CommandObjectFactory::PrintHelp(std::ostream &os, Indent indent)
     CommandObjectBase* command = dynamic_cast<CommandObjectBase*>(i->GetPointer());
     if(command)
     {
-      commandNames.push_back ( command->GetCommandName() );
+      std::string line;
+      line += command->GetCommandName();
+      if (line.size() < 7) line += "\t";
+      line += "\t :: \t";
+      line += command->GetShortDescription();
+      
+      commandNames.push_back ( line );
     }
   }
 
