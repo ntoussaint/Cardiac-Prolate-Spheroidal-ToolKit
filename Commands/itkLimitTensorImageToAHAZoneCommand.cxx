@@ -15,6 +15,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 ============================================================================*/
+#include <itkLimitTensorsToAHAZoneCommand.h>
 
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
@@ -27,37 +28,43 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "GetPot.h"
 
-void PrintHelp (const char* exec)
+namespace itk
 {
 
-  std::cout << exec << ": " << std::endl;
-  std::cout << "-i    [input image]" << std::endl;
-  std::cout << "-f    [inverse displacement field (default : backward.mha)]" << std::endl;
-  std::cout << "-pr   [prolate transform used (default : prolate.pr)]" << std::endl;
-  std::cout << "-z    [AHA zone to take into account (1~17) (default: 0 : ALL ZONES)]" << std::endl;
-  std::cout << "-o    [output image zone file]" << std::endl;
-  std::exit(EXIT_SUCCESS);
-}
+  LimitTensorsToAHAZoneCommand::LimitTensorsToAHAZoneCommand()
+  {
+    m_ShortDescription = "Crop a a tensor image/mesh to an AHA zone in the Prolate Spheroidal sense";
+    m_LongDescription = m_ShortDescription;
+    m_LongDescription = "\n\nUsage:\n";
+    m_LongDescription +="-i    [input tensor image/mesh]\n";
+    m_LongDescription +="-f    [inverse displacement field (default : backward.mha)]\n";
+    m_LongDescription +="-pr   [prolate transform used (default : prolate.pr)]\n";
+    m_LongDescription +="-z    [AHA zone to take into account (1~17) (default: 0 : ALL ZONES)]\n";
+    m_LongDescription +="-o    [output image zone file]\n";
+  }
 
+  LimitTensorsToAHAZoneCommand::~LimitTensorsToAHAZoneCommand()
+  {}
 
-
-int main(int narg, char* arg[])
-{
-
-  typedef double                               ScalarType;
-  typedef itk::TensorImageIO<ScalarType, 3, 3> TensorImageIOType;
-  typedef itk::TensorMeshIO<ScalarType, 3, 3>  TensorMeshIOType;
-  typedef TensorImageIOType::TensorImageType        ImageType;  
-  typedef itk::Vector<float, 3>                DisplacementType;
+  int LimitTensorsToAHAZoneCommand::Execute (int narg, const char* arg[])
+  {
+  
+    typedef double                               ScalarType;
+    typedef itk::TensorImageIO<ScalarType, 3, 3> TensorImageIOType;
+    typedef itk::TensorMeshIO<ScalarType, 3, 3>  TensorMeshIOType;
+    typedef TensorImageIOType::TensorImageType        ImageType;  
+    typedef itk::Vector<float, 3>                DisplacementType;
   typedef itk::Image<DisplacementType, 3>      DisplacementFieldType;
   typedef itk::ProlateSpheroidalTransform<ScalarType> TransformType;
   typedef itk::ImageFileReader<DisplacementFieldType> DisplacementFileReaderType;
   typedef itk::LimitToAHAZoneImageFilter<ImageType> AHALimiterType;    
 
-  GetPot   cl(narg, arg); // argument parser
-  if( cl.size() == 1 || cl.search(2, "--help", "-h") ) 
-    PrintHelp(cl[0]);
-
+    GetPot cl(narg, const_cast<char**>(arg)); // argument parser
+    if( cl.size() == 1 || cl.search(2, "--help", "-h") )
+    {
+      std::cout << std::endl << this->GetLongDescription() << std::endl;
+      return -1;
+    }
   const char*  inputfile                    = cl.follow("input.vtk",2,"-i","-I");
   const char*  prolatefile                  = cl.follow("prolate.pr",2,"-pr","-PR");
   const char*  displacementfieldfile        = cl.follow("forward.mha",2,"-f","-F");
@@ -72,7 +79,6 @@ int main(int narg, char* arg[])
   std::cout << "zone:      \t\t\t" <<zone << std::endl;
   
   std::cout << std::flush;
-  
 
   std::cout << "Reading input image: " << inputfile << std::flush;  
   TensorImageIOType::Pointer reader = TensorImageIOType::New();
@@ -149,7 +155,10 @@ int main(int narg, char* arg[])
     std::cerr << e << std::endl;
     std::exit(EXIT_FAILURE);
   }
+
+  return EXIT_SUCCESS;
   
 }
 
   
+}

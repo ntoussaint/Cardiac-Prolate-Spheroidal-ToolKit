@@ -58,6 +58,12 @@ CreatePtkCommand(TensorMeshStatistics
 CreatePtkCommand(CreateProlateAtlas
   "atlas" "Create an tensor atlas from a set of tensors in prolate coordinates"
   )
+CreatePtkCommand(LimitImageToAHAZone
+  "AHA-crop-image" "Crop an image to an AHA zone in the Prolate Spheroidal sense"
+  )
+CreatePtkCommand(LimitTensorsToAHAZone
+  "AHA-crop-tensors" "Crop a tensor image to an AHA zone in the Prolate Spheroidal sense"
+  )
 
 add_library(ptkCommands ${PTK_BUILD_TYPE}
   ${PTK_COMMAND_SRCS}

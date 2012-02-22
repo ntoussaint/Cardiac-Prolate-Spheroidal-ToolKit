@@ -87,7 +87,7 @@ MeshType::Pointer DomainToMesh (typename ImageType::Pointer image)
 }
 
 
-void UnNormalizeFirstComponent(const MeshType::Pointer in, double* range)
+void UnNormalizeFirstComponent(MeshType::Pointer in, double* range)
 {
 
   MeshType::PointsContainer::Pointer points = in->GetPoints();
@@ -118,7 +118,7 @@ namespace itk
   {
     m_ShortDescription = "Create an tensor atlas from a set of tensors in prolate coordinates ";
     m_LongDescription += m_ShortDescription;
-    m_LongDescription = "\nThe key parameter is the kernel sizes";
+    m_LongDescription += "\nThe key parameter is the kernel sizes";
     m_LongDescription += "\n\nUsage:\n";
     
     m_LongDescription += "-i    [input tensor unstructured grid (default : input.vtk)]\n";
@@ -139,13 +139,13 @@ namespace itk
   CostFunctionType::Pointer costfunction = CostFunctionType::New();
   
 
-    GetPot   cl(narg, const_cast<char**>(arg)); // argument parser
-    if( cl.size() == 1 || cl.search(2, "--help", "-h") ) 
-    {
-      std::cout << std::endl << this->GetLongDescription() << std::endl;
-      return -1;
-    }
-    
+  GetPot   cl(narg, const_cast<char**>(arg)); // argument parser
+  if( cl.size() == 1 || cl.search(2, "--help", "-h") ) 
+  {
+    std::cout << std::endl << this->GetLongDescription() << std::endl;
+    return -1;
+  }
+  
   const char*  inputfile                    = cl.follow("NoFile",2,"-i","-I");
   const char*  domainfile                    = cl.follow("NoFile",2,"-d","-D");
   const char*  prolatefile                  = cl.follow("NoFile",2,"-pr","-PR");
