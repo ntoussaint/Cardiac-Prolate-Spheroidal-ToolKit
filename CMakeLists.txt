@@ -92,6 +92,7 @@ endif (NOT WIN32)
 
 add_subdirectory(IPF)
 add_subdirectory(Algorithms)
+add_subdirectory(Numerics)
 add_subdirectory(Commands)
 
 add_executable(ptk

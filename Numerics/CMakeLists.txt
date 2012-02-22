@@ -1,3 +1,11 @@
+add_library(PTKNumerics ${PTK_BUILD_TYPE}
+  itkKaiserBesselKernelFunction.cxx
+  itkTensorMeshImageHybridCostFunction3.cxx
+  itkNewUoaOptimizer.cxx
+  )
+target_link_libraries(PTKNumerics
+  ${ITK_LIBRARIES}
+  )
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
   file(GLOB __files1 "${CMAKE_CURRENT_SOURCE_DIR}/*.h")

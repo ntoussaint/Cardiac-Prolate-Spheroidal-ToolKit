@@ -27,14 +27,18 @@
 #include "itkCreateProlateAtlasCommandFactory.h"
 #include "itkLimitImageToAHAZoneCommandFactory.h"
 #include "itkLimitTensorImageToAHAZoneCommandFactory.h"
+#include "itkApplyTransformToImageCommandFactory.h"
+#include "itkApplyTransformToTensorImageCommandFactory.h"
+#include "itkApplyTransformToMeshCommandFactory.h"
+#include "itkResampleImage3CommandFactory.h"
+#include "itkResampleTensorImage3CommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
-
 #include "ptkConfigure.h"
+#include "GetPot.h"
 
 int main (int narg, char *args[])
 {
-
   itk::TensorsToVTKCommandFactory::RegisterOneFactory();
   itk::RotateProlateSpheroidCommandFactory::RegisterOneFactory();
   itk::ExtractProlateInformationCommandFactory::RegisterOneFactory();
@@ -48,8 +52,17 @@ int main (int narg, char *args[])
   itk::CreateProlateAtlasCommandFactory::RegisterOneFactory();
   itk::LimitImageToAHAZoneCommandFactory::RegisterOneFactory();
   itk::LimitTensorImageToAHAZoneCommandFactory::RegisterOneFactory();
+  itk::ApplyTransformToImageCommandFactory::RegisterOneFactory();
+  itk::ApplyTransformToTensorImageCommandFactory::RegisterOneFactory();
+  itk::ApplyTransformToMeshCommandFactory::RegisterOneFactory();
+  itk::ResampleImage3CommandFactory::RegisterOneFactory();
+  itk::ResampleTensorImage3CommandFactory::RegisterOneFactory();
   
-  if (narg<2) {
+  
+
+  GetPot cl(narg, const_cast<char**>(args)); // argument parser
+  if( cl.size() == 1 || cl.search(2, "--help", "-h") )
+  {
     std::cout << "Software Prolate Spheroidal ToolKit (c)KCL 2012, version " << PTK_VERSION << "\n";
     std::cout << "\n";
     std::cout << "Author: Nicolas Toussaint (nicolas.toussaint@kcl.ac.uk)\n";
@@ -60,21 +73,23 @@ int main (int narg, char *args[])
     std::cout << "Available commands:\n";
     itk::CommandObjectFactory::PrintHelp( std::cout, 0 );
     std::cout << "\n\n\n";
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
   }
 
   const char *programName = args[1];
   
   itk::CommandObjectBase::Pointer prog = itk::CommandObjectFactory::CreateCommandObject( programName );
   
-  int returnValue = EXIT_SUCCESS;
+  int returnValue = EXIT_FAILURE;
   
   if( !prog.IsNull() )
   {
     returnValue = prog->Execute(narg-1, (const char**)args+1);
   }
-  else {
-    std::cout << "Command not found" << std::endl;
+  else
+  {
+    std::cout << std::endl << "\'"<< programName << "\'"<< " : invalid "<< args[0] <<" command name." << std::endl;
+    std::cout << "type ["<< args[0] <<" -h] for a list of commands" << std::endl << std::endl;
   }
   
   return returnValue;

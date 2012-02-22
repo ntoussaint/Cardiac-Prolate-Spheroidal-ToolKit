@@ -15,10 +15,7 @@
 #include <vector>
 #include <iostream>
 
-
-
 #include "GetPot.h"
-
 
 namespace itk
 {

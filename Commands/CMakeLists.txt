@@ -64,6 +64,21 @@ CreatePtkCommand(LimitImageToAHAZone
 CreatePtkCommand(LimitTensorImageToAHAZone
   "aha-tensors" "Crop a tensor image to an AHA zone in the Prolate Spheroidal sense"
   )
+CreatePtkCommand(ApplyTransformToImage
+  "apply-image" "Apply a rigid transformation to an image without resampling"
+  )
+CreatePtkCommand(ApplyTransformToTensorImage
+  "apply-tensors" "Apply a rigid transformation to tensor image without resampling"
+  )
+CreatePtkCommand(ApplyTransformToMesh
+  "apply-mesh" "Apply an affine transformation to a vtk mesh"
+  )
+CreatePtkCommand(ResampleImage3
+  "res-image" "Resample a 3D image to a reference field-of-view"
+  )
+CreatePtkCommand(ResampleTensorImage3
+  "res-tensors" "Resample a 3D tensor image to a reference field-of-view"
+  )
 
 add_library(PTKCommands ${PTK_BUILD_TYPE}
   ${PTK_COMMAND_SRCS}
