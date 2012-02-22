@@ -43,6 +43,21 @@ CreatePtkCommand(TensorMeshToImage
 CreatePtkCommand(ExtrapolateTensorField
   "extrapolate" "Tensor Field Dense Approximation from Sparse Data"
   )
+CreatePtkCommand(CreateSyntheticCardiacTensorMap
+  "synthesize" "Create a synthetic tensor map out of some cardiac LV fibre structure information"
+  )
+CreatePtkCommand(FindClosestProlateTransform
+  "find" "Find a prolate spheroid approximating an LV segmentation mesh"
+  )
+CreatePtkCommand(CreateProlateDomain
+  "domain" "Create an ellipsoidal domain image out of a prolate sph. transform"
+  )
+CreatePtkCommand(TensorMeshStatistics
+  "stats" "Compute statistics in prolate sph. coordinates over a set of tensors"
+  )
+CreatePtkCommand(CreateProlateAtlas
+  "atlas" "Create an tensor atlas from a set of tensors in prolate coordinates"
+  )
 
 add_library(ptkCommands ${PTK_BUILD_TYPE}
   ${PTK_COMMAND_SRCS}

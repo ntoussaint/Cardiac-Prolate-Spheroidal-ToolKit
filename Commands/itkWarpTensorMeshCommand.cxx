@@ -55,9 +55,9 @@ namespace itk
   WarpTensorMeshCommand::WarpTensorMeshCommand()
   {
     
-    m_ShortDescription = "\nWarp\n\n";
+    m_ShortDescription = "Warp";
     m_LongDescription = m_ShortDescription;
-    m_LongDescription += "Usage:\n";
+    m_LongDescription += "\n\nUsage:\n";
     
     m_LongDescription +="-i    [input tensor mesh (default : input.vtk)]\n";
     m_LongDescription +="-f1   [displacement field (default : forward.mha)]\n";
@@ -75,7 +75,7 @@ namespace itk
     GetPot   cl(narg, const_cast<char**>(arg)); // argument parser
     if( cl.size() == 1 || cl.search(2, "--help", "-h") ) 
     {
-      std::cout << this->GetLongDescription() << std::endl;
+      std::cout << std::endl << this->GetLongDescription() << std::endl;
       return -1;
     }
     

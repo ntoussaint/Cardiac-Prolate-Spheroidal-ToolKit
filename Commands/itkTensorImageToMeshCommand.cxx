@@ -40,9 +40,9 @@ namespace itk
 
   TensorImageToMeshCommand::TensorImageToMeshCommand()
   {
-    m_ShortDescription = "\nConverts a tensor image into a tensor mesh structure\n\n";
+    m_ShortDescription = "Converts a tensor image into a tensor mesh structure";
     m_LongDescription = m_ShortDescription;
-    m_LongDescription += "Usage:\n";
+    m_LongDescription += "\n\nUsage:\n";
     
     m_LongDescription +="-i    [input  image]\n";
     m_LongDescription +="-o    [output mesh]\n";
@@ -65,7 +65,7 @@ namespace itk
     GetPot   cl(narg, const_cast<char**>(arg)); // argument parser
     if( cl.size() == 1 || cl.search(2, "--help", "-h") ) 
     {
-      std::cout << this->GetLongDescription() << std::endl;
+      std::cout << std::endl << this->GetLongDescription() << std::endl;
       return -1;
     }
     

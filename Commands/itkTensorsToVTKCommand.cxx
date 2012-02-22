@@ -25,9 +25,9 @@ namespace itk
 
   TensorsToVTKCommand::TensorsToVTKCommand()
   {
-    m_ShortDescription = "\nConvert a tensor image (or a list of tensor images) into a vtkUnstructuredGrid structure\n\n";
+    m_ShortDescription = "Convert a tensor image (or a list of tensor images) into a vtkUnstructuredGrid structure";
     m_LongDescription = m_ShortDescription;
-    m_LongDescription = "Usage:\n";
+    m_LongDescription = "\n\nUsage:\n";
     m_LongDescription +="-i  [input tensor  image (or list of images (.list))]\n";    
     m_LongDescription +="-m  [optional mask image]\n";    
     m_LongDescription +="-o  [output tensor mesh structure (vtk format)]\n";    
@@ -42,7 +42,7 @@ namespace itk
     GetPot cl(narg, const_cast<char**>(arg)); // argument parser
     if( cl.size() == 1 || cl.search(2, "--help", "-h") )
     {
-      std::cout << this->GetLongDescription() << std::endl;
+      std::cout << std::endl << this->GetLongDescription() << std::endl;
       return -1;
     }
     

@@ -20,9 +20,9 @@ namespace itk
 
   RotateProlateSpheroidCommand::RotateProlateSpheroidCommand()
   {
-    m_ShortDescription = "Rotate a Prolate Spheroid according to a vtk file describing the antero-posterior line\n\n";
+    m_ShortDescription = "Rotate a Prolate Spheroid according to a vtk file describing the antero-posterior line";
     m_LongDescription = m_ShortDescription;
-    m_LongDescription = "Usage:\n";
+    m_LongDescription = "\n\nUsage:\n";
     m_LongDescription +="-i  [input prolate transform file]\n";    
     m_LongDescription +="-a  [input rotation axis file (points on the antero-posterior wall, vtk format)]\n";
     m_LongDescription +="-o  [output prolate transform file]\n";
@@ -37,7 +37,7 @@ namespace itk
     GetPot cl(narg, const_cast<char**>(arg)); // argument parser
     if( cl.size() == 1 || cl.search(2, "--help", "-h") )
     {
-      std::cout << this->GetLongDescription() << std::endl;
+      std::cout  << std::endl << this->GetLongDescription() << std::endl;
       return EXIT_FAILURE;
     }
 

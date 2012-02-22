@@ -20,6 +20,11 @@
 #include "itkTensorImageToMeshCommandFactory.h"
 #include "itkTensorMeshToImageCommandFactory.h"
 #include "itkExtrapolateTensorFieldCommandFactory.h"
+#include "itkCreateSyntheticCardiacTensorMapCommandFactory.h"
+#include "itkFindClosestProlateTransformCommandFactory.h"
+#include "itkCreateProlateDomainCommandFactory.h"
+#include "itkTensorMeshStatisticsCommandFactory.h"
+#include "itkCreateProlateAtlasCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 
@@ -34,6 +39,11 @@ int main (int narg, char *args[])
   itk::TensorImageToMeshCommandFactory::RegisterOneFactory();
   itk::TensorMeshToImageCommandFactory::RegisterOneFactory();
   itk::ExtrapolateTensorFieldCommandFactory::RegisterOneFactory();
+  itk::CreateSyntheticCardiacTensorMapCommandFactory::RegisterOneFactory();
+  itk::FindClosestProlateTransformCommandFactory::RegisterOneFactory();
+  itk::CreateProlateDomainCommandFactory::RegisterOneFactory();
+  itk::TensorMeshStatisticsCommandFactory::RegisterOneFactory();
+  itk::CreateProlateAtlasCommandFactory::RegisterOneFactory();
   
   if (narg<2) {
     std::cout << "Software Prolate Spheroidal ToolKit (c)KCL 2012, version " << PTK_VERSION << "\n";

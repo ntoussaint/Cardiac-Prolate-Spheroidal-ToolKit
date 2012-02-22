@@ -50,9 +50,9 @@ namespace itk
 
   ExtrapolateTensorFieldCommand::ExtrapolateTensorFieldCommand()
   {
-    m_ShortDescription = "\nTensor Field Dense Approximation from Sparse Data\n\n";
+    m_ShortDescription = "Tensor Field Dense Approximation from Sparse Data";
     m_LongDescription = m_ShortDescription;
-    m_LongDescription += "Usage:\n";
+    m_LongDescription += "\n\nUsage:\n";
     
     m_LongDescription +="-p     [use prolate spheroid (default : 0.0)]\n";
     m_LongDescription +="-i     [input tensor unstructured grid (default : input.vtk)]\n";
@@ -77,7 +77,7 @@ namespace itk
     GetPot   cl(narg, const_cast<char**>(arg)); // argument parser
     if( cl.size() == 1 || cl.search(2, "--help", "-h") ) 
     {
-      std::cout << this->GetLongDescription() << std::endl;
+      std::cout << std::endl << this->GetLongDescription() << std::endl;
       return -1;
     }
     
