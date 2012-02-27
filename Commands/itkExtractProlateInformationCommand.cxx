@@ -7,6 +7,7 @@
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
 #include <itkTensorImageToMeshFilter.h>
+#include <itkLimitToAHAZoneImageFilter.h>
 
 #include "itkWarpTensorMeshFilter.h"
 #include "itkTransformFileWriter.h"
@@ -87,12 +88,12 @@ namespace itk
     typedef itk::ImageRegionIterator<TensorImageType>                      TensorIteratorType;
     typedef itk::GradientImageFilter<ImageType>                            GradientImageFilterType;
     typedef GradientImageFilterType::OutputPixelType                       CovariantVectorType;
-    typedef itk::Vector<double, 3>                                          VectorType;
+    typedef itk::Vector<ScalarType, 3>                                          VectorType;
     typedef itk::Image<VectorType, 3>                                      VectorImageType;
     typedef itk::Image<CovariantVectorType, 3>                             GradientImageType;
     typedef itk::Matrix<ScalarType, 3, 3>                                  MatrixType;
-    typedef itk::LinearInterpolateImageFunction<ImageType, double>         InterpolatorType;
-    typedef itk::Vector<double, 3>                                         DisplacementType;
+    typedef itk::LinearInterpolateImageFunction<ImageType, ScalarType>         InterpolatorType;
+    typedef itk::Vector<ScalarType, 3>                                         DisplacementType;
     typedef itk::Image<DisplacementType, 3>                                DisplacementFieldType;
     typedef itk::ImageFileReader<DisplacementFieldType>                    DisplacementFileReaderType;
     typedef itk::ImageFileWriter<DisplacementFieldType>                    DisplacementFileWriterType;
@@ -103,8 +104,7 @@ namespace itk
     typedef TransformType::InputPointType                                  PointType;
     typedef itk::WarpTensorMeshFilter<MeshType, DisplacementFieldType>     WarperType;
     typedef itk::TensorImageToMeshFilter<TensorType, 3>                    TensorImageToMeshFilterType;
-
-
+    typedef itk::LimitToAHAZoneImageFilter<TensorImageType> AHALimiterType;
 
     // instantiation
     DisplacementFileReaderType::Pointer    displacementreader1    = DisplacementFileReaderType::New();
@@ -115,10 +115,13 @@ namespace itk
     CoordinateSwitcherType::Pointer        coordinateswitcherref  = CoordinateSwitcherType::New();
     WarperType::Pointer                    warperdata             = WarperType::New();
     WarperType::Pointer                    warperref              = WarperType::New();
-  
+
+    TensorImageType::Pointer tensorimage = 0;
+    
     // read the input tensors and put tham into a vtkUnstructuredGrid
     // they come from a text file listing all files to read, either vtk or itk...  
- 
+    
+    
     std::cout<<"reading input : "<<inputfile<<std::endl;
     std::string extension = itksys::SystemTools::GetFilenameLastExtension(inputfile).c_str();
     MeshType::Pointer Data = NULL;
@@ -134,6 +137,9 @@ namespace itk
       TensorImageIOType::Pointer reader = TensorImageIOType::New();
       reader->SetFileName(inputfile);    
       reader->Read();
+
+      tensorimage = reader->GetOutput();
+      
       TensorImageToMeshFilterType::Pointer imagetomesh = TensorImageToMeshFilterType::New();
       imagetomesh->SetInput (reader->GetOutput());
       imagetomesh->Update();
@@ -205,6 +211,24 @@ namespace itk
     warperref->SetInverseDisplacementField (displacementfield);
     warperref->Update();
 
+    AHALimiterType::Pointer zonelimiter = AHALimiterType::New();
+    zonelimiter->SetInput (tensorimage);
+    zonelimiter->SetAHASegmentationType (AHALimiterType::AHA_17_ZONES);
+    zonelimiter->SetTransform (transform);
+    zonelimiter->SetInverseDisplacementField (inversedisplacementfield);
+    zonelimiter->CanineDivisionsOn();
+    
+    try
+    {
+      zonelimiter->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+      std::cerr << e << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    
     vtkDoubleArray* positions = vtkDoubleArray::New();
     positions->SetNumberOfComponents (3);
     positions->SetNumberOfTuples (Data->GetNumberOfPoints());
@@ -271,11 +295,11 @@ namespace itk
 	mainvector = cartesiantensor.GetEigenvector (2);
 	mainvectorprolate = prolatetensor.GetEigenvector (2);
       }
-    
+      
       CartesianData->GetPoint (i, &mainpoint);
       ProlateData->GetPoint (i, &mainpointprolate);
       Data->GetPoint (i, &initialpoint);
-
+      
       mainvector.Normalize();
       mainvectorprolate.Normalize();
 
@@ -304,7 +328,7 @@ namespace itk
       // secondvector.Normalize();
       // double anisotropy  = std::acos (secondvector[0]);    
       // os << anisotropy << " " << std::endl;
-      double c1 = prolatetensor.GetCl();
+      double c1 = prolatetensor.GetFA();
       double cp = prolatetensor.GetCp();
       double cs = 1 - (c1 + cp);
       os << pos[0] << " "
@@ -313,6 +337,14 @@ namespace itk
       os << c1 << " "
 	 << cp << " "
 	 << cs << std::endl;
+#endif
+      
+#if 0
+      double zone = zonelimiter->InWhichZoneIsPoint (mainpointprolate);
+      os << pos[0] << " "
+	 << pos[1] << " "
+	 << pos[2] << " ";
+      os << zone << std::endl;
 #endif
     
       positions->SetTuple (i, pos);

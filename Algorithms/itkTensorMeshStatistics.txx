@@ -142,7 +142,7 @@ namespace itk
       m_MeshOutput->SetPoint (i, m_Limiter->GetZoneCentralPointCartesian());
       if (m_CoordinatesType == ProlateSpheroidal)
       {
-	m_AuxMesh->SetPoint (i, m_Limiter->GetZoneCentralPointProlate());	
+	m_AuxMesh->SetPoint (i, m_Limiter->GetZoneCentralPointProlate());
 	m_AuxMesh->SetPointData (i, tensor);
 	// m_MeshOutput tensor will be calculated after the loop
       }
@@ -210,14 +210,16 @@ namespace itk
   TensorMeshStatistics<TPrecision, TDimension>
   ::ComputeGradientTensor (typename MeshType::Pointer mesh)
   {
-    std::cout<<std::endl<<"gradient computation"<<std::endl;
     typedef GradientTensorImageFilter<ImageType, ScalarType> GradientFilterType;
     typedef typename GradientFilterType::OutputImageType VectorImageType;
     
     typename MeshToImageFilterType::Pointer mesh2image = MeshToImageFilterType::New();
     mesh2image->SetInput (mesh);
     
-    if (m_CoordinatesType == ProlateSpheroidal) mesh2image->SetDomain (this->CreateDomain (mesh));
+    if (m_CoordinatesType == ProlateSpheroidal)
+    {
+      mesh2image->SetDomain (this->CreateDomain (mesh));
+    }
     else mesh2image->SetDomain (this->CreateDomain (this->GetInput()));
     
     mesh2image->Update();
@@ -228,7 +230,6 @@ namespace itk
     {
       VectorType spacing = image->GetSpacing();
       ScalarType scalefactors[3] = {0,0,0};
-
       PointType p , centre; p.Fill (0.0); centre.Fill (0.0);
       for (unsigned long i=0; i<mesh->GetNumberOfPoints(); i++)
       {
@@ -382,7 +383,7 @@ namespace itk
   TensorMeshStatistics<TPrecision, TDimension>
   ::CreateDomain(typename MeshType::Pointer mesh)
   {
-    double range[3][2];    
+    double range[3][2];
     PointType p; p.Fill (0.0);
     
     for (unsigned int i=0; i<3; i++)
@@ -390,15 +391,17 @@ namespace itk
       range[i][0] =  9999;
       range[i][1] = -9999;
     }
+    
     for (unsigned long i=0; i<mesh->GetNumberOfPoints(); i++)
     {
       mesh->GetPoint (i, &p);
       
       for (unsigned int j=0; j<3; j++)
       {
-	range[j][0] = std::min (p[i], range[j][0]);
-	range[j][1] = std::max (p[i], range[j][1]);
+	range[j][0] = std::min (p[j], range[j][0]);
+	range[j][1] = std::max (p[j], range[j][1]);
       }
+      
     }
     
     VectorType spacing (0.0);
@@ -422,7 +425,7 @@ namespace itk
     image->SetRegions (region);
     image->SetSpacing (spacing);
     image->Allocate();
-    
+
     return image;
   }
 

@@ -60,7 +60,7 @@ namespace itk
     typedef Tensor<ScalarType,TDimension>          TensorType;
     typedef ProlateSpheroidalTransform<ScalarType> TransformType;
     typedef Image<TPrecision, TDimension>          ImageType;
-    typedef Vector<float, TDimension>              DisplacementType;
+    typedef Vector<ScalarType, TDimension>              DisplacementType;
     typedef Image<DisplacementType, TDimension>    DisplacementFieldType;
 
     typedef TensorImageToMeshFilter<TensorType, TDimension>       ImageToMeshFilterType;

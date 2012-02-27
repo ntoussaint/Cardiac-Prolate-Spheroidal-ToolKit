@@ -48,12 +48,12 @@ namespace itk
 
   int LimitTensorImageToAHAZoneCommand::Execute (int narg, const char* arg[])
   {
-  
+    
     typedef double                               ScalarType;
     typedef itk::TensorImageIO<ScalarType, 3, 3> TensorImageIOType;
     typedef itk::TensorMeshIO<ScalarType, 3, 3>  TensorMeshIOType;
     typedef TensorImageIOType::TensorImageType        ImageType;  
-    typedef itk::Vector<float, 3>                DisplacementType;
+    typedef itk::Vector<ScalarType, 3>                DisplacementType;
     typedef itk::Image<DisplacementType, 3>      DisplacementFieldType;
     typedef itk::ProlateSpheroidalTransform<ScalarType> TransformType;
     typedef itk::ImageFileReader<DisplacementFieldType> DisplacementFileReaderType;

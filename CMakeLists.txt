@@ -101,7 +101,7 @@ add_executable(ptk
 
 target_link_libraries(ptk
   PTKCommands
-  ITKProgramFactory
+  PTKProgramFactory
   ${ITK_LIBRARIES}
   )
 

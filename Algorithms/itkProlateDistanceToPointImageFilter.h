@@ -33,7 +33,6 @@ namespace itk
 
   public:
 
-    typedef double ScalarType;
     
     typedef ProlateDistanceToPointImageFilter Self;
     typedef ImageToImageFilter<TImage, TImage> Superclass;
@@ -43,18 +42,19 @@ namespace itk
     typedef TImage ImageType;
     typedef typename ImageType::PixelType PixelType;
     typedef typename ImageType::RegionType ImageRegionType;
+    typedef PixelType ScalarType;
 
     itkNewMacro(Self);
     itkTypeMacro(ProlateDistanceToPointImageFilter, ImageToImageFilter);
 
     itkStaticConstMacro( ImageDimension, unsigned int, ImageType::ImageDimension);
 
-    typedef Vector<float, 3>              DisplacementType;
+    typedef Vector<ScalarType, 3>              DisplacementType;
     typedef Image<DisplacementType, 3>    DisplacementFieldType;
-    typedef ProlateSpheroidalTransform<double> TransformType;
+    typedef ProlateSpheroidalTransform<ScalarType> TransformType;
     typedef typename ImageType::PointType PointType;
-    typedef Matrix<double, 3, 3> BandwidthMatrixType;
-    typedef CovariantVector<double, 3> CovariantVectorType;
+    typedef Matrix<ScalarType, 3, 3> BandwidthMatrixType;
+    typedef CovariantVector<ScalarType, 3> CovariantVectorType;
     typedef LinearInterpolateImageFunction<DisplacementFieldType, ScalarType> InterpolatorType;
     typedef ContinuousIndex< ScalarType, ImageDimension > ContinuousIndexType;
     
@@ -63,13 +63,13 @@ namespace itk
     itkGetMacro (Point, PointType);
     
     
-    void SetInverseDisplacementField (DisplacementFieldType::Pointer field)
+    void SetInverseDisplacementField (typename DisplacementFieldType::Pointer field)
     {
       m_InverseDisplacementField  = field;
       this->Modified();
     }
     
-    void SetTransform (TransformType::Pointer forward)
+    void SetTransform (typename TransformType::Pointer forward)
     {
       m_Transform = forward;
       this->Modified();

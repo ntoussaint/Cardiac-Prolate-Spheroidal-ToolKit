@@ -102,7 +102,7 @@ public:
   typedef TensorMeshType::PointIdentifier                                 PointIdentifier;
   
   typedef GaussianInterpolationTensorMeshFilter<TensorMeshType>           InterpolatorType;
-  typedef Vector<float, 3>                                                VectorType;
+  typedef Vector<ScalarType, 3>                                                VectorType;
   typedef VectorType                                                      DisplacementType;
   typedef Image<DisplacementType, 3>                                      DisplacementFieldType;
   typedef WarpTensorMeshFilter<TensorMeshType, DisplacementFieldType>     WarperType;

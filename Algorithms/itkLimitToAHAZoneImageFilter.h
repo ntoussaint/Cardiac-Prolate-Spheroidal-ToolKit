@@ -130,6 +130,10 @@ namespace itk
 
   public:
 
+    typedef TImage ImageType;
+    typedef typename ImageType::PixelType PixelType;
+    typedef typename ImageType::RegionType ImageRegionType;
+
     typedef double ScalarType;
     
     typedef LimitToAHAZoneImageFilter Self;
@@ -137,16 +141,12 @@ namespace itk
     typedef SmartPointer<Self> Pointer;
     typedef SmartPointer<const Self> ConstPointer;
 
-    typedef TImage ImageType;
-    typedef typename ImageType::PixelType PixelType;
-    typedef typename ImageType::RegionType ImageRegionType;
-
     itkNewMacro(Self);
     itkTypeMacro(LimitToAHAZoneImageFilter, ImageToImageFilter);
 
     itkStaticConstMacro( ImageDimension, unsigned int, ImageType::ImageDimension);
 
-    typedef Vector<float, 3>              DisplacementType;
+    typedef Vector<ScalarType, 3>              DisplacementType;
     typedef Image<DisplacementType, 3>    DisplacementFieldType;
     typedef ProlateSpheroidalTransform<ScalarType> TransformType;
     typedef typename ImageType::PointType PointType;

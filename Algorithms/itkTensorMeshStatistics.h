@@ -60,7 +60,7 @@ namespace itk
     typedef ProlateSpheroidalTransform<ScalarType> TransformType;
     typedef Image<TensorType, TDimension>          InputImageType;
     typedef Image<TPrecision, TDimension>          OutputImageType;
-    typedef Vector<float, TDimension>              DisplacementType;
+    typedef Vector<ScalarType, TDimension>              DisplacementType;
     typedef Image<DisplacementType, TDimension>    DisplacementFieldType;
 
     typedef LimitToAHAZoneImageFilter<InputImageType>             AHALimiterType;

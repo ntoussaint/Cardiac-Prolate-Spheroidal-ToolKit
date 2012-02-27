@@ -1,14 +1,14 @@
-add_library(ITKProgramFactory ${PTK_BUILD_TYPE}
+add_library(PTKProgramFactory ${PTK_BUILD_TYPE}
 itkCommandObjectBase.cxx
 itkCommandObjectFactory.cxx
 )
 
-target_link_libraries(ITKProgramFactory
+target_link_libraries(PTKProgramFactory
 ${ITK_LIBRARIES}
 )
 
 if (NOT ${PROJECT_NAME}_INSTALL_NO_LIBRARIES)
-  install(TARGETS ITKProgramFactory
+  install(TARGETS PTKProgramFactory
   DESTINATION lib
   COMPONENT RuntimeLibraries
   )

@@ -46,9 +46,10 @@ namespace itk
 
   int LimitImageToAHAZoneCommand::Execute (int narg, const char* arg[])
   {
-  
-    typedef itk::Image<double,3>      ImageType;
-    typedef itk::Vector<float, 3>              DisplacementType;
+
+    typedef double ScalarType;
+    typedef itk::Image<ScalarType,3>      ImageType;
+    typedef itk::Vector<ScalarType, 3>              DisplacementType;
     typedef itk::Image<DisplacementType, 3>    DisplacementFieldType;
     typedef itk::ProlateSpheroidalTransform<double> TransformType;
 

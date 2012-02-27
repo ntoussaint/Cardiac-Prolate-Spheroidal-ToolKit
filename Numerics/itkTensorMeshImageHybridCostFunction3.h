@@ -54,7 +54,7 @@ public:
   typedef double                                 ScalarType;
   typedef ProlateSpheroidalTransform<ScalarType> TransformType;
   typedef Tensor<ScalarType, 3>                  TensorType;
-  typedef Vector<float, 3>                       VectorType;
+  typedef Vector<ScalarType, 3>                       VectorType;
   typedef Image <VectorType, 3>                  DisplacementFieldType;
   typedef TensorImageToMeshFilter<TensorType, 3> ImageToMeshType;
   typedef TensorMeshToImageFilter<TensorType, 3> MeshToImageType;
