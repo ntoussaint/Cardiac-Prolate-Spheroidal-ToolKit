@@ -24,7 +24,7 @@ namespace itk
   {
     m_ShortDescription = "Convert a tensor image (or a list of tensor images) into a vtkUnstructuredGrid structure";
     m_LongDescription = m_ShortDescription;
-    m_LongDescription = "\n\nUsage:\n";
+    m_LongDescription += "\n\nUsage:\n";
     m_LongDescription +="-i  [input tensor  image (or list of images (.list))]\n";    
     m_LongDescription +="-m  [optional mask image]\n";    
     m_LongDescription +="-o  [output tensor mesh structure (vtk format)]\n";    

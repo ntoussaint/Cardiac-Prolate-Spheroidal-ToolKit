@@ -32,6 +32,7 @@
 #include "itkApplyTransformToMeshCommandFactory.h"
 #include "itkResampleImage3CommandFactory.h"
 #include "itkResampleTensorImage3CommandFactory.h"
+#include "itkColorFibresWithProlateAngleCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 #include "ptkConfigure.h"
@@ -57,7 +58,7 @@ int main (int narg, char *args[])
   itk::ApplyTransformToMeshCommandFactory::RegisterOneFactory();
   itk::ResampleImage3CommandFactory::RegisterOneFactory();
   itk::ResampleTensorImage3CommandFactory::RegisterOneFactory();
-  
+  itk::ColorFibresWithProlateAngleCommandFactory::RegisterOneFactory();
   
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser

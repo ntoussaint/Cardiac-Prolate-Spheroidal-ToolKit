@@ -46,7 +46,16 @@ namespace itk
     m_LongDescription +="-f1   [forward displacement field (default : forward.mha)]\n";
     m_LongDescription +="-f2   [backward displacement field (default : backward.mha)]\n";
     m_LongDescription +="-o    [output csv file where cost function values are stored (default: output.csv)]\n";
-    m_LongDescription +="-s    [sheet-angle distribution instead of elevation (default 0)]\n";
+    
+    m_LongDescription +="-t    [type of the output (default: helix)]\n";
+    m_LongDescription +="available types:\n";
+    m_LongDescription +="\t helix [helix angle] \n";
+    m_LongDescription +="\t transverse [transverse angle] \n";
+    m_LongDescription +="\t fa [Fractional Anisotropy]\n";
+    m_LongDescription +="\t cl-cp-cs [Linear / Planar and Spherical coefficients]\n";
+    m_LongDescription +="\t sheet [sheet angle]\n";
+    m_LongDescription +="\t error [position error accumulation]\n";
+    m_LongDescription +="\t zone [AHA zone of point]\n";
   }
 
   ExtractProlateInformationCommand::~ExtractProlateInformationCommand()
@@ -71,8 +80,49 @@ namespace itk
     const char* displacementfieldfile        = cl.follow("forward.mha",2,"-f1","-F1");
     const char* inversedisplacementfieldfile = cl.follow("backward.mha",2,"-f2","-F2");
     const char* outputfile                   = cl.follow("output.csv",2,"-o","-O");
-    const bool  sheetangle                   = cl.follow(false,2,"-s","-S");
-  
+    const char* typestring                   = cl.follow("helix",2,"-t","-T");
+
+    unsigned int type = 0;
+
+    if      (std::strcmp (typestring,"helix") == 0 )      type = 0;
+    else if (std::strcmp (typestring,"transverse") == 0 ) type = 1;
+    else if (std::strcmp (typestring,"fa") == 0 )         type = 2;
+    else if (std::strcmp (typestring,"cl-cp-cs") == 0 )   type = 3;
+    else if (std::strcmp (typestring,"sheet") == 0 )      type = 4;
+    else if (std::strcmp (typestring,"error") == 0 )      type = 5;
+    else if (std::strcmp (typestring,"zone") == 0 )       type = 6;
+
+    
+    std::cout<<"computing the extraction of ";
+    switch(type)
+    {
+	case 0:
+	default:
+	  std::cout<<"helix angle";
+	  break;
+	case 1:
+	  std::cout<<"transverse angle";
+	  break;
+	case 2:
+	  std::cout<<"fractional anisotropy";
+	  break;
+	case 3:
+	  std::cout<<"linear/planar/spherical coefficients";
+	  break;
+	case 4:
+	  std::cout<<"sheet angle";
+	  break;
+	case 5:
+	  std::cout<<"position error accumulation";
+	  break;
+	case 6:
+	  std::cout<<"AHA zone";
+	  break;
+    }
+
+    std::cout<<"..."<<std::endl;
+    
+    
     // typedefs
     typedef double                                                         ScalarType;
     typedef itk::TensorImageIO<ScalarType, 3, 3>                           TensorImageIOType;
@@ -260,15 +310,11 @@ namespace itk
     ventriclepoints->SetNumberOfPoints (Data->GetNumberOfPoints());
 
     PointType pt; pt[0] = pt[1] = pt[2] = 0.0;
-    double pos[3] = {0,0,0};
-    double err[3] = {0,0,0};  
-    double proj[3] = {0,0,0};
-    double vec[3] = {0,0,0};
   
     std::cout << "Writing csv file in : " << outputfile << std::endl;
     unsigned long numberofpoints = Data->GetNumberOfPoints();
-    VectorType mainvector;
-    VectorType mainvectorprolate;
+    VectorType mainvector, lastvector, error;
+    VectorType mainvectorprolate, lastvectorprolate;
     PointType mainpoint; mainpoint[0] = mainpoint[1] = mainpoint[2] = 0.0;
     PointType mainpointprolate; mainpointprolate[0] = mainpointprolate[1] = mainpointprolate[2] = 0.0;
     PointType initialpoint; initialpoint[0] = initialpoint[1] = initialpoint[2] = 0.0;
@@ -276,100 +322,86 @@ namespace itk
     std::cout<<"how many points are we dealing with ?? "<<numberofpoints<<std::endl;
     MeshType::Pointer ProlateData   = coordinateswitcherdata->GetOutput();
     MeshType::Pointer CartesianData = warperref->GetOutput();
-  
+    
     TensorType prolatetensor (0.0);
     TensorType cartesiantensor (0.0);
-  
+
+    double helix=0, sheet=0, transverse=0, fa=0;
+    unsigned int zone=0;
+    
     for (unsigned long i=0; i<numberofpoints; i++)
     {
-      ProlateData->GetPointData (i, &prolatetensor);
       CartesianData->GetPointData (i, &cartesiantensor);
-
-      if (sheetangle)
-      {
-	mainvector = cartesiantensor.GetEigenvector (0);
-	mainvectorprolate = prolatetensor.GetEigenvector (0);
-      }
-      else
-      {  
-	mainvector = cartesiantensor.GetEigenvector (2);
-	mainvectorprolate = prolatetensor.GetEigenvector (2);
-      }
-      
       CartesianData->GetPoint (i, &mainpoint);
+      ProlateData->GetPointData (i, &prolatetensor);
       ProlateData->GetPoint (i, &mainpointprolate);
+      
+      mainvector = cartesiantensor.GetEigenvector (2);
+      mainvectorprolate = prolatetensor.GetEigenvector (2);
+      lastvector = cartesiantensor.GetEigenvector (0);
+      lastvectorprolate = prolatetensor.GetEigenvector (0);
+
       Data->GetPoint (i, &initialpoint);
       
       mainvector.Normalize();
       mainvectorprolate.Normalize();
-
-    
-      for (unsigned int j=0; j<3; j++)
-      {
-	pos[j] = mainpointprolate[j];
-	vec[j] = mainvector[j];
-	err[j] = mainpoint[j] - initialpoint[j];      
-	// @warning The eigenvectors are assumed to be normalized.
-	proj[j] = mainvectorprolate[j];
-      }
-    
-#if 0
-      os << pos[0] << " "
-	 << pos[1] << " "
-	 << pos[2] << " "
-	 << proj[0] << " "
-	 << proj[1] << " "
-	 << proj[2] << " "
-	 << std::endl;
-#endif
-    
-#if 1
-      // VectorType secondvector = prolatetensor.GetEigenvector (1);
-      // secondvector.Normalize();
-      // double anisotropy  = std::acos (secondvector[0]);    
-      // os << anisotropy << " " << std::endl;
-      double c1 = prolatetensor.GetFA();
-      double cp = prolatetensor.GetCp();
-      double cs = 1 - (c1 + cp);
-      os << pos[0] << " "
-	 << pos[1] << " "
-	 << pos[2] << " ";
-      os << c1 << " "
-	 << cp << " "
-	 << cs << std::endl;
-#endif
+      lastvector.Normalize();
+      lastvectorprolate.Normalize();
       
-#if 0
-      double zone = zonelimiter->InWhichZoneIsPoint (mainpointprolate);
-      os << pos[0] << " "
-	 << pos[1] << " "
-	 << pos[2] << " ";
-      os << zone << std::endl;
-#endif
-    
-      positions->SetTuple (i, pos);
-      projections->SetTuple (i, proj);
-      mainvectors->SetTuple (i, vec);
-      positionerrors->SetTuple (i,err);
+      os << mainpointprolate[0] << " "
+	 << mainpointprolate[1] << " "
+	 << mainpointprolate[2] << " ";
+      
+      switch (type)
+      {
+	  case 0:
+	  default:
+	    helix = mainvectorprolate[1];
+	    if (mainvectorprolate[2] < 0) helix = -helix;
+	    helix = std::asin(helix) * 180.0 / vnl_math::pi;
+	    os << helix;
+	    break;
+	  case 1:
+	    transverse = mainvectorprolate[0];
+	    if (mainvectorprolate[2] < 0) transverse = -transverse;
+	    transverse = std::asin(transverse) * 180.0 / vnl_math::pi;
+	    os << transverse;
+	    break;
+	  case 2:
+	    fa = prolatetensor.GetFA();
+	    os << fa;
+	    break;
+	  case 3:
+	    os << prolatetensor.GetCl() << " ";
+	    os << prolatetensor.GetCp() << " ";
+	    os << prolatetensor.GetCs();
+	    break;
+	  case 4:
+	    sheet = lastvectorprolate[0];
+	    sheet = std::asin(sheet) * 180.0 / vnl_math::pi;
+	    os << sheet;
+	    break;
+	  case 5:
+	    error = mainpoint - initialpoint;
+	    os << error.GetNorm();
+	    break;
+	  case 6:
+	    zone = zonelimiter->InWhichZoneIsPoint (mainpoint);
+	    os << zone;
+	    break;
+      }
+      
+      os << std::endl;
+      
+      positions->SetTuple (i, mainpointprolate.GetDataPointer());
+      projections->SetTuple (i, mainvectorprolate.GetDataPointer());
+      mainvectors->SetTuple (i, mainvector.GetDataPointer());
+      positionerrors->SetTuple (i,error.GetDataPointer());
       coordinateswitcherref->GetOutput()->GetPoint (i, &pt);
       ellipsoidpoints->SetPoint (i, pt[0], pt[1], pt[2]);
       pt = mainpoint;
       ventriclepoints->SetPoint (i, pt[0], pt[1], pt[2]);
-
-      double angle = proj[0];
-      if (sheetangle)
-      {
-	if (proj[1])
-	  angle = -angle;
-      }
-      else
-      {  
-	if (proj[2])
-	  angle = -angle;
-      }
-      angle = std::asin(angle) * 180.0 / vnl_math::pi;
-      helixarray->SetTuple1 (i, angle);
-    
+      helixarray->SetTuple1 (i, helix);
     }
 
 
@@ -394,18 +426,18 @@ namespace itk
     projections->Delete();
     mainvectors->Delete();
   
-    vtkDataSetWriter* writer = vtkDataSetWriter::New();
-    writer->SetInput (outputgrid);
-    writer->SetFileName ("ellipsoiddada.vtk");
-    writer->SetFileTypeToBinary();
-    writer->Update();
+    // vtkDataSetWriter* writer = vtkDataSetWriter::New();
+    // writer->SetInput (outputgrid);
+    // writer->SetFileName ("ellipsoiddada.vtk");
+    // writer->SetFileTypeToBinary();
+    // writer->Update();
 
-    outputgrid->SetPoints (ventriclepoints);
-    writer->SetInput (outputgrid);
-    writer->SetFileName ("ventricledata.vtk");
-    writer->SetFileTypeToBinary();
-    writer->Update();
-    writer->Delete();
+    // outputgrid->SetPoints (ventriclepoints);
+    // writer->SetInput (outputgrid);
+    // writer->SetFileName ("ventricledata.vtk");
+    // writer->SetFileTypeToBinary();
+    // writer->Update();
+    // writer->Delete();
 
     outputgrid->Delete();
     ellipsoidpoints->Delete();

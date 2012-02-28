@@ -79,6 +79,9 @@ CreatePtkCommand(ResampleImage3
 CreatePtkCommand(ResampleTensorImage3
   "res-tensors" "Resample a 3D tensor image to a reference field-of-view"
   )
+CreatePtkCommand(ColorFibresWithProlateAngle
+  "colorify" "Colorify a fibre field with Prolate angular information"
+  )
 
 add_library(PTKCommands ${PTK_BUILD_TYPE}
   ${PTK_COMMAND_SRCS}
