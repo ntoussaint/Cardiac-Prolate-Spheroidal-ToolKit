@@ -56,6 +56,8 @@ namespace itk
     m_LongDescription +="\t sheet [sheet angle]\n";
     m_LongDescription +="\t error [position error accumulation]\n";
     m_LongDescription +="\t zone [AHA zone of point]\n";
+    m_LongDescription +="\t deltaangle [absolute angular error accumulation] \n";
+    
   }
 
   ExtractProlateInformationCommand::~ExtractProlateInformationCommand()
@@ -91,6 +93,7 @@ namespace itk
     else if (std::strcmp (typestring,"sheet") == 0 )      type = 4;
     else if (std::strcmp (typestring,"error") == 0 )      type = 5;
     else if (std::strcmp (typestring,"zone") == 0 )       type = 6;
+    else if (std::strcmp (typestring,"deltaangle") == 0 ) type = 7;
 
     
     std::cout<<"computing the extraction of ";
@@ -117,6 +120,9 @@ namespace itk
 	  break;
 	case 6:
 	  std::cout<<"AHA zone";
+	  break;
+	case 7:
+	  std::cout<<"angular error";
 	  break;
     }
 
@@ -313,7 +319,7 @@ namespace itk
   
     std::cout << "Writing csv file in : " << outputfile << std::endl;
     unsigned long numberofpoints = Data->GetNumberOfPoints();
-    VectorType mainvector, lastvector, error;
+    VectorType mainvector, lastvector, error, initialvector;
     VectorType mainvectorprolate, lastvectorprolate;
     PointType mainpoint; mainpoint[0] = mainpoint[1] = mainpoint[2] = 0.0;
     PointType mainpointprolate; mainpointprolate[0] = mainpointprolate[1] = mainpointprolate[2] = 0.0;
@@ -325,8 +331,9 @@ namespace itk
     
     TensorType prolatetensor (0.0);
     TensorType cartesiantensor (0.0);
+    TensorType initialtensor (0.0);
 
-    double helix=0, sheet=0, transverse=0, fa=0;
+    double helix=0, sheet=0, transverse=0, fa=0, deltav = 0;
     unsigned int zone=0;
     
     for (unsigned long i=0; i<numberofpoints; i++)
@@ -335,18 +342,20 @@ namespace itk
       CartesianData->GetPoint (i, &mainpoint);
       ProlateData->GetPointData (i, &prolatetensor);
       ProlateData->GetPoint (i, &mainpointprolate);
+      Data->GetPoint (i, &initialpoint);
+      Data->GetPointData (i, &initialtensor);
       
       mainvector = cartesiantensor.GetEigenvector (2);
       mainvectorprolate = prolatetensor.GetEigenvector (2);
       lastvector = cartesiantensor.GetEigenvector (0);
       lastvectorprolate = prolatetensor.GetEigenvector (0);
-
-      Data->GetPoint (i, &initialpoint);
+      initialvector = initialtensor.GetEigenvector (2);
       
       mainvector.Normalize();
       mainvectorprolate.Normalize();
       lastvector.Normalize();
       lastvectorprolate.Normalize();
+      initialvector.Normalize();
       
       os << mainpointprolate[0] << " "
 	 << mainpointprolate[1] << " "
@@ -389,6 +398,10 @@ namespace itk
 	    zone = zonelimiter->InWhichZoneIsPoint (mainpoint);
 	    os << zone;
 	    break;
+	  case 7:
+	    deltav = std::abs (mainvector * initialvector);
+	    os << std::acos (deltav) * 180 / vnl_math::pi;
+	    break;
       }
       
       os << std::endl;
@@ -403,7 +416,6 @@ namespace itk
       ventriclepoints->SetPoint (i, pt[0], pt[1], pt[2]);
       helixarray->SetTuple1 (i, helix);
     }
-
 
     std::ofstream buffer (outputfile, ios::out);
     buffer << os.str().c_str();
