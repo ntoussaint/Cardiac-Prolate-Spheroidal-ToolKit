@@ -412,10 +412,6 @@ namespace itk
 	    case 2:
 	      fa = prolatetensor.GetFA();
 	      information = fa;
-	      std::cout<<"tensor : "<<prolatetensor<<std::endl;
-	      std::cout<<"got fa of : "<<fa<<std::endl;
-	      getchar();
-	      
 	      break;
 	    case 3:
 	      information = prolatetensor.GetCl();
