@@ -18,6 +18,8 @@
 #include "itkColorFibresWithProlateAngleCommand.h"
 
 #include "itkTensorImageIO.h"
+#include "itkTensorMeshIO.h"
+
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
 
@@ -94,43 +96,43 @@ void CalculateVectorFromAngleHSV (double angle, double* range, double* anglevect
 
 void CalculateVectorFromAngleJet (double angle, double* range, double* anglevector)
 {
-  angle = (angle - range[0])/(range[1] - range[0]);
+  double myangle = (angle - range[0])/(range[1] - range[0]);
 
-  angle = std::max (0.0, angle);
-  angle = std::min (1.0, angle);
+  myangle = std::max (0.0, myangle);
+  myangle = std::min (1.0, myangle);
   //fix me !
   // we wanna use the inverse of the jet colorbar
-  //angle = 1.0 - angle;
+  myangle = 1.0 - myangle;
   
-  if (angle >= 0 && angle < 0.125)
+  if (myangle >= 0 && myangle < 0.125)
   {
-    anglevector[0] = 0.5 + (angle - 0.0) / 0.25;
+    anglevector[0] = 0.5 + (myangle - 0.0) / 0.25;
     anglevector[1] = 0;
     anglevector[2] = 0;
   }
-  else if (angle >= 0.125 && angle < 0.375)
+  else if (myangle >= 0.125 && myangle < 0.375)
   {
     anglevector[0] = 1;
-    anglevector[1] = 0.0 + (angle - 0.125) / 0.25;
+    anglevector[1] = 0.0 + (myangle - 0.125) / 0.25;
     anglevector[2] = 0;
   }
-  else if (angle >= 0.375 && angle < 0.625)
+  else if (myangle >= 0.375 && myangle < 0.625)
   {
-    anglevector[0] = 1.0 - (angle - 0.375) / 0.25;
+    anglevector[0] = 1.0 - (myangle - 0.375) / 0.25;
     anglevector[1] = 1;
-    anglevector[2] = 0.0 + (angle - 0.375) / 0.25;
+    anglevector[2] = 0.0 + (myangle - 0.375) / 0.25;
   }
-  else if (angle >= 0.625 && angle < 0.875)
+  else if (myangle >= 0.625 && myangle < 0.875)
   {
     anglevector[0] = 0;
-    anglevector[1] = 1.0 - (angle - 0.625) / 0.25;
+    anglevector[1] = 1.0 - (myangle - 0.625) / 0.25;
     anglevector[2] = 1;
   }
-  else if (angle >= 0.875 && angle <= 1.0)
+  else if (myangle >= 0.875 && myangle <= 1.0)
   {
     anglevector[0] = 0;
     anglevector[1] = 0;
-    anglevector[2] = 1.0 - (angle - 0.875) / 0.25;
+    anglevector[2] = 1.0 - (myangle - 0.875) / 0.25;
   }
 }
 
@@ -143,7 +145,7 @@ namespace itk
     m_LongDescription = m_ShortDescription;
     m_LongDescription += "\n\nUsage:\n";
     m_LongDescription +="-i  [input fibre field]\n";
-    m_LongDescription +="-t  [prolate transform]\n";
+    m_LongDescription +="-pr  [prolate transform]\n";
     m_LongDescription +="-f1 [forward displacement field]\n";
     m_LongDescription +="-f2 [forward displacement field]\n";    
     m_LongDescription +="-g  [global color (default: 0)]\n";    
@@ -157,6 +159,9 @@ namespace itk
     m_LongDescription +="\t fa [Fractional Anisotropy]\n";
     m_LongDescription +="\t cl-cp-cs [Linear / Planar and Spherical coefficients]\n";
     m_LongDescription +="\t sheet [sheet angle]\n";
+    m_LongDescription +="\t xi1 [xi1 coordinate]\n";
+    m_LongDescription +="\t xi2 [xi2 coordinate]\n";
+    m_LongDescription +="\t xi3 [xi3 coordinate]\n";
     
   }
 
@@ -191,7 +196,7 @@ namespace itk
     std::cout << "displacementfieldfile: " << displacementfieldfile << std::endl;
     std::cout << "inversedisplacementfieldfile: " << inversedisplacementfieldfile << std::endl;
     std::cout << "output: " << outputfile << std::endl;
-    std::cout << "range: [" << rangemin <<":"<<rangemax<< std::endl;
+    std::cout << "range: [" << rangemin << ":" << rangemax << "]" << std::endl;
   
     std::cout << std::flush;  
 
@@ -201,6 +206,9 @@ namespace itk
     else if (std::strcmp (typestring,"fa") == 0 )         type = 2;
     else if (std::strcmp (typestring,"cl-cp-cs") == 0 )   type = 3;
     else if (std::strcmp (typestring,"sheet") == 0 )      type = 4;
+    else if (std::strcmp (typestring,"xi1") == 0 )        type = 5;
+    else if (std::strcmp (typestring,"xi2") == 0 )        type = 6;
+    else if (std::strcmp (typestring,"xi3") == 0 )        type = 7;
     
     std::cout<<"computing the color-coding of ";
     switch(type)
@@ -221,6 +229,15 @@ namespace itk
 	case 4:
 	  std::cout<<"sheet angle";
 	  break;
+	case 5:
+	  std::cout<<"xi1 coordinate";
+	  break;
+	case 6:
+	  std::cout<<"xi2 coordinate";
+	  break;
+	case 7:
+	  std::cout<<"xi3 coordinate";
+	  break;
     }
 
     std::cout<<"..."<<std::endl;
@@ -229,6 +246,7 @@ namespace itk
     typedef double                                                         ScalarType;
     typedef itk::TensorImageIO<ScalarType, 3, 3>                           TensorIOType;
     typedef TensorIOType::TensorImageType                                  TensorImageType;
+    typedef itk::TensorMeshIO<ScalarType, 3, 3>                            TensorMeshIOType;
     typedef itk::Image<ScalarType,3>                                       ImageType;
     typedef TensorImageType::PixelType                                     TensorType;
     typedef itk::ImageFileReader<ImageType>                                ImageFileReaderType;
@@ -238,83 +256,43 @@ namespace itk
     typedef itk::ImageRegionIterator<TensorImageType>                      TensorIteratorType;
     typedef itk::GradientImageFilter<ImageType>                            GradientImageFilterType;
     typedef GradientImageFilterType::OutputPixelType                       CovariantVectorType;
-    typedef itk::Vector<double, 3>                                          VectorType;
+    typedef itk::Vector<ScalarType, 3>                                          VectorType;
     typedef itk::Image<VectorType, 3>                                      VectorImageType;
     typedef itk::Image<CovariantVectorType, 3>                             GradientImageType;
     typedef itk::Matrix<ScalarType, 3, 3>                                  MatrixType;
-    typedef itk::LinearInterpolateImageFunction<ImageType, double>         InterpolatorType;
-    typedef itk::Vector<double, 3>                                         DisplacementType;
+    typedef itk::LinearInterpolateImageFunction<ImageType, ScalarType>         InterpolatorType;
+    typedef itk::Vector<ScalarType, 3>                                         DisplacementType;
     typedef itk::Image<DisplacementType, 3>                                DisplacementFieldType;
     typedef itk::ImageFileReader<DisplacementFieldType>                    DisplacementFileReaderType;
     typedef itk::ImageFileWriter<DisplacementFieldType>                    DisplacementFileWriterType;
 
-    typedef itk::DefaultStaticMeshTraits<TensorType, 3, 3, double, double, TensorType> MeshTraits;
+    typedef itk::DefaultStaticMeshTraits<TensorType, 3, 3, ScalarType, ScalarType, TensorType> MeshTraits;
     typedef itk::Mesh<TensorType, 3, MeshTraits>                                       MeshType;
-    typedef itk::ProlateSpheroidalTransformTensorMeshFilter<MeshType>                        CoordinateSwitcherType;
+    typedef itk::ProlateSpheroidalTransformTensorMeshFilter<MeshType>                        TransformerType;
     typedef itk::ProlateSpheroidalTransform<ScalarType>                                            TransformType;
     typedef TransformType::InputPointType                                              PointType;
     typedef itk::WarpTensorMeshFilter<MeshType, DisplacementFieldType>     WarperType;
-
   
     // instantiation
     DisplacementFileReaderType::Pointer    displacementreader1    = DisplacementFileReaderType::New();
     DisplacementFileReaderType::Pointer    displacementreader2    = DisplacementFileReaderType::New();
     DisplacementFileWriterType::Pointer    displacementwriter     = DisplacementFileWriterType::New();
     TransformType::Pointer                 transform              = TransformType::New();
-    CoordinateSwitcherType::Pointer        coordinateswitcherdata = CoordinateSwitcherType::New();
-    CoordinateSwitcherType::Pointer        coordinateswitcherref  = CoordinateSwitcherType::New();
-    WarperType::Pointer                    warperdata             = WarperType::New();
-    WarperType::Pointer                    warperref              = WarperType::New();
+    TransformerType::Pointer               transformer            = TransformerType::New();
+    WarperType::Pointer                    warper                 = WarperType::New();
   
     // read the input tensors and put tham into a vtkUnstructuredGrid
-    // they come from a text file listing all files to read, either vtk or itk...  
- 
-    std::cout<<"reading input : "<<inputfile<<std::endl;
-    MeshType::Pointer Data = MeshType::New();
-    MeshType::PointsContainer::Pointer DataPoints = MeshType::PointsContainer::New();
-    MeshType::PointDataContainer::Pointer  DataPixels = MeshType::PointDataContainer::New();  
-
-    vtkDataSetReader* reader = vtkDataSetReader::New();
+    // they come from a text file listing all files to read, either vtk or itk...
+    
+    std::cout << "Reading input fibres (with tensors): " << inputfile << std::endl;
+    TensorMeshIOType::Pointer reader = TensorMeshIOType::New();
     reader->SetFileName (inputfile);
-    reader->Update();
-    vtkPolyData* input = vtkPolyData::SafeDownCast (reader->GetOutput());
-  
-    unsigned long NumberOfDataPoints = input->GetPoints()->GetNumberOfPoints();
-    DataPoints->Reserve (NumberOfDataPoints);
-    DataPixels->Reserve (NumberOfDataPoints);
-    
-    Data->SetPoints (DataPoints);
-    Data->SetPointData (DataPixels);
-    unsigned long counter = 0;
-    vtkFloatArray* tensors = vtkFloatArray::SafeDownCast (input->GetPointData()->GetArray ("Tensors"));
-  
-    for (unsigned long i=0; i<NumberOfDataPoints; i++)
-    {
-      double* tensor = tensors->GetTuple (i);
-      double* point  = input->GetPoint (i);
-    
-      TensorType T;
-      T[0] = tensor[0];
-      T[1] = tensor[1];
-      T[2] = tensor[2];
-      T[3] = tensor[3];
-      T[4] = tensor[4];
-      T[5] = tensor[5];
-
-      PointType x;
-      x[0] = point[0];
-      x[1] = point[1];
-      x[2] = point[2];
-      if (T.GetTrace() > 0.1)
-      {
-	Data->SetPoint (counter, x);
-	Data->SetPointData (counter, T);
-	counter++;
-      }
-    
-    }
+    reader->Read();
+    MeshType::Pointer data = reader->GetOutput();
     std::cout<<" Done."<<std::endl;
-
+    
+    vtkPolyData* polydata = vtkPolyData::SafeDownCast (reader->GetVtkOutput());
+    
     // read the displacement field images
     DisplacementFieldType::Pointer displacementfield = NULL;
     DisplacementFieldType::Pointer inversedisplacementfield = NULL;
@@ -330,10 +308,9 @@ namespace itk
       std::cerr << e << std::endl;
       std::exit(EXIT_FAILURE);
     }
-    std::cout << " Done." << std::endl;
-  
     displacementfield = displacementreader1->GetOutput();
-  
+    std::cout << " Done." << std::endl;
+    
     std::cout << "Reading backward field: " << inversedisplacementfieldfile << std::flush;
     displacementreader2->SetFileName(inversedisplacementfieldfile);
     try
@@ -345,86 +322,75 @@ namespace itk
       std::cerr << e << std::endl;
       std::exit(EXIT_FAILURE);
     }
-    std::cout << " Done." << std::endl;
-
     inversedisplacementfield = displacementreader2->GetOutput();
-
-    warperdata->SetInput (Data);
-    warperdata->SetDisplacementField (displacementfield);
-    warperdata->SetInverseDisplacementField (inversedisplacementfield);
-    warperdata->Update();
-  
-    std::cout<<"registering"<<std::endl;
-    itk::TransformFactory<TransformType>::RegisterTransform ();
-  
-    std::cout<<"reading"<<std::endl;
+    std::cout << " Done." << std::endl;
+    
+    std::cout<<"reading transform"<<std::endl;
+    itk::TransformFactory<TransformType>::RegisterTransform ();    
     itk::TransformFileReader::Pointer transformreader = itk::TransformFileReader::New();
     transformreader->SetFileName( prolatefile );
-    transformreader->Update();
-  
+    transformreader->Update();  
     transform = dynamic_cast<TransformType*>( transformreader->GetTransformList()->front().GetPointer() );
-    TransformType::Pointer transform_inverse = TransformType::New();
-    transform->GetInverse(transform_inverse);
     
-    coordinateswitcherdata->SetInput (warperdata->GetOutput());
-    coordinateswitcherdata->SetTransform (transform);
-    coordinateswitcherdata->Update();
-  
-    coordinateswitcherref->SetInput (coordinateswitcherdata->GetOutput());
-    coordinateswitcherref->SetTransform (transform_inverse);
-    coordinateswitcherref->Update();
-  
-    warperref->SetInput (coordinateswitcherref->GetOutput());
-    warperref->SetDisplacementField (inversedisplacementfield);
-    warperref->SetInverseDisplacementField (displacementfield);
-    warperref->Update();
+    std::cout<<"warping to ellipsoid"<<std::endl;
+    warper->SetInput (data);
+    warper->SetDisplacementField (displacementfield);
+    warper->SetInverseDisplacementField (inversedisplacementfield);
+    warper->Update();
+    
+    std::cout<<"switching to prolates"<<std::endl;
+    transformer->SetInput (warper->GetOutput());
+    transformer->SetTransform (transform);
+    transformer->Update();
 
+    MeshType::Pointer ProlateData   = transformer->GetOutput();
+    ProlateData->DisconnectPipeline();
+    
     vtkUnsignedCharArray* colors = vtkUnsignedCharArray::New();
     colors->SetNumberOfComponents (3);
-    colors->SetNumberOfTuples (input->GetNumberOfPoints());
+    colors->SetNumberOfTuples (data->GetNumberOfPoints());
     colors->FillComponent (0, (unsigned char)(255.0));
     colors->FillComponent (1, (unsigned char)(0.0));
     colors->FillComponent (2, (unsigned char)(0.0));
-  
+    
     double range[2]={rangemin, rangemax};
-  
-    unsigned long numberofpoints = Data->GetNumberOfPoints();
+    
     PointType mainpointprolate;
     VectorType mainvectorprolate, lastvectorprolate;
     
-    double helix, sheet, transverse, fa;
+    double xi, helix, sheet, transverse, fa;
     MeshType::PixelType prolatetensor (0.0);
-
+    
     for (unsigned int i=0; i<3; i++)
-    {
       mainpointprolate[i] = 0.0;
-    }
-  
+    
     std::ostringstream os;
-    std::cout<<"how many points are we dealing with ?? "<<numberofpoints<<std::endl;
-    MeshType::Pointer ProlateData   = coordinateswitcherdata->GetOutput();
-  
-    vtkCellArray* lines = input->GetLines();
+    std::cout<<"evaluating "<<typestring<<" colors for "<<polydata->GetNumberOfPoints()<<" points..."<<std::endl;
+    
+    vtkCellArray* lines = polydata->GetLines();
     lines->InitTraversal();
     vtkIdType npt  = 0;
     vtkIdType *pto = 0;
-
     
     vtkIdType test = lines->GetNextCell (npt, pto);
     while( test!=0 )
     {
-
       double meandata = 0.0;
-      double data = 0.0;
+      double information = 0.0;
       
       for( int fi=0; fi<npt; fi++)
       {
 	int i = pto[fi];
-      
-	ProlateData->GetPoint (i, &mainpointprolate);
+	
+ 	ProlateData->GetPoint (i, &mainpointprolate);
 	ProlateData->GetPointData (i, &prolatetensor);
-      
+
 	mainvectorprolate = prolatetensor.GetEigenvector (2);
+	// PointType p1, p2;
+	// int j = (fi < npt-1) ? pto[fi+1] : pto[fi-1];
+	// ProlateData->GetPoint (i, &p1);
+	// ProlateData->GetPoint (j, &p2);
+	// mainvectorprolate = p2-p1;
 	lastvectorprolate = prolatetensor.GetEigenvector (0);
 	mainvectorprolate.Normalize();
 	lastvectorprolate.Normalize();
@@ -432,40 +398,58 @@ namespace itk
 	switch (type)
 	{
 	    case 0:
-	    default:
 	      helix = mainvectorprolate[1];
-	      if (mainvectorprolate[2] < 0) helix = -helix;
+	      if (mainvectorprolate[2] > 0) helix = -helix;
 	      helix = std::asin(helix) * 180.0 / vnl_math::pi;
-	      data = helix;
+	      information = helix;
 	      break;
 	    case 1:
 	      transverse = mainvectorprolate[0];
 	      if (mainvectorprolate[2] < 0) transverse = -transverse;
 	      transverse = std::asin(transverse) * 180.0 / vnl_math::pi;
-	      data = transverse;
+	      information = transverse;
 	      break;
 	    case 2:
 	      fa = prolatetensor.GetFA();
-	      data = fa;
+	      information = fa;
+	      std::cout<<"tensor : "<<prolatetensor<<std::endl;
+	      std::cout<<"got fa of : "<<fa<<std::endl;
+	      getchar();
+	      
 	      break;
 	    case 3:
-	      data = prolatetensor.GetCl();
+	      information = prolatetensor.GetCl();
 	      break;
 	    case 4:
 	      sheet = lastvectorprolate[0];
 	      sheet = std::asin(sheet) * 180.0 / vnl_math::pi;
-	      data = sheet;
+	      information = sheet;
 	      break;
+	    case 5:
+	      xi = mainpointprolate[0];
+	      information = xi;
+	      break;
+	    case 6:
+	      xi = mainpointprolate[1];
+	      information = xi;
+	      break;
+	    case 7:
+	      xi = mainpointprolate[2];
+	      information = xi;
+	      break;
+	    default:
+	      std::cerr<<"Cannot recognize information type "<<typestring<<" (got unknown id : "<<type<<")"<<std::endl;    
+	      break;
+	      
 	}
 	
-	meandata = meandata + data;
+	meandata = meandata + information;
 	
 	// for color
 	if (!globalcolor)
 	{
 	  double anglevector[3];
-	  CalculateVectorFromAngleJet (data, range, anglevector);
-	  
+	  CalculateVectorFromAngleJet (information, range, anglevector);
 	  for (unsigned int k=0; k<3; k++)
 	  {
 	    double c = fabs (anglevector[k])*255.0;
@@ -474,7 +458,7 @@ namespace itk
 	}
       
       }
-
+      
       meandata = meandata / (double)(npt);
     
       // for color
@@ -498,20 +482,20 @@ namespace itk
       test = lines->GetNextCell (npt, pto);
     }
 
-    std::cout << "Writing the fibres... "<<outputfile<< " " << std::endl;
-    vtkPolyData* helixanglefibres = vtkPolyData::New();
-    helixanglefibres->DeepCopy (input);
-    helixanglefibres->GetPointData()->SetScalars (colors);
+    std::cout << "Copying information to the fibres..."<< std::endl;
+    vtkPolyData* output = vtkPolyData::New();
+    output->DeepCopy (polydata);
+    output->GetPointData()->SetScalars (colors);
     
+    std::cout << "Writing the fibres to... "<<outputfile<< " " << std::endl;
     vtkDataSetWriter* writer = vtkDataSetWriter::New();
-    writer->SetInput (helixanglefibres);
+    writer->SetInput (output);
     writer->SetFileName (outputfile);
     //writer->SetFileTypeToBinary();
     writer->Update();
   
-    reader->Delete();
     writer->Delete();
-    helixanglefibres->Delete();
+    output->Delete();
     colors->Delete();
     
     return EXIT_SUCCESS;
