@@ -246,9 +246,9 @@ namespace itk
     m_LongDescription += m_ShortDescription;
     m_LongDescription += "\n\nUsage:\n";
     
-    m_LongDescription += "-i    [input  geometry (i.e. anatomy)]";
-    m_LongDescription += "-t    [prolate transform]";
-    m_LongDescription += "-o    [output ellipsoidal image]";
+    m_LongDescription += "-i    [input  geometry (i.e. anatomy)]\n";
+    m_LongDescription += "-t    [prolate transform]\n";
+    m_LongDescription += "-o    [output ellipsoidal image]\n";
   }
 
   CreateProlateDomainCommand::~CreateProlateDomainCommand()
