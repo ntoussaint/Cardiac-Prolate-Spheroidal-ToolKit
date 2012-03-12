@@ -27,7 +27,10 @@
  
 // VTK
 #include <vtkCellArray.h>
+#include <vtkDataSetReader.h>
+
 class vtkUnstructuredGrid;
+class vtkDataSet;
 
 namespace itk
 {
@@ -127,7 +130,7 @@ namespace itk
     typedef ProcessObject Superclass;
     typedef SmartPointer<Self> Pointer;
     typedef SmartPointer<const Self> ConstPointer;
-
+    
     itkNewMacro (Self);
     itkTypeMacro (TensorMeshIO, ProcessObject);
     
@@ -142,7 +145,7 @@ namespace itk
 
     /** Actually read the data */
     void Read(void);
-
+    
     /** Actually read the data */
     void Write(void);
     
@@ -153,15 +156,23 @@ namespace itk
     itkGetConstObjectMacro(Input,  TensorMeshType);
     itkGetObjectMacro(Output,      TensorMeshType);
     
+    vtkDataSet* GetVtkOutput (void)
+    {
+      return this->Reader->GetOutput();
+    }
     
     protected:
 
     TensorMeshIO()
     {
       m_Output = TensorMeshType::New();
+      Reader = vtkDataSetReader::New();
     }
-    ~TensorMeshIO(){};
-  
+    ~TensorMeshIO()
+    {
+      Reader->Delete();
+    };
+    
     void PrintSelf (std::ostream &os, Indent indent) const
     {
       Superclass::PrintSelf (os,indent);      
@@ -169,21 +180,23 @@ namespace itk
   
     /** @return True if \c filename has extension \c ext */
     bool CheckExtension(const char* filename, const char* ext) const;
-
+    
     void ConvertMeshToUnstructuredGrid(typename TensorMeshType::ConstPointer mesh, vtkUnstructuredGrid* vtkmesh);
     
     void ReadVTK (const char* filename);
     void WriteVTK (const char* filename);
     
     private:
-
+    
     TensorMeshIO (const Self&);
     void operator=(const Self&);
-
+    
     std::string m_FileName;
     typename TensorMeshType::ConstPointer m_Input; // purposely not implemented
     typename TensorMeshType::Pointer m_Output; // purposely not implemented    
-        
+    
+    vtkDataSetReader* Reader;
+    
     };
   
   
