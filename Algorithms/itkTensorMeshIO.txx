@@ -44,18 +44,18 @@ namespace itk
     // return true if extension is found and is at the end of the filename
     return ( found && found == ( filename+strlen(filename)-strlen(ext) ) );
   }
-
+  
   template<class T, unsigned int TensorDimension, unsigned int ImageDimension>
   void
   TensorMeshIO<T,TensorDimension,ImageDimension>
   ::Read (void)
   {
-
+    
     if(m_FileName == "")
     {
       throw itk::ExceptionObject (__FILE__,__LINE__,"Error: FileName is not set.");
     }
-
+    
     vtksys_stl::string ext = vtksys::SystemTools::GetFilenameExtension (m_FileName.c_str());
     if( ext=="" )
     {
@@ -64,14 +64,14 @@ namespace itk
    
     try
     {
-      if ( CheckExtension(m_FileName.c_str(), ".vtk") )
+      if ( CheckExtension(m_FileName.c_str(), ".vtk") || CheckExtension(m_FileName.c_str(), ".fib") )
       {
         this->ReadVTK (m_FileName.c_str());
       }
       else
       {
         throw itk::ExceptionObject (__FILE__,__LINE__,"Error: extension not recognized."
-                                    " Supported extenstions are:\n-vtk.");
+                                    " Supported extenstions are: .vtk and .fib");
       }
     }
     catch (itk::ExceptionObject &e)
@@ -141,17 +141,37 @@ namespace itk
     {
       throw itk::ExceptionObject (__FILE__,__LINE__,"Error: VTK only supports 3D images and 3x3 tensors.");
     }
-
     
     typename TensorMeshType::Pointer                          output = m_Output;
     typename TensorMeshType::PointsContainer::Pointer     DataPoints = TensorMeshType::PointsContainer::New();
     typename TensorMeshType::PointDataContainer::Pointer  DataPixels = TensorMeshType::PointDataContainer::New();
     
-    vtkDataSetReader* reader = vtkDataSetReader::New();
-    reader->SetFileName (filename);
-    reader->Update();
+    this->Reader->SetFileName (filename);
+    this->Reader->Update();
+
+    if (!vtkPointSet::SafeDownCast (this->Reader->GetOutput()))
+    {
+      throw itk::ExceptionObject (__FILE__,__LINE__,"Error: This Reader only supports vtkPointSet subclasses.");
+    }
+    bool tensors_in_points = false;
+    bool tensors_in_fields = false;
     
-    unsigned long NumberOfDataPoints = vtkPointSet::SafeDownCast (reader->GetOutput())->GetPoints()->GetNumberOfPoints();
+    vtkDataArray* tensors = vtkPointSet::SafeDownCast (this->Reader->GetOutput())->GetPointData()->GetTensors();
+    if (!tensors) 
+    {
+      itkWarningMacro (<<"Warning : No Tensors in Point_Data, attempting field-data...");
+      tensors = vtkPointSet::SafeDownCast (this->Reader->GetOutput())->GetPointData()->GetArray ("Tensors");
+      if (!tensors)
+      {
+	itkWarningMacro (<<"Warning : The PointSet you are reading does not contain any tensors. \n Only point information will be passed to the output");
+      }
+      else
+	tensors_in_fields = true;
+    }
+    else
+      tensors_in_points = true;
+    
+    unsigned long NumberOfDataPoints = vtkPointSet::SafeDownCast (this->Reader->GetOutput())->GetPoints()->GetNumberOfPoints();
     DataPoints->Reserve (NumberOfDataPoints);
     DataPixels->Reserve (NumberOfDataPoints);
     
@@ -160,16 +180,16 @@ namespace itk
     
     for (unsigned long i=0; i<NumberOfDataPoints; i++)
     {
-      double* point  = vtkPointSet::SafeDownCast (reader->GetOutput())->GetPoint (i);      
+      double* point  = vtkPointSet::SafeDownCast (this->Reader->GetOutput())->GetPoint (i);
       typename TensorMeshType::PointType x;
       x[0] = point[0];
       x[1] = point[1];
       x[2] = point[2];
       output->SetPoint (i, x);
-
-      if (vtkPointSet::SafeDownCast (reader->GetOutput())->GetPointData()->GetTensors())
+      
+      if (tensors_in_points)
       {
-	double* tensor = vtkPointSet::SafeDownCast (reader->GetOutput())->GetPointData()->GetTensors()->GetTuple (i);
+	double* tensor = tensors->GetTuple (i);
 	TensorType Tensor;
 	Tensor[0] = tensor[0];
 	Tensor[1] = tensor[1];
@@ -179,9 +199,20 @@ namespace itk
 	Tensor[5] = tensor[8];
 	output->SetPointData (i, Tensor);
       }
+      else if (tensors_in_fields)
+      {
+	double* tensor = tensors->GetTuple (i);
+	TensorType Tensor;
+	Tensor[0] = tensor[0];
+	Tensor[1] = tensor[1];
+	Tensor[2] = tensor[2];
+	Tensor[3] = tensor[3];
+	Tensor[4] = tensor[4];
+	Tensor[5] = tensor[5];
+	output->SetPointData (i, Tensor);
+      }
     }
     
-    reader->Delete();
   }
 
 
