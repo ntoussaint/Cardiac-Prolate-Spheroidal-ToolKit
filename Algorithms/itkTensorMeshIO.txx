@@ -7,7 +7,7 @@
   Date:      $Date: 2010-05-21 14:00:33 +0000 (Fri, 21 May 2010) $
   Version:   $Revision: 1 $
 
-  Copyright (c) 2010 King's College London - Division of Imaging Sciences. All rights reserved.
+  Copyright (c) 2012 King's College London - Division of Imaging Sciences. All rights reserved.
   See Copyright.txt for details.
 
   This software is distributed WITHOUT ANY WARRANTY; without even
@@ -40,8 +40,6 @@ namespace itk
   ::CheckExtension (const char* filename, const char* ext) const
   {
     const char* found = strstr(filename, ext);
-
-    // return true if extension is found and is at the end of the filename
     return ( found && found == ( filename+strlen(filename)-strlen(ext) ) );
   }
   
@@ -142,9 +140,7 @@ namespace itk
       throw itk::ExceptionObject (__FILE__,__LINE__,"Error: VTK only supports 3D images and 3x3 tensors.");
     }
     
-    typename TensorMeshType::Pointer                          output = m_Output;
-    typename TensorMeshType::PointsContainer::Pointer     DataPoints = TensorMeshType::PointsContainer::New();
-    typename TensorMeshType::PointDataContainer::Pointer  DataPixels = TensorMeshType::PointDataContainer::New();
+    typename TensorMeshType::Pointer output = m_Output;
     
     this->Reader->SetFileName (filename);
     this->Reader->Update();
@@ -153,17 +149,22 @@ namespace itk
     {
       throw itk::ExceptionObject (__FILE__,__LINE__,"Error: This Reader only supports vtkPointSet subclasses.");
     }
+
+    // The tensors are usually stored in the POINTDATA as GetTensors()
+    // In some cases (e.g. fibre fields from \"ttk tractography\"), tensors are stored as N=6 vectors in the
+    // POINTDATA. They MUST be named as "Tensors" to be recognized here.
+    
     bool tensors_in_points = false;
     bool tensors_in_fields = false;
     
     vtkDataArray* tensors = vtkPointSet::SafeDownCast (this->Reader->GetOutput())->GetPointData()->GetTensors();
     if (!tensors) 
     {
-      itkWarningMacro (<<"Warning : No Tensors in Point_Data, attempting field-data...");
+      itkWarningMacro (<<"Warning : No Tensors in POINTDATA, attempting FIELDDATA...");
       tensors = vtkPointSet::SafeDownCast (this->Reader->GetOutput())->GetPointData()->GetArray ("Tensors");
       if (!tensors)
       {
-	itkWarningMacro (<<"Warning : The PointSet you are reading does not contain any tensors. \n Only point information will be passed to the output");
+	itkWarningMacro (<<"Warning : The dataset you are reading does not contain any tensors. \n Only point information will be passed to the output");
       }
       else
 	tensors_in_fields = true;
@@ -171,22 +172,18 @@ namespace itk
     else
       tensors_in_points = true;
     
-    unsigned long NumberOfDataPoints = vtkPointSet::SafeDownCast (this->Reader->GetOutput())->GetPoints()->GetNumberOfPoints();
-    DataPoints->Reserve (NumberOfDataPoints);
+    
+    // Pass the Points and Cells information
+    this->ConvertPointSetToMesh (vtkPointSet::SafeDownCast (this->Reader->GetOutput()), output);
+
+    // Pass the tensor information
+    typename TensorMeshType::PointDataContainer::Pointer DataPixels = TensorMeshType::PointDataContainer::New();
+    unsigned long NumberOfDataPoints = output->GetNumberOfPoints();    
     DataPixels->Reserve (NumberOfDataPoints);
-    
-    output->SetPoints (DataPoints);
     output->SetPointData (DataPixels);
-    
+
     for (unsigned long i=0; i<NumberOfDataPoints; i++)
     {
-      double* point  = vtkPointSet::SafeDownCast (this->Reader->GetOutput())->GetPoint (i);
-      typename TensorMeshType::PointType x;
-      x[0] = point[0];
-      x[1] = point[1];
-      x[2] = point[2];
-      output->SetPoint (i, x);
-      
       if (tensors_in_points)
       {
 	double* tensor = tensors->GetTuple (i);
@@ -211,11 +208,12 @@ namespace itk
 	Tensor[5] = tensor[5];
 	output->SetPointData (i, Tensor);
       }
+      else
+      {
+	// No tensor is present, we pass on the points only.
+      }
     }
-    
   }
-
-
   
   template<class T, unsigned int TensorDimension, unsigned int ImageDimension>
   void
@@ -228,13 +226,15 @@ namespace itk
     {
       throw itk::ExceptionObject (__FILE__,__LINE__,"Error: VTK only supports 3D images and 3x3 tensors.");
     }
-
+    
     typename TensorMeshType::ConstPointer mesh = m_Input;
     
     vtkUnstructuredGrid* vtkoutput = vtkUnstructuredGrid::New();
 
+    // Pass the Points and Cell information.
     this->ConvertMeshToUnstructuredGrid(mesh, vtkoutput);
-    
+
+    // Pass the tensor information
     vtkDoubleArray* data = vtkDoubleArray::New();
     data->SetNumberOfComponents (9);
     data->SetNumberOfTuples (mesh->GetNumberOfPoints());
@@ -359,6 +359,32 @@ namespace itk
   }
   
   
+  template<class T, unsigned int TensorDimension, unsigned int ImageDimension>
+  void
+  TensorMeshIO<T,TensorDimension,ImageDimension>
+  ::ConvertPointSetToMesh (vtkPointSet* vtkmesh, typename TensorMeshType::Pointer mesh)
+  {
+    
+    // NOTA :
+    // here the optimal way would be to properly convert the vtkPointSet into the itk::Mesh
+    // Here we only pass the point information
+    
+    typename TensorMeshType::PointsContainer::Pointer DataPoints = TensorMeshType::PointsContainer::New();
+    unsigned long NumberOfDataPoints = vtkmesh->GetPoints()->GetNumberOfPoints();
+    DataPoints->Reserve (NumberOfDataPoints);
+    
+    mesh->SetPoints (DataPoints);
+    
+    for (unsigned long i=0; i<NumberOfDataPoints; i++)
+    {
+      double* point  = vtkPointSet::SafeDownCast (this->Reader->GetOutput())->GetPoint (i);
+      typename TensorMeshType::PointType x;
+      x[0] = point[0];
+      x[1] = point[1];
+      x[2] = point[2];
+      mesh->SetPoint (i, x);
+    }
+  }	   
 }
 
 

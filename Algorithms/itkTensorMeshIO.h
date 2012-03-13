@@ -7,7 +7,7 @@
   Date:      $Date: 2010-05-21 14:00:33 +0000 (Fri, 21 May 2010) $
   Version:   $Revision: 1 $
 
-  Copyright (c) 2010 King's College London - Division of Imaging Sciences. All rights reserved.
+  Copyright (c) 2012 King's College London - Division of Imaging Sciences. All rights reserved.
   See Copyright.txt for details.
 
   This software is distributed WITHOUT ANY WARRANTY; without even
@@ -42,7 +42,9 @@ namespace itk
   */
 
 
-  // create a class to store counts of cells found in the visit pass
+  /**
+     class to store counts of cells found in the visit pass
+  */
   class CountClass
   {
   public:
@@ -115,11 +117,19 @@ namespace itk
       }
     };
   
-  
-  
-  
-  
-  
+  /**
+     \Class TensorMeshIO
+     This class is a ProcessObject that helps the user read and write a PointSet that contains (or not)
+     some tensor information.
+     It is templated with the tensor dimension and the mesh dimension. However, only implementation
+     with Dimension = 3 is provided.
+     The extensions allowed are .vtk and .fib.
+     The Read() method will read the provided filename using a vtkDataSetReader. The dataset has to be a
+     subclass of a vtkPointSet. It will pass the point and tensor information to the itk::Mesh output object.
+     It is robust to the case where no tensor is present, and a warning will be thrown.
+
+     \seealso Tensor TensorImageIO
+  */
   template <class T=double, unsigned int TensorDimension=3, unsigned int MeshDimension=3>
     class ITK_EXPORT TensorMeshIO : public ProcessObject
     {
@@ -143,10 +153,10 @@ namespace itk
     
     static const unsigned int DegreesOfFreedom = TensorDimension*(TensorDimension+1)/2;
 
-    /** Actually read the data */
+    /** read the data */
     void Read(void);
     
-    /** Actually read the data */
+    /** write the data */
     void Write(void);
     
     itkSetStringMacro(FileName);
@@ -155,7 +165,11 @@ namespace itk
     itkSetConstObjectMacro(Input,  TensorMeshType);
     itkGetConstObjectMacro(Input,  TensorMeshType);
     itkGetObjectMacro(Output,      TensorMeshType);
-    
+
+    /**
+       Retrieve the vtkObject for potential user use.
+       It is the output of the vtkDataSetReader.
+    */
     vtkDataSet* GetVtkOutput (void)
     {
       return this->Reader->GetOutput();
@@ -180,10 +194,26 @@ namespace itk
   
     /** @return True if \c filename has extension \c ext */
     bool CheckExtension(const char* filename, const char* ext) const;
-    
+
+    /**
+       This important method converts a itk::Mesh object into a vtkUnstructuredGrid.
+       If the itk::Mesh has any cells they will be passed onto the vtkUnstructuredGrid as they are
+       Additionnaly, the tensor information is also passed on if present.
+    */
     void ConvertMeshToUnstructuredGrid(typename TensorMeshType::ConstPointer mesh, vtkUnstructuredGrid* vtkmesh);
-    
+    /**
+       \todo this method is yet to be done. It could be interesting to keep track of cells
+       from the vtkObject onto the itk::Mesh object.
+    */
+    void ConvertPointSetToMesh(vtkPointSet* vtkmesh, typename TensorMeshType::Pointer mesh);
+
+    /**
+       The only format that this class reads is vtk files. It has to be a subclass of vtkPointSet
+    */
     void ReadVTK (const char* filename);
+    /**
+       The only format that this class reads is vtk files. It writes the object as a vtkUnstructuredGrid.
+    */
     void WriteVTK (const char* filename);
     
     private:
@@ -192,8 +222,8 @@ namespace itk
     void operator=(const Self&);
     
     std::string m_FileName;
-    typename TensorMeshType::ConstPointer m_Input; // purposely not implemented
-    typename TensorMeshType::Pointer m_Output; // purposely not implemented    
+    typename TensorMeshType::ConstPointer m_Input; 
+    typename TensorMeshType::Pointer m_Output;
     
     vtkDataSetReader* Reader;
     
