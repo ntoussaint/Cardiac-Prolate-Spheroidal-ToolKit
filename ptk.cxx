@@ -33,6 +33,7 @@
 #include "itkResampleImage3CommandFactory.h"
 #include "itkResampleTensorImage3CommandFactory.h"
 #include "itkColorFibresWithProlateAngleCommandFactory.h"
+#include "itkOptimizeExtrapolationKernelsCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 #include "ptkConfigure.h"
@@ -59,7 +60,7 @@ int main (int narg, char *args[])
   itk::ResampleImage3CommandFactory::RegisterOneFactory();
   itk::ResampleTensorImage3CommandFactory::RegisterOneFactory();
   itk::ColorFibresWithProlateAngleCommandFactory::RegisterOneFactory();
-  
+  itk::OptimizeExtrapolationKernelsCommandFactory::RegisterOneFactory();
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
   if( cl.size() == 1 || cl.search(2, "--help", "-h") )

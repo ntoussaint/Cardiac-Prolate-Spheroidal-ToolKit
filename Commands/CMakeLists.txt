@@ -82,6 +82,9 @@ CreatePtkCommand(ResampleTensorImage3
 CreatePtkCommand(ColorFibresWithProlateAngle
   "colorify" "Colorify a fibre field with Prolate angular information"
   )
+CreatePtkCommand(OptimizeExtrapolationKernels
+  "optimize" "Find optimal extrapolation Prol. Sph. kernel sizes to minimize discrepancies in a LS sense"
+  )
 
 add_library(PTKCommands ${PTK_BUILD_TYPE}
   ${PTK_COMMAND_SRCS}

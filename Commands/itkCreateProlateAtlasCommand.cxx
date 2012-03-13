@@ -17,14 +17,17 @@
   =========================================================================*/
 #include "itkCreateProlateAtlasCommand.h"
 
-
-#include "itkTensorMeshImageHybridCostFunction3.h"
 #include "itkTransformFileReader.h"
 #include "itkTransformFactory.h"
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
 #include "itkTensorImageIO.h"
 #include "itkTensorMeshIO.h"
+#include "itkProlateSpheroidalTransformTensorMeshFilter.h"
+#include "itkWarpTensorMeshFilter.h"
+#include <itkTensorImageToMeshFilter.h>
+#include <itkTensorMeshToImageFilter.h>
+
 
 #include <vtkDataSetWriter.h>
 #include <vtkDataSetReader.h>
@@ -60,8 +63,6 @@ typename MeshType::Pointer DomainToMesh (typename ImageType::Pointer image)
     
   return mesh;
 }
-
-
 
 template<typename MeshType, typename ImageType>
 void UnNormalizeFirstComponent(typename MeshType::Pointer in, double* range)
@@ -112,35 +113,34 @@ namespace itk
 
   int CreateProlateAtlasCommand::Execute (int narg, const char* arg[])
   {
+
+    typedef double                                                         ScalarType;
+    typedef itk::TensorImageIO<ScalarType, 3, 3>                           TensorImageIOType;
+    typedef itk::TensorMeshIO <ScalarType, 3, 3>                           TensorMeshIOType;
     
-    typedef double                                  ScalarType;
-    typedef itk::TensorMeshImageHybridCostFunction3 CostFunctionType;
-    typedef itk::Image<ScalarType,3>                ImageType;
-    typedef CostFunctionType::TensorType            TensorType;
-    typedef CostFunctionType::MeshType              MeshType;
-    typedef CostFunctionType::DisplacementFieldType     DisplacementFieldType;
-    typedef itk::ImageFileReader<DisplacementFieldType> DisplacementFileReaderType;
-  
-    typedef CostFunctionType::TransformType         TransformType;
-    typedef CostFunctionType::ParametersType        ParametersType;
-    typedef CostFunctionType::ParametersValueType   ParametersValueType;
-    typedef CostFunctionType::MeasureType           MeasureType;
+    typedef TensorImageIOType::TensorImageType                             TensorImageType;
+    typedef itk::Image<ScalarType,3>                                       ImageType;
+    typedef TensorImageType::PixelType                                     TensorType;
+    typedef TensorMeshIOType::TensorMeshType                               MeshType;
+
+    typedef itk::Vector<ScalarType, 3>                                     DisplacementType;
+    typedef itk::Image<DisplacementType, 3>                                DisplacementFieldType;
+    typedef itk::ImageFileReader<DisplacementFieldType>                    DisplacementFileReaderType;
+    typedef itk::ImageFileWriter<DisplacementFieldType>                    DisplacementFileWriterType;
+    typedef itk::ImageFileReader<ImageType>                                ImageFileReaderType;
+    typedef itk::ImageFileWriter<ImageType>                                ImageFileWriterType;
+
+    typedef itk::ProlateSpheroidalTransformTensorMeshFilter<MeshType>      TransformerType;
+    typedef TransformerType::TransformType                                 TransformType;
+    
     typedef MeshType::PointType                     PointType;
-    typedef itk::ImageFileReader<ImageType>         ImageFileReaderType;
-    typedef itk::ImageFileWriter<ImageType>         ImageFileWriterType;
     typedef itk::ImageRegionIterator<ImageType>     ImageIteratorType;
-    typedef itk::TensorImageIO<ScalarType, 3, 3>    TensorImageIOType;
-    typedef itk::TensorMeshIO<ScalarType, 3, 3>     TensorMeshIOType;
-    typedef TensorImageIOType::TensorImageType      TensorImageType;
 
     typedef itk::WarpTensorMeshFilter<MeshType, DisplacementFieldType> WarperType;
-    typedef itk::ProlateSpheroidalTransformTensorMeshFilter<MeshType>  CoordinateSwitcherType;
+    typedef itk::ProlateSpheroidalTransformTensorMeshFilter<MeshType>  TransformerType;
 
     typedef itk::GaussianInterpolationTensorMeshFilter2<MeshType>  InterpolatorType;
     typedef itk::TensorMeshToImageFilter<TensorType, 3> TensorMeshToImageFilterType;
-
-    CostFunctionType::Pointer costfunction = CostFunctionType::New();
-  
 
     GetPot   cl(narg, const_cast<char**>(arg)); // argument parser
     if( cl.size() == 1 || cl.search(2, "--help", "-h") ) 
@@ -261,7 +261,7 @@ namespace itk
   
 
     WarperType::Pointer             WarperIn = WarperType::New();
-    CoordinateSwitcherType::Pointer SwitcherIn = CoordinateSwitcherType::New();
+    TransformerType::Pointer SwitcherIn = TransformerType::New();
     WarperIn->SetDisplacementField (displacementfield);
     WarperIn->SetInverseDisplacementField (inversedisplacementfield);
     SwitcherIn->SetTransform (transform);
@@ -329,7 +329,7 @@ namespace itk
     writert->Write();
 
     WarperType::Pointer             WarperOut = WarperType::New();
-    CoordinateSwitcherType::Pointer SwitcherOut = CoordinateSwitcherType::New();
+    TransformerType::Pointer SwitcherOut = TransformerType::New();
     WarperOut->SetDisplacementField (inversedisplacementfield);
     WarperOut->SetInverseDisplacementField (displacementfield);
     TransformType::Pointer backtransform = TransformType::New();
