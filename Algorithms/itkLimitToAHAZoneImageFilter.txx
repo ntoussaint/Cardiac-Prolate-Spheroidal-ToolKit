@@ -41,8 +41,8 @@ namespace itk
     m_InverseInterpolator = InterpolatorType::New();
 
     m_Thickness = 15.0;
-    // m_MaxAngle = 93 * vnl_math::pi / 180.0;
-    m_MaxAngle = 105 * vnl_math::pi / 180.0;
+    m_MaxAngle = 93 * vnl_math::pi / 180.0;
+    // m_MaxAngle = 105 * vnl_math::pi / 180.0;
 
     m_AHASegmentationType = AHA_17_ZONES;
     m_CanineDivisions = 0;
