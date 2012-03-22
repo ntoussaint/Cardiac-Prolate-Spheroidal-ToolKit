@@ -57,6 +57,9 @@ namespace itk
     m_LongDescription +="\t error [position error accumulation]\n";
     m_LongDescription +="\t zone [AHA zone of point]\n";
     m_LongDescription +="\t deltaangle [absolute angular error accumulation] \n";
+    m_LongDescription +="\t h1 [scale factor in xi1 direction] \n";
+    m_LongDescription +="\t h2 [scale factor in xi2 direction] \n";
+    m_LongDescription +="\t h3 [scale factor in xi3 direction] \n";
     
   }
 
@@ -65,8 +68,6 @@ namespace itk
 
   int ExtractProlateInformationCommand::Execute (int narg, const char* arg[])
   {
-
-    itk::Object::GlobalWarningDisplayOff();
     
     GetPot cl(narg, const_cast<char**>(arg)); // argument parser
     if( cl.size() == 1 || cl.search(2, "--help", "-h") )
@@ -94,6 +95,9 @@ namespace itk
     else if (std::strcmp (typestring,"error") == 0 )      type = 5;
     else if (std::strcmp (typestring,"zone") == 0 )       type = 6;
     else if (std::strcmp (typestring,"deltaangle") == 0 ) type = 7;
+    else if (std::strcmp (typestring,"h1") == 0 )         type = 8;
+    else if (std::strcmp (typestring,"h2") == 0 )         type = 9;
+    else if (std::strcmp (typestring,"h3") == 0 )         type = 10;
 
     
     std::cout<<"computing the extraction of ";
@@ -123,6 +127,15 @@ namespace itk
 	  break;
 	case 7:
 	  std::cout<<"angular error";
+	  break;
+	case 8:
+	  std::cout<<"scale factor h1";
+	  break;
+	case 9:
+	  std::cout<<"scale factor h2";
+	  break;
+	case 10:
+	  std::cout<<"scale factor h3";
 	  break;
     }
 
@@ -333,7 +346,7 @@ namespace itk
     TensorType cartesiantensor (0.0);
     TensorType initialtensor (0.0);
 
-    double helix=0, sheet=0, transverse=0, fa=0, deltav = 0;
+    double helix=0, sheet=0, transverse=0, fa=0, deltav = 0, scalefactor[3]={0,0,0};
     unsigned int zone=0;
     
     for (unsigned long i=0; i<numberofpoints; i++)
@@ -356,6 +369,8 @@ namespace itk
       lastvector.Normalize();
       lastvectorprolate.Normalize();
       initialvector.Normalize();
+
+      transform->EvaluateScaleFactors (mainpointprolate.GetDataPointer(), scalefactor);
       
       os << mainpointprolate[0] << " "
 	 << mainpointprolate[1] << " "
@@ -401,6 +416,15 @@ namespace itk
 	  case 7:
 	    deltav = std::abs (mainvector * initialvector);
 	    os << std::acos (deltav) * 180 / vnl_math::pi;
+	    break;
+	  case 8:
+	    os << scalefactor[0];
+	    break;
+	  case 9:
+	    os << scalefactor[1];
+	    break;
+	  case 10:
+	    os << scalefactor[2];
 	    break;
       }
       

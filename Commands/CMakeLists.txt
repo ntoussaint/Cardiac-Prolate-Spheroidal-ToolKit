@@ -85,6 +85,12 @@ CreatePtkCommand(ColorFibresWithProlateAngle
 CreatePtkCommand(OptimizeExtrapolationKernels
   "optimize" "Find optimal extrapolation Prol. Sph. kernel sizes to minimize discrepancies in a LS sense"
   )
+CreatePtkCommand(ExtractKernelsEnveloppe
+  "enveloppe" "Extract the kernel distance enveloppes in n AHA zones"
+  )
+CreatePtkCommand(TensorMeshGradient
+  "gradient" "Compute the gradient of a tensor field in Prolate Spheroidal sense"
+  )
 
 add_library(PTKCommands ${PTK_BUILD_TYPE}
   ${PTK_COMMAND_SRCS}

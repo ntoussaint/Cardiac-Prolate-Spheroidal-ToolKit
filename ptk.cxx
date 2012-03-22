@@ -34,6 +34,8 @@
 #include "itkResampleTensorImage3CommandFactory.h"
 #include "itkColorFibresWithProlateAngleCommandFactory.h"
 #include "itkOptimizeExtrapolationKernelsCommandFactory.h"
+#include "itkExtractKernelsEnveloppeCommandFactory.h"
+#include "itkTensorMeshGradientCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 #include "ptkConfigure.h"
@@ -61,6 +63,8 @@ int main (int narg, char *args[])
   itk::ResampleTensorImage3CommandFactory::RegisterOneFactory();
   itk::ColorFibresWithProlateAngleCommandFactory::RegisterOneFactory();
   itk::OptimizeExtrapolationKernelsCommandFactory::RegisterOneFactory();
+  itk::ExtractKernelsEnveloppeCommandFactory::RegisterOneFactory();
+  itk::TensorMeshGradientCommandFactory::RegisterOneFactory();
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
   if( cl.size() == 1 || cl.search(2, "--help", "-h") )
