@@ -137,10 +137,10 @@ namespace itk
 
       u_i_Sigma = Sigma * u_i.GetVnlVector();
       
-      std::cout<<"u_i_Sigma : \n" << u_i_Sigma <<std::endl;
-      std::cout<<"Sigma : \n"     << Sigma <<std::endl;
-      std::cout<<"duil : \n"      << duil <<std::endl;
-      getchar();
+      // std::cout<<"u_i_Sigma : \n" << u_i_Sigma <<std::endl;
+      // std::cout<<"Sigma : \n"     << Sigma <<std::endl;
+      // std::cout<<"duil : \n"      << duil <<std::endl;
+      // getchar();
       
       USigma.set_row (counter, u_i_Sigma.data_block());
       dUl.set_row    (counter, this->tensor2vec (duil));
