@@ -75,7 +75,7 @@ namespace itk
 
     TensorType out;
     out.SetVnlMatrix (T);
-    if (out.GetEigenValue(2) > 20.0)
+    if (out.GetEigenvalue(2) > 20.0)
     {
       itkWarningMacro (<<"outlier tensor : \n"<<out);
       out = static_cast<TensorType>(0.0);
