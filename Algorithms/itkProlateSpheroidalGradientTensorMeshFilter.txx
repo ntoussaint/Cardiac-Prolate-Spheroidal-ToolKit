@@ -162,15 +162,15 @@ namespace itk
     InternalMatrixType m (3,3);
     m.set_identity();
     
-    if (m_UsePiWorkAround)
-    {
-      if (m_Transform.IsNull())
-      {
-    	itkWarningMacro (<<"Prolate Spheroidal Transform is null, cannot estimate Sigma\n");
-      }
-      else
-    	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);
-    }
+    // if (m_UsePiWorkAround)
+    // {
+    //   if (m_Transform.IsNull())
+    //   {
+    // 	itkWarningMacro (<<"Prolate Spheroidal Transform is null, cannot estimate Sigma\n");
+    //   }
+    //   else
+    // 	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);
+    // }
     
     m.put (0,0, 1.0 / h[0]);
     m.put (1,1, 1.0 / h[1]);
