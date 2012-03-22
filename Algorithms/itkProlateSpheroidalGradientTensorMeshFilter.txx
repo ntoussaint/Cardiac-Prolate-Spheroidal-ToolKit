@@ -338,15 +338,15 @@ namespace itk
 
     this->CopyInputMeshToOutputMeshPoints();
     
-    typename PixelContainer::Pointer outputdata   = PixelContainer::New();    
-    outputdata->Reserve (input1->GetNumberOfPoints());
-    output1->SetPointData (outputdata);
-    output2->SetPointData (outputdata);
-    output3->SetPointData (outputdata);
-
-    output1->SetPointData (outputdata);
-    output2->SetPointData (outputdata);
-    output3->SetPointData (outputdata);
+    typename PixelContainer::Pointer outputdata1   = PixelContainer::New();    
+    typename PixelContainer::Pointer outputdata2   = PixelContainer::New();    
+    typename PixelContainer::Pointer outputdata3   = PixelContainer::New();    
+    outputdata1->Reserve (input1->GetNumberOfPoints());
+    outputdata2->Reserve (input1->GetNumberOfPoints());
+    outputdata3->Reserve (input1->GetNumberOfPoints());
+    output1->SetPointData (outputdata1);
+    output2->SetPointData (outputdata2);
+    output3->SetPointData (outputdata3);
 
     typename PointContainer::ConstPointer datapoints = input2->GetPoints();
     typename PointContainer::ConstPointer samplingpoints = input1->GetPoints();
@@ -400,7 +400,6 @@ namespace itk
       out_it3.Value() = p;
       ++in_it; ++out_it1; ++out_it2; ++out_it3;
     }
-
     
     output1->SetPoints (logsamplingpoints1);
     output2->SetPoints (logsamplingpoints2);
