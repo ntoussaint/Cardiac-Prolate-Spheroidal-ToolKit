@@ -353,10 +353,6 @@ namespace itk
     typename PixelContainer::ConstPointer datapixels = input2->GetPointData();
     typename PixelContainer::ConstPointer samplingpixels = input1->GetPointData();
     
-    output1->SetPoints (samplingpoints);
-    output2->SetPoints (samplingpoints);
-    output3->SetPoints (samplingpoints);
-    
     typename PointContainer::Pointer logdatapoints = PointContainer::New();
     typename PointContainer::Pointer logsamplingpoints1 = PointContainer::New();
     typename PointContainer::Pointer logsamplingpoints2 = PointContainer::New();
@@ -404,6 +400,12 @@ namespace itk
       out_it3.Value() = p;
       ++in_it; ++out_it1; ++out_it2; ++out_it3;
     }
+
+    
+    output1->SetPoints (logsamplingpoints1);
+    output2->SetPoints (logsamplingpoints2);
+    output3->SetPoints (logsamplingpoints3);
+    
     
   }
   
