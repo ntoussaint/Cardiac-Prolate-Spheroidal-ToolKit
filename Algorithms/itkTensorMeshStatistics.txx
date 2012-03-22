@@ -75,9 +75,6 @@ namespace itk
     m_AuxTransformer           = TransformerType::New();
     m_MeshOutput               = MeshType::New();
 
-    m_GradientFilter           = GradientFilterType::New();
-    
-
   };
   
   template< class TPrecision, unsigned int TDimension>

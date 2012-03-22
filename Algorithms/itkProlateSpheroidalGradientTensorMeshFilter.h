@@ -97,7 +97,7 @@ namespace itk
     ~ProlateSpheroidalGradientTensorMeshFilter(){};
 
     void EvaluateAtIndex (unsigned long index);
-    void EvaluateUSigmaAnddUl (unsigned long index, InternalMatrixType USigma, InternalMatrixType dUl);
+    void EvaluateUSigmaAnddUl (unsigned long index, InternalMatrixType &USigma, InternalMatrixType &dUl);
     InternalMatrixType EvaluateSigma (PointType p);
   
     void GenerateData ();

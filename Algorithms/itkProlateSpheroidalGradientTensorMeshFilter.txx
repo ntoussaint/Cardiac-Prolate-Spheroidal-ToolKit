@@ -73,11 +73,13 @@ namespace itk
     InternalMatrixType dUl    (input->GetNumberOfPoints(), TensorType::DegreesOfFreedom);
     this->EvaluateUSigmaAnddUl (index, USigma, dUl);
 
-    
     SolverType solver (USigma);
     // solve USigma . gradl = dUl
     InternalMatrixType gradl = solver.solve (dUl);
 
+    itkDebugMacro (<<"found gradl = \n"<<gradl);
+    // getchar();
+    
     output1->SetPointData (index, this->vec2tensor (gradl.get_row (0)));
     output2->SetPointData (index, this->vec2tensor (gradl.get_row (1)));
     output3->SetPointData (index, this->vec2tensor (gradl.get_row (2)));
@@ -85,7 +87,7 @@ namespace itk
 
   template<class TMesh>
   void
-  ProlateSpheroidalGradientTensorMeshFilter<TMesh>::EvaluateUSigmaAnddUl (unsigned long index, InternalMatrixType USigma, InternalMatrixType dUl)
+  ProlateSpheroidalGradientTensorMeshFilter<TMesh>::EvaluateUSigmaAnddUl (unsigned long index, InternalMatrixType &USigma, InternalMatrixType &dUl)
   {
     typedef typename MeshType::PointDataContainer  PixelContainer;
     typedef typename MeshType::PointsContainer     PointContainer;
@@ -134,10 +136,11 @@ namespace itk
       }      
 
       u_i_Sigma = Sigma * u_i.GetVnlVector();
-
+      
       itkDebugMacro (<<"u_i_Sigma : \n" << u_i_Sigma );
-      itkDebugMacro (<<"Sigma : "     << Sigma );
-      itkDebugMacro (<<"duil : "      << duil );
+      itkDebugMacro (<<"Sigma : \n"     << Sigma );
+      itkDebugMacro (<<"duil : \n"      << duil );
+      // getchar();
       
       USigma.set_row (counter, u_i_Sigma.data_block());
       dUl.set_row    (counter, this->tensor2vec (duil));
