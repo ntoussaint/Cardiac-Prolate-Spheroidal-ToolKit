@@ -91,6 +91,9 @@ CreatePtkCommand(ExtractKernelsEnveloppe
 CreatePtkCommand(TensorMeshGradient
   "gradient" "Compute the gradient of a tensor field in Prolate Spheroidal sense"
   )
+CreatePtkCommand(TensorMeshStructure
+  "structure" "Compute the structure tensor field of a tensor field in Prolate Spheroidal sense"
+  )
 
 add_library(PTKCommands ${PTK_BUILD_TYPE}
   ${PTK_COMMAND_SRCS}

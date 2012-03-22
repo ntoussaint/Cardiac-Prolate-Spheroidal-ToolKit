@@ -73,6 +73,7 @@ namespace itk
     InternalMatrixType dUl    (input->GetNumberOfPoints(), TensorType::DegreesOfFreedom);
     this->EvaluateUSigmaAnddUl (index, USigma, dUl);
 
+    
     SolverType solver (USigma);
     // solve USigma . gradl = dUl
     InternalMatrixType gradl = solver.solve (dUl);
@@ -133,6 +134,10 @@ namespace itk
       }      
 
       u_i_Sigma = Sigma * u_i.GetVnlVector();
+
+      itkDebugMacro (<<"u_i_Sigma : \n" << u_i_Sigma );
+      itkDebugMacro (<<"Sigma : "     << Sigma );
+      itkDebugMacro (<<"duil : "      << duil );
       
       USigma.set_row (counter, u_i_Sigma.data_block());
       dUl.set_row    (counter, this->tensor2vec (duil));
@@ -152,20 +157,21 @@ namespace itk
     // and get the scaling factors
     double h[3] = {1,1,1};
     InternalMatrixType m (3,3);
-
+    m.set_identity();
+    
     if (m_UsePiWorkAround)
     {
       if (m_Transform.IsNull())
       {
-	itkWarningMacro (<<"Prolate Spheroidal Transform is null, cannot estimate Sigma\n");
+    	itkWarningMacro (<<"Prolate Spheroidal Transform is null, cannot estimate Sigma\n");
       }
       else
-	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);
+    	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);
     }
     
-    m[0][0] = h[0];
-    m[1][1] = h[1];
-    m[2][2] = h[2];
+    m.put (0,0, 1.0 / h[0]);
+    m.put (1,1, 1.0 / h[1]);
+    m.put (2,2, 1.0 / h[2]);
 
     return m;
   }

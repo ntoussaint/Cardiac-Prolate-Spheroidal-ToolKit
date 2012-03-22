@@ -15,7 +15,7 @@
   PURPOSE.  See the above copyright notices for more information.
 
   ============================================================================*/
-#include <itkTensorMeshGradientCommand.h>
+#include <itkTensorMeshStructureCommand.h>
 
 #include <itkTensorImageIO.h>
 #include <itkTensorMeshIO.h>
@@ -25,7 +25,7 @@
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
 
-#include "itkProlateSpheroidalGradientTensorMeshFilter.h"
+#include "itkProlateSpheroidalStructureTensorMeshFilter.h"
 #include "itkTensorImageToMeshFilter.h"
 #include "itkTensorMeshToImageFilter.h"
 #include "itkWarpTensorMeshFilter.h"
@@ -36,9 +36,9 @@
 namespace itk
 {
 
-  TensorMeshGradientCommand::TensorMeshGradientCommand()
+  TensorMeshStructureCommand::TensorMeshStructureCommand()
   {
-    m_ShortDescription = "Compute the gradient of a tensor field in Prolate Spheroidal sense";
+    m_ShortDescription = "Compute the structure tensor field of a tensor field in Prolate Spheroidal sense";
     m_LongDescription += m_ShortDescription;
     m_LongDescription += "\n\nUsage:\n";
     
@@ -46,14 +46,14 @@ namespace itk
     m_LongDescription += "-pr   [prolate transform used]\n";
     m_LongDescription += "-f1   [forward displacement field (default : forward.mha)]\n";
     m_LongDescription += "-f2   [backward displacement field (default : backward.mha)]\n";  
-    m_LongDescription += "-o    [output image]\n";
+    m_LongDescription += "-o    [output structure tensor field]\n";
     
   }
 
-  TensorMeshGradientCommand::~TensorMeshGradientCommand()
+  TensorMeshStructureCommand::~TensorMeshStructureCommand()
   {}
 
-  int TensorMeshGradientCommand::Execute (int narg, const char* arg[])
+  int TensorMeshStructureCommand::Execute (int narg, const char* arg[])
   {
     
     typedef double                                      ScalarType;
@@ -61,7 +61,7 @@ namespace itk
     typedef itk::TensorMeshIO<ScalarType, 3, 3>         TensorMeshIOType;
     typedef TensorMeshIOType::TensorMeshType            MeshType;
     
-    typedef itk::ProlateSpheroidalGradientTensorMeshFilter<MeshType> FilterType;
+    typedef itk::ProlateSpheroidalStructureTensorMeshFilter<MeshType> FilterType;
     
     typedef FilterType::TensorType                      TensorType;
     typedef FilterType::TransformType                   TransformType;
@@ -70,8 +70,7 @@ namespace itk
     typedef itk::Image<DisplacementType, 3>             DisplacementFieldType;
     typedef itk::ImageFileReader<DisplacementFieldType> DisplacementFileReaderType;
     typedef itk::TensorImageToMeshFilter<TensorType, 3> ImageToMeshFilterType;
-    typedef itk::TensorMeshToImageFilter<TensorType, 3> MeshToImageFilterType;
-    
+
     typedef itk::WarpTensorMeshFilter<MeshType, DisplacementFieldType>  WarperType;
     typedef itk::ProlateSpheroidalTransformTensorMeshFilter<MeshType>   TransformerType;    
  
@@ -169,50 +168,30 @@ namespace itk
     MeshType::Pointer data = transformer->GetOutput();
     data->DisconnectPipeline();
     
-    FilterType::Pointer gradientfilter = FilterType::New();
-    gradientfilter->SetInput (0, data);
-    gradientfilter->SetInput (1, data);
-    gradientfilter->SetTransform (transform);
-    gradientfilter->Update();
+    FilterType::Pointer structurefilter = FilterType::New();
+    structurefilter->SetInput (0, data);
+    structurefilter->SetInput (1, data);
+    structurefilter->SetTransform (transform);
+    structurefilter->Update();
 
-    MeshType::Pointer gradient1 = gradientfilter->GetOutput(0);
-    MeshType::Pointer gradient2 = gradientfilter->GetOutput(1);
-    MeshType::Pointer gradient3 = gradientfilter->GetOutput(2);
+    MeshType::Pointer structure = structurefilter->GetOutput();
+    structure->DisconnectPipeline();
     
-    gradient1->DisconnectPipeline();
-    gradient2->DisconnectPipeline();
-    gradient3->DisconnectPipeline();
-
     TransformerType::Pointer backtransformer = TransformerType::New();
     backtransformer->SetTransform (backtransform);
-    backtransformer->SetInput (gradient1);
+    backtransformer->SetInput (structure);
     backtransformer->Update();
 
     WarperType::Pointer backwarper = WarperType::New();
     backwarper->SetDisplacementField (inversedisplacementfield);
     backwarper->SetInverseDisplacementField (displacementfield);
     backwarper->SetInput (backtransformer->GetOutput());
-    backwarper->Update();
+    backwarper->Update();    
     
     TensorMeshIOType::Pointer meshwriter = TensorMeshIOType::New();
     meshwriter->SetInput (backwarper->GetOutput());
-    meshwriter->SetFileName ("gradient1.vtk");
+    meshwriter->SetFileName (outputfile);  
     meshwriter->Write();
-
-    backtransformer->SetInput (gradient2);
-    backtransformer->Update();
-    backwarper->SetInput (backtransformer->GetOutput());
-    backwarper->Update();
-    meshwriter->SetFileName ("gradient2.vtk");
-    meshwriter->Write();
-
-    backtransformer->SetInput (gradient3);
-    backtransformer->Update();
-    backwarper->SetInput (backtransformer->GetOutput());
-    backwarper->Update();
-    meshwriter->SetFileName ("gradient3.vtk");
-    meshwriter->Write();
-
 
     return EXIT_SUCCESS;
   
