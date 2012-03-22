@@ -173,6 +173,8 @@ namespace itk
     gradientfilter->SetInput (0, data);
     gradientfilter->SetInput (1, data);
     gradientfilter->SetTransform (transform);
+    gradientfilter->UsePiWorkAroundOn();
+    
     gradientfilter->Update();
 
     MeshType::Pointer gradient1 = gradientfilter->GetOutput(0);

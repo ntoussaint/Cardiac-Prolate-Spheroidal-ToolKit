@@ -186,7 +186,7 @@ namespace itk
   ProlateSpheroidalGradientTensorMeshFilter<TMesh>
   ::BeforeThreadedGenerateData()
   {
-    std::cout<<"tensors LOG"<<std::endl;
+    std::cout<<"gradient: tensors LOG"<<std::endl;
     
     typedef typename MeshType::PointDataContainer  PixelContainer;
     typename PixelContainer::ConstPointer pixels = this->GetInput(1)->GetPointData();
@@ -231,7 +231,7 @@ namespace itk
   ::AfterThreadedGenerateData()
   {
 
-    std::cout<<"tensors EXP"<<std::endl;
+    std::cout<<"gradient: tensors EXP"<<std::endl;
 
     typedef typename MeshType::PointDataContainer  PixelContainer;
     typename PixelContainer::Pointer pixels1    = this->GetOutput(0)->GetPointData();

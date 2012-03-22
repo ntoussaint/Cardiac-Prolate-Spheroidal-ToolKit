@@ -172,6 +172,8 @@ namespace itk
     structurefilter->SetInput (0, data);
     structurefilter->SetInput (1, data);
     structurefilter->SetTransform (transform);
+    structurefilter->UsePiWorkAroundOn();
+    
     structurefilter->Update();
 
     MeshType::Pointer structure = structurefilter->GetOutput();
