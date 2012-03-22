@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkProlateSpheroidalTransformTensorMeshFilter.h"
 #include "itkWarpTensorMeshFilter.h"
 
+#include <itkProlateSpheroidalGradientTensorMeshFilter.h>
+
 #include <vector>
 
 namespace itk
@@ -77,6 +79,8 @@ namespace itk
 
     typedef typename TensorType::VectorType VectorType;
     typedef typename MeshType::PointType PointType;
+
+    typedef ProlateSpheroidalGradientTensorMeshFilter<MeshType> GradientFilterType;
     
     enum CoordinatesTypesIds
     {
@@ -149,6 +153,8 @@ namespace itk
     typename WarperType::Pointer             m_AuxWarper;
     typename MeshType::Pointer               m_MeshOutput;
 
+    typename GradientFilterType::Pointer     m_GradientFilter;
+    
     unsigned int m_StatisticsOutputType;
     unsigned int m_CoordinatesType;
     
