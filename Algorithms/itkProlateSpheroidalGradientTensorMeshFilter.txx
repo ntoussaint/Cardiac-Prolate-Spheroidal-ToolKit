@@ -172,9 +172,9 @@ namespace itk
     	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);
     }
     
-    m.put (0,0, h[0]);
-    m.put (1,1, h[1]);
-    m.put (2,2, h[2]);
+    m.put (0,0, 1.0/(h[0]*h[0]));
+    m.put (1,1, 1.0/(h[1]*h[1]));
+    m.put (2,2, 1.0/(h[2]*h[2]));
 
     return m;
   }
