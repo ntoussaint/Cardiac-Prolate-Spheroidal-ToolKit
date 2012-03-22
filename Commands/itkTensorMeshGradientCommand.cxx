@@ -187,7 +187,7 @@ namespace itk
 
     TransformerType::Pointer backtransformer = TransformerType::New();
     backtransformer->SetTransform (backtransform);
-    backtransformer->SetInput (gradient1);
+    backtransformer->SetInput (gradient2);
     backtransformer->Update();
 
     WarperType::Pointer backwarper = WarperType::New();
@@ -198,13 +198,6 @@ namespace itk
     
     TensorMeshIOType::Pointer meshwriter = TensorMeshIOType::New();
     meshwriter->SetInput (backwarper->GetOutput());
-    meshwriter->SetFileName ("gradient1.vtk");
-    meshwriter->Write();
-
-    backtransformer->SetInput (gradient2);
-    backtransformer->Update();
-    backwarper->SetInput (backtransformer->GetOutput());
-    backwarper->Update();
     meshwriter->SetFileName ("gradient2.vtk");
     meshwriter->Write();
 
@@ -213,6 +206,13 @@ namespace itk
     backwarper->SetInput (backtransformer->GetOutput());
     backwarper->Update();
     meshwriter->SetFileName ("gradient3.vtk");
+    meshwriter->Write();
+
+    backtransformer->SetInput (gradient1);
+    backtransformer->Update();
+    backwarper->SetInput (backtransformer->GetOutput());
+    backwarper->Update();
+    meshwriter->SetFileName ("gradient1.vtk");
     meshwriter->Write();
 
 
