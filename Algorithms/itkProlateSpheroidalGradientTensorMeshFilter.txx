@@ -344,10 +344,18 @@ namespace itk
     output2->SetPointData (outputdata);
     output3->SetPointData (outputdata);
 
+    output1->SetPointData (outputdata);
+    output2->SetPointData (outputdata);
+    output3->SetPointData (outputdata);
+
     typename PointContainer::ConstPointer datapoints = input2->GetPoints();
     typename PointContainer::ConstPointer samplingpoints = input1->GetPoints();
     typename PixelContainer::ConstPointer datapixels = input2->GetPointData();
     typename PixelContainer::ConstPointer samplingpixels = input1->GetPointData();
+    
+    output1->SetPoints (samplingpoints);
+    output2->SetPoints (samplingpoints);
+    output3->SetPoints (samplingpoints);
     
     typename PointContainer::Pointer logdatapoints = PointContainer::New();
     typename PointContainer::Pointer logsamplingpoints1 = PointContainer::New();
