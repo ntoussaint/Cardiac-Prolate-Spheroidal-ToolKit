@@ -82,17 +82,17 @@ namespace itk
     
     /// solve [ Sigma . U ] . gradl = dUl    
     SolverType solver (U.transpose());
-    InternalMatrixType M    = solver.U();
-    InternalMatrixType S    = solver.W();
-    InternalMatrixType Sinv = solver.Winverse();
-    InternalMatrixType N    = solver.V();
+    // InternalMatrixType M    = solver.U();
+    // InternalMatrixType S    = solver.W();
+    // InternalMatrixType Sinv = solver.Winverse();
+    // InternalMatrixType N    = solver.V();
 
-    InternalMatrixType m1 = N * Sinv;
-    InternalMatrixType m2 = M.transpose() * Sigma;
-    InternalMatrixType m = m1 * m2;
+    // InternalMatrixType m1 = N * Sinv;
+    // InternalMatrixType m2 = M.transpose() * Sigma;
+    // InternalMatrixType m = m1 * m2;
+    // InternalMatrixType gradl = m * dUl;
     
-    // InternalMatrixType gradl = solver.solve (dUl);
-    InternalMatrixType gradl = m * dUl;
+    InternalMatrixType gradl = solver.solve (dUl);
 
     TensorType
       t1 = this->vec2tensor (gradl.get_row (0)),
