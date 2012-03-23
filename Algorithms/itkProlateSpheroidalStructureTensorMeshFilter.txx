@@ -76,7 +76,7 @@ namespace itk
     TensorType out;
     out.SetVnlMatrix (T);
 
-    out = out.Exp();
+    // out = out.Exp();
     
     // if (out.GetFA() > 0.999)
     // {
@@ -110,30 +110,30 @@ namespace itk
     
     std::cout<<"structure: tensors LOG"<<std::endl;
     
-    typedef typename MeshType::PointDataContainer  PixelContainer;
-    typename PixelContainer::Pointer pixels1    = m_Gradient1->GetPointData();
-    typename PixelContainer::Pointer pixels2    = m_Gradient2->GetPointData();
-    typename PixelContainer::Pointer pixels3    = m_Gradient3->GetPointData();
-    typename PixelContainer::Iterator it1       = pixels1->Begin();
-    typename PixelContainer::Iterator it2       = pixels2->Begin();
-    typename PixelContainer::Iterator it3       = pixels3->Begin();
+    // typedef typename MeshType::PointDataContainer  PixelContainer;
+    // typename PixelContainer::Pointer pixels1    = m_Gradient1->GetPointData();
+    // typename PixelContainer::Pointer pixels2    = m_Gradient2->GetPointData();
+    // typename PixelContainer::Pointer pixels3    = m_Gradient3->GetPointData();
+    // typename PixelContainer::Iterator it1       = pixels1->Begin();
+    // typename PixelContainer::Iterator it2       = pixels2->Begin();
+    // typename PixelContainer::Iterator it3       = pixels3->Begin();
 
-    while( it1 != pixels1->End() )
-    {
-      if (!it1.Value().IsFinite() || it1.Value().HasNans() || !it1.Value().IsPositive())
-	std::cout<<"T1 is given not finite at "<<it1.Value()<<std::endl;
-      else
-	it1.Value() = it1.Value().Log();
-      if (!it2.Value().IsFinite() || it2.Value().HasNans() || !it2.Value().IsPositive())
-	std::cout<<"T2 is given not finite at "<<it2.Value()<<std::endl;
-      else
-	it2.Value() = it2.Value().Log();
-      if (!it3.Value().IsFinite() || it3.Value().HasNans() || !it3.Value().IsPositive())
-	std::cout<<"T3 is given not finite at "<<it3.Value()<<std::endl;
-      else
-	it3.Value() = it3.Value().Log();
-      ++it1; ++it2; ++it3;
-    }
+    // while( it1 != pixels1->End() )
+    // {
+    //   if (!it1.Value().IsFinite() || it1.Value().HasNans() || !it1.Value().IsPositive())
+    // 	std::cout<<"T1 is given not finite at "<<it1.Value()<<std::endl;
+    //   else
+    // 	it1.Value() = it1.Value().Log();
+    //   if (!it2.Value().IsFinite() || it2.Value().HasNans() || !it2.Value().IsPositive())
+    // 	std::cout<<"T2 is given not finite at "<<it2.Value()<<std::endl;
+    //   else
+    // 	it2.Value() = it2.Value().Log();
+    //   if (!it3.Value().IsFinite() || it3.Value().HasNans() || !it3.Value().IsPositive())
+    // 	std::cout<<"T3 is given not finite at "<<it3.Value()<<std::endl;
+    //   else
+    // 	it3.Value() = it3.Value().Log();
+    //   ++it1; ++it2; ++it3;
+    // }
     
   }
   
