@@ -79,13 +79,20 @@ namespace itk
     this->EvaluateUAnddUl (index, U, dUl);
     
     InternalMatrixType Sigma = this->EvaluateSigma (p);    
-    InternalMatrixType SigmaU = Sigma * U;
     
-    /// solve [ Sigma . U ] . gradl = dUl
+    /// solve [ Sigma . U ] . gradl = dUl    
+    SolverType solver (U);
+    InternalMatrixType M    = solver.U();
+    InternalMatrixType S    = solver.W();
+    InternalMatrixType Sinv = solver.Winverse();
+    InternalMatrixType N    = solver.V();
+
+    InternalMatrixType m1 = N * Sinv;
+    InternalMatrixType m2 = M.transpose() * Sigma;
+    InternalMatrixType m = m1 * m2;
     
-    /// Not sure this is the best way to solve this simple LLSQR problem
-    SolverType solver (SigmaU);
-    InternalMatrixType gradl = solver.solve (dUl);
+    // InternalMatrixType gradl = solver.solve (dUl);
+    InternalMatrixType gradl = m * dUl;
 
     TensorType
       t1 = this->vec2tensor (gradl.get_row (0)),
