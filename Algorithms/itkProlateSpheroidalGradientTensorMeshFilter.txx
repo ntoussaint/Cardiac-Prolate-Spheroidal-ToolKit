@@ -92,7 +92,7 @@ namespace itk
       t2 = this->vec2tensor (gradl.get_row (1)),
       t3 = this->vec2tensor (gradl.get_row (2));
     
-    double threshold = 10.0;
+    double threshold = 100.0;
     
     if (t1.GetNorm() > threshold) std::cerr<<"found outlier t1 tensor:\n"<<t1<<std::endl;
     if (t2.GetNorm() > threshold) std::cerr<<"found outlier t2 tensor:\n"<<t2<<std::endl;
