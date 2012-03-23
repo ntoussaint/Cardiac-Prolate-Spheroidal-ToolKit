@@ -92,18 +92,18 @@ namespace itk
       t2 = this->vec2tensor (gradl.get_row (1)),
       t3 = this->vec2tensor (gradl.get_row (2));
     
-    double threshold = 100.0;
+    // double threshold = 100.0;
     
-    if (t1.GetNorm() > threshold) std::cerr<<"found outlier t1 tensor:\n"<<t1<<std::endl;
-    if (t2.GetNorm() > threshold) std::cerr<<"found outlier t2 tensor:\n"<<t2<<std::endl;
-    if (t3.GetNorm() > threshold) std::cerr<<"found outlier t3 tensor:\n"<<t3<<std::endl;
-    if ( (t1.GetNorm() > threshold) || (t1.GetNorm() > threshold) || (t1.GetNorm() > threshold) )
-    {
-      t1 = TensorType (static_cast<ScalarType>(0.0));
-      t2 = TensorType (static_cast<ScalarType>(0.0));
-      t3 = TensorType (static_cast<ScalarType>(0.0));
-      getchar();
-    }
+    // if (t1.GetNorm() > threshold) std::cerr<<"found outlier t1 tensor:\n"<<t1<<std::endl;
+    // if (t2.GetNorm() > threshold) std::cerr<<"found outlier t2 tensor:\n"<<t2<<std::endl;
+    // if (t3.GetNorm() > threshold) std::cerr<<"found outlier t3 tensor:\n"<<t3<<std::endl;
+    // if ( (t1.GetNorm() > threshold) || (t1.GetNorm() > threshold) || (t1.GetNorm() > threshold) )
+    // {
+    //   t1 = TensorType (static_cast<ScalarType>(0.0));
+    //   t2 = TensorType (static_cast<ScalarType>(0.0));
+    //   t3 = TensorType (static_cast<ScalarType>(0.0));
+    //   getchar();
+    // }
     
     output1->SetPointData (index, t1);
     output2->SetPointData (index, t2);
