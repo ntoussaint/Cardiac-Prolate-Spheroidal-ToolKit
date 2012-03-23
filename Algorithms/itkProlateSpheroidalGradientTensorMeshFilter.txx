@@ -90,11 +90,12 @@ namespace itk
       t3 = this->vec2tensor (gradl.get_row (2));
 
     
-    if (t1.GetNorm() > 50)
-    {
-      std::cout<<"t1 got overloaded norm at index "<<index<<" :\n"<<t1<<std::endl;
-      getchar();
-    }
+    // std::cout<<"at index "<<index<<" :"<<std::endl;
+    // std::cout<<"t1\n"<<t1.Exp()<<std::endl;
+    // std::cout<<"t2\n"<<t2.Exp()<<std::endl;
+    // std::cout<<"t3\n"<<t3.Exp()<<std::endl;
+    // std::cout<<"fa-s : "<<t1.Exp().GetFA()<<" : "<<t2.Exp().GetFA()<<" : "<<t3.Exp().GetFA()<<std::endl;
+    // getchar();
     
     output1->SetPointData (index, t1);
     output2->SetPointData (index, t2);

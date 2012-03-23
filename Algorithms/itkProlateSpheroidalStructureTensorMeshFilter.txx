@@ -75,12 +75,14 @@ namespace itk
 
     TensorType out;
     out.SetVnlMatrix (T);
+
+    out = out.Exp();
     
-    if (out.GetFA() > 0.999)
-    {
-      itkWarningMacro (<<"outlier tensor : \n"<<out);
-      out = static_cast<TensorType>(0.0);
-    }
+    // if (out.GetFA() > 0.999)
+    // {
+    //   itkWarningMacro (<<"outlier tensor : \n"<<out);
+    //   out = static_cast<TensorType>(0.0);
+    // }
     
     output->SetPointData (index, out);
   }
