@@ -79,25 +79,21 @@ namespace itk
     this->EvaluateUAnddUl (index, U, dUl);
     
     InternalMatrixType Sigma = this->EvaluateSigma (p);    
+    InternalMatrixType SigmaU = Sigma * U;
     
-    /// solve Sigma . U . gradl = dUl
+    /// solve [ Sigma . U ] . gradl = dUl
+    
     /// Not sure this is the best way to solve this simple LLSQR problem
-    SolverType solver (Sigma * U);
+    SolverType solver (SigmaU);
     InternalMatrixType gradl = solver.solve (dUl);
     
     output1->SetPointData (index, this->vec2tensor (gradl.get_row (0)));
     output2->SetPointData (index, this->vec2tensor (gradl.get_row (1)));
     output3->SetPointData (index, this->vec2tensor (gradl.get_row (2)));
 
-    // std::cout<<"computing USigma_t"<<std::endl;    
-    // InternalMatrixType USigma_t = Sigma2 * U;
-    // std::cout<<"computing USigma"<<std::endl;    
-    // InternalMatrixType USigma = U.transpose() * USigma_t;    
-    // std::cout<<"computing USolver"<<std::endl;
-    // InternalMatrixType Usolver = vnl_inverse (USigma) * U.transpose() * Sigma;
-    // std::cout<<"computing gradl"<<std::endl;
-    // InternalMatrixType gradl = Usolver * dUl;
-    // std::cout<<"found gradl = \n"<<gradl<<std::endl;
+    std::cout<<"found gradl = \n"<<gradl<<std::endl;
+    getchar();
+    
   }
 
   template<class TMesh>
