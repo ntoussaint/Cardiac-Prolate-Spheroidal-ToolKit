@@ -81,7 +81,7 @@ namespace itk
     InternalMatrixType Sigma = this->EvaluateSigma (p);    
     
     /// solve [ Sigma . U ] . gradl = dUl    
-    SolverType solver (U);
+    SolverType solver (U.transpose());
     InternalMatrixType M    = solver.U();
     InternalMatrixType S    = solver.W();
     InternalMatrixType Sinv = solver.Winverse();
