@@ -142,20 +142,20 @@ namespace itk
   ::AfterThreadedGenerateData()
   {
 
-    std::cout<<"structure: tensors EXP"<<std::endl;
+    // std::cout<<"structure: tensors EXP"<<std::endl;
 
-    typedef typename MeshType::PointDataContainer  PixelContainer;
-    typename PixelContainer::Pointer pixels    = this->GetOutput()->GetPointData();
-    typename PixelContainer::Iterator it       = pixels->Begin();
+    // typedef typename MeshType::PointDataContainer  PixelContainer;
+    // typename PixelContainer::Pointer pixels    = this->GetOutput()->GetPointData();
+    // typename PixelContainer::Iterator it       = pixels->Begin();
 
-    while( it != pixels->End() )
-    {
-      if (!it.Value().IsFinite() || it.Value().HasNans())
-	std::cout<<"T is given not finite at "<<it.Value()<<std::endl;
-      else
-	it.Value() = it.Value().Exp();
-      ++it;
-    }
+    // while( it != pixels->End() )
+    // {
+    //   if (!it.Value().IsFinite() || it.Value().HasNans())
+    // 	std::cout<<"T is given not finite at "<<it.Value()<<std::endl;
+    //   else
+    // 	it.Value() = it.Value().Exp();
+    //   ++it;
+    // }
     
   }
 
