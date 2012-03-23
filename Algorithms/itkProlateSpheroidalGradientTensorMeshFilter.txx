@@ -80,37 +80,14 @@ namespace itk
     
     InternalMatrixType Sigma = this->EvaluateSigma (p);    
     
-    /// solve [ Sigma . U ] . gradl = dUl 
-
+    /// solve [ U Sigma ] . gradl = dUl
     SolverType solver (U * Sigma);
-    // InternalMatrixType M    = solver.U();
-    // InternalMatrixType S    = solver.W();
-    // InternalMatrixType Sinv = solver.Winverse();
-    // InternalMatrixType N    = solver.V();
-    // InternalMatrixType m1 = N * Sinv;
-    // InternalMatrixType m2 = M.transpose() * Sigma;
-    // InternalMatrixType m = m1 * m2;
-    // InternalMatrixType gradl = m * dUl;
-    
     InternalMatrixType gradl = solver.solve (dUl);
 
     TensorType
       t1 = this->vec2tensor (gradl.get_row (0)),
       t2 = this->vec2tensor (gradl.get_row (1)),
       t3 = this->vec2tensor (gradl.get_row (2));
-    
-    // double threshold = 100.0;
-    
-    // if (t1.GetNorm() > threshold) std::cerr<<"found outlier t1 tensor:\n"<<t1<<std::endl;
-    // if (t2.GetNorm() > threshold) std::cerr<<"found outlier t2 tensor:\n"<<t2<<std::endl;
-    // if (t3.GetNorm() > threshold) std::cerr<<"found outlier t3 tensor:\n"<<t3<<std::endl;
-    // if ( (t1.GetNorm() > threshold) || (t1.GetNorm() > threshold) || (t1.GetNorm() > threshold) )
-    // {
-    //   t1 = TensorType (static_cast<ScalarType>(0.0));
-    //   t2 = TensorType (static_cast<ScalarType>(0.0));
-    //   t3 = TensorType (static_cast<ScalarType>(0.0));
-    //   getchar();
-    // }
     
     output1->SetPointData (index, t1);
     output2->SetPointData (index, t2);
@@ -182,15 +159,15 @@ namespace itk
     InternalMatrixType m (3,3);
     m.set_identity();
     
-    if (m_UsePiWorkAround)
-    {
-      if (m_Transform.IsNull())
-      {
-    	itkWarningMacro (<<"Prolate Spheroidal Transform is null, cannot estimate Sigma\n");
-      }
-      else
-    	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);
-    }
+    // if (m_UsePiWorkAround)
+    // {
+    //   if (m_Transform.IsNull())
+    //   {
+    // 	itkWarningMacro (<<"Prolate Spheroidal Transform is null, cannot estimate Sigma\n");
+    //   }
+    //   else
+    // 	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);
+    // }
     
     m.put (0,0, 1.0/h[0]);
     m.put (1,1, 1.0/h[1]);
