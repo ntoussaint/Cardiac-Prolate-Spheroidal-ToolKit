@@ -74,10 +74,10 @@ namespace itk
     typedef typename MeshType::PointType  PointType;
     typedef Vector <ScalarType, 3>        VectorType;
     typedef CovariantVector<double, 3>    CovariantVectorType;
-    typedef vnl_svd< ScalarType >         SolverType;
     typedef vnl_matrix< ScalarType >      InternalMatrixType;
     typedef vnl_vector< ScalarType >      InternalVectorType;
-
+    typedef vnl_svd< ScalarType >         SolverType;
+  
     typedef ProlateSpheroidalTransform<ScalarType> TransformType;
 
     itkGetObjectMacro (Transform, TransformType);
@@ -97,7 +97,7 @@ namespace itk
     ~ProlateSpheroidalGradientTensorMeshFilter(){};
 
     void EvaluateAtIndex (unsigned long index);
-    void EvaluateUSigmaAnddUl (unsigned long index, InternalMatrixType &USigma, InternalMatrixType &dUl);
+    void EvaluateUAnddUl (unsigned long index, InternalMatrixType &U, InternalMatrixType &dUl);
     InternalMatrixType EvaluateSigma (PointType p);
   
     void GenerateData ();

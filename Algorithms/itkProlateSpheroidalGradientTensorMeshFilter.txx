@@ -19,8 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _itk_ProlateSpheroidalGradientTensorMeshFilter_txx_
 
 #include "itkProlateSpheroidalGradientTensorMeshFilter.h"
-#include <cstdio>
-
+#include <vnl/vnl_inverse.h>
 namespace itk
 {
 
@@ -69,25 +68,41 @@ namespace itk
     MeshType* output2 = m_LogOutput2;
     MeshType* output3 = m_LogOutput3;
 
-    InternalMatrixType USigma (input->GetNumberOfPoints(), 3);
-    InternalMatrixType dUl    (input->GetNumberOfPoints(), TensorType::DegreesOfFreedom);
-    this->EvaluateUSigmaAnddUl (index, USigma, dUl);
-
-    SolverType solver (USigma);
-    // solve USigma . gradl = dUl
+    
+    InternalMatrixType U     (input->GetNumberOfPoints(), 3);
+    InternalMatrixType dUl   (input->GetNumberOfPoints(), TensorType::DegreesOfFreedom);
+    
+    typename PointType::ValueType zeros[3] = {0,0,0};
+    PointType p  (zeros);
+    output1->GetPoint (index, & p);
+    
+    this->EvaluateUAnddUl (index, U, dUl);
+    
+    InternalMatrixType Sigma = this->EvaluateSigma (p);    
+    
+    /// solve Sigma . U . gradl = dUl
+    /// Not sure this is the best way to solve this simple LLSQR problem
+    SolverType solver (Sigma * U);
     InternalMatrixType gradl = solver.solve (dUl);
-
-    itkDebugMacro (<<"found gradl = \n"<<gradl);
-    // getchar();
     
     output1->SetPointData (index, this->vec2tensor (gradl.get_row (0)));
     output2->SetPointData (index, this->vec2tensor (gradl.get_row (1)));
     output3->SetPointData (index, this->vec2tensor (gradl.get_row (2)));
+
+    // std::cout<<"computing USigma_t"<<std::endl;    
+    // InternalMatrixType USigma_t = Sigma2 * U;
+    // std::cout<<"computing USigma"<<std::endl;    
+    // InternalMatrixType USigma = U.transpose() * USigma_t;    
+    // std::cout<<"computing USolver"<<std::endl;
+    // InternalMatrixType Usolver = vnl_inverse (USigma) * U.transpose() * Sigma;
+    // std::cout<<"computing gradl"<<std::endl;
+    // InternalMatrixType gradl = Usolver * dUl;
+    // std::cout<<"found gradl = \n"<<gradl<<std::endl;
   }
 
   template<class TMesh>
   void
-  ProlateSpheroidalGradientTensorMeshFilter<TMesh>::EvaluateUSigmaAnddUl (unsigned long index, InternalMatrixType &USigma, InternalMatrixType &dUl)
+  ProlateSpheroidalGradientTensorMeshFilter<TMesh>::EvaluateUAnddUl (unsigned long index, InternalMatrixType &U, InternalMatrixType &dUl)
   {
     typedef typename MeshType::PointDataContainer  PixelContainer;
     typedef typename MeshType::PointsContainer     PointContainer;
@@ -98,15 +113,12 @@ namespace itk
 
     MeshType* output1 = m_LogOutput1;
     typename PointType::ValueType zeros[3] = {0,0,0};
-    
     PointType p  (zeros);
     TensorType t (static_cast<ScalarType>(0.0));
     PointType ptn;
     TensorType tn;
     VectorType u_i;
     TensorType duil;
-    InternalMatrixType Sigma;
-    InternalVectorType u_i_Sigma;
     
     output1->GetPoint (index, & p);
     output1->GetPointData (index, & t);
@@ -121,8 +133,6 @@ namespace itk
       u_i = ptn - p;
       duil = tn - t;
       
-      Sigma = this->EvaluateSigma (ptn);
-
       if (m_UsePiWorkAround)
       {
 	while (u_i[2] >= vnl_math::pi)
@@ -133,16 +143,9 @@ namespace itk
 	  u_i[1] -= 2 * vnl_math::pi;
 	while (u_i[1] < - vnl_math::pi)
 	  u_i[1] += 2 * vnl_math::pi;
-      }      
+      }
 
-      u_i_Sigma = Sigma * u_i.GetVnlVector();
-      
-      // std::cout<<"u_i_Sigma : \n" << u_i_Sigma <<std::endl;
-      // std::cout<<"Sigma : \n"     << Sigma <<std::endl;
-      // std::cout<<"duil : \n"      << duil <<std::endl;
-      // getchar();
-      
-      USigma.set_row (counter, u_i_Sigma.data_block());
+      U.set_row (counter, u_i.GetDataPointer());
       dUl.set_row    (counter, this->tensor2vec (duil));
       
       ++p_it;
@@ -172,9 +175,9 @@ namespace itk
     	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);
     }
     
-    m.put (0,0, 1.0/(h[0]*h[0]));
-    m.put (1,1, 1.0/(h[1]*h[1]));
-    m.put (2,2, 1.0/(h[2]*h[2]));
+    m.put (0,0, 1.0/h[0]);
+    m.put (1,1, 1.0/h[1]);
+    m.put (2,2, 1.0/h[2]);
 
     return m;
   }
