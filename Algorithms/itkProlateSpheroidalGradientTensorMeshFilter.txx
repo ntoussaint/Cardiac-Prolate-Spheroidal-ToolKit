@@ -88,6 +88,13 @@ namespace itk
       t1 = this->vec2tensor (gradl.get_row (0)),
       t2 = this->vec2tensor (gradl.get_row (1)),
       t3 = this->vec2tensor (gradl.get_row (2));
+
+    
+    if (t1.GetNorm() > 50)
+    {
+      std::cout<<"t1 got overloaded norm at index "<<index<<" :\n"<<t1<<std::endl;
+      getchar();
+    }
     
     output1->SetPointData (index, t1);
     output2->SetPointData (index, t2);
@@ -169,7 +176,7 @@ namespace itk
     	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);
     }
     
-    m.put (0,0, 0.75/h[0]);
+    m.put (0,0, 1.0/h[0]);
     m.put (1,1, 1.0/h[1]);
     m.put (2,2, 1.0/h[2]);
 
