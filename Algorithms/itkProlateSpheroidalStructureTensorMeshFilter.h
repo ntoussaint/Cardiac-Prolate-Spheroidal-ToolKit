@@ -139,9 +139,9 @@ namespace itk
     void operator=(const Self&); // purposely not implemented
     
     unsigned int               m_UsePiWorkAround;
-    typename MeshType::Pointer m_Gradient1;
-    typename MeshType::Pointer m_Gradient2;
-    typename MeshType::Pointer m_Gradient3;
+    typename MeshType::Pointer m_LogGradient1;
+    typename MeshType::Pointer m_LogGradient2;
+    typename MeshType::Pointer m_LogGradient3;
     
     typename MeshType::Pointer m_LogOutput;
 

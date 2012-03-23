@@ -44,6 +44,11 @@ namespace itk
     m_Transform = 0;
 
     m_GradientFilter = GradientFilterType::New();
+
+    m_LogOutput = MeshType::New();
+    m_LogGradient1 = MeshType::New();
+    m_LogGradient2 = MeshType::New();
+    m_LogGradient3 = MeshType::New();
     
     this->SetNumberOfRequiredOutputs(1);
     this->SetNumberOfRequiredInputs(2);
@@ -56,15 +61,15 @@ namespace itk
   ProlateSpheroidalStructureTensorMeshFilter<TMesh>
   ::EvaluateAtIndex(unsigned long index)
   {
-    typename MeshType::Pointer      output  = this->GetOutput();
+    typename MeshType::Pointer logoutput  = m_LogOutput;
     
     TensorType g1 (static_cast<ScalarType>(0.0));
     TensorType g2 (static_cast<ScalarType>(0.0));
     TensorType g3 (static_cast<ScalarType>(0.0));
     
-    m_Gradient1->GetPointData (index, &g1);
-    m_Gradient2->GetPointData (index, &g2);
-    m_Gradient3->GetPointData (index, &g3);
+    m_LogGradient1->GetPointData (index, &g1);
+    m_LogGradient2->GetPointData (index, &g2);
+    m_LogGradient3->GetPointData (index, &g3);
 
     InternalMatrixType gradl (3, TensorType::DegreesOfFreedom);
     gradl.set_row (0, this->tensor2vec (g1));
@@ -76,15 +81,7 @@ namespace itk
     TensorType out;
     out.SetVnlMatrix (T);
 
-    // out = out.Exp();
-    
-    // if (out.GetFA() > 0.999)
-    // {
-    //   itkWarningMacro (<<"outlier tensor : \n"<<out);
-    //   out = static_cast<TensorType>(0.0);
-    // }
-    
-    output->SetPointData (index, out);
+    logoutput->SetPointData (index, out);
   }
 
   template<class TMesh>
@@ -100,41 +97,49 @@ namespace itk
 
     m_GradientFilter->Update();
 
-    m_Gradient1 = m_GradientFilter->GetOutput (0);
-    m_Gradient2 = m_GradientFilter->GetOutput (1);
-    m_Gradient3 = m_GradientFilter->GetOutput (2);
+    typename MeshType::Pointer l1  = m_GradientFilter->GetOutput (0);
+    typename MeshType::Pointer l2  = m_GradientFilter->GetOutput (1);
+    typename MeshType::Pointer l3  = m_GradientFilter->GetOutput (2);
 
-    m_Gradient1->DisconnectPipeline();
-    m_Gradient2->DisconnectPipeline();
-    m_Gradient3->DisconnectPipeline();
+    l1->DisconnectPipeline();
+    l2->DisconnectPipeline();
+    l3->DisconnectPipeline();
     
     std::cout<<"structure: tensors LOG"<<std::endl;
     
-    // typedef typename MeshType::PointDataContainer  PixelContainer;
-    // typename PixelContainer::Pointer pixels1    = m_Gradient1->GetPointData();
-    // typename PixelContainer::Pointer pixels2    = m_Gradient2->GetPointData();
-    // typename PixelContainer::Pointer pixels3    = m_Gradient3->GetPointData();
-    // typename PixelContainer::Iterator it1       = pixels1->Begin();
-    // typename PixelContainer::Iterator it2       = pixels2->Begin();
-    // typename PixelContainer::Iterator it3       = pixels3->Begin();
-
-    // while( it1 != pixels1->End() )
-    // {
-    //   if (!it1.Value().IsFinite() || it1.Value().HasNans() || !it1.Value().IsPositive())
-    // 	std::cout<<"T1 is given not finite at "<<it1.Value()<<std::endl;
-    //   else
-    // 	it1.Value() = it1.Value().Log();
-    //   if (!it2.Value().IsFinite() || it2.Value().HasNans() || !it2.Value().IsPositive())
-    // 	std::cout<<"T2 is given not finite at "<<it2.Value()<<std::endl;
-    //   else
-    // 	it2.Value() = it2.Value().Log();
-    //   if (!it3.Value().IsFinite() || it3.Value().HasNans() || !it3.Value().IsPositive())
-    // 	std::cout<<"T3 is given not finite at "<<it3.Value()<<std::endl;
-    //   else
-    // 	it3.Value() = it3.Value().Log();
-    //   ++it1; ++it2; ++it3;
-    // }
+    typedef typename MeshType::PointDataContainer  PixelContainer;
+    typename PixelContainer::Pointer pixels1    = l1->GetPointData();
+    typename PixelContainer::Pointer pixels2    = l2->GetPointData();
+    typename PixelContainer::Pointer pixels3    = l3->GetPointData();
+    typename PixelContainer::Pointer logpixels1    = m_LogGradient1->GetPointData();
+    typename PixelContainer::Pointer logpixels2    = m_LogGradient2->GetPointData();
+    typename PixelContainer::Pointer logpixels3    = m_LogGradient3->GetPointData();
     
+    typename PixelContainer::Iterator it1       = pixels1->Begin();
+    typename PixelContainer::Iterator it2       = pixels2->Begin();
+    typename PixelContainer::Iterator it3       = pixels3->Begin();
+    typename PixelContainer::Iterator logit1       = logpixels1->Begin();
+    typename PixelContainer::Iterator logit2       = logpixels2->Begin();
+    typename PixelContainer::Iterator logit3       = logpixels3->Begin();
+
+    while( it1 != pixels1->End() )
+    {
+      if (!it1.Value().IsFinite() || it1.Value().HasNans() || !it1.Value().IsPositive())
+    	std::cout<<"T1 is given not finite at "<<it1.Value()<<std::endl;
+      else
+    	logit1.Value() = it1.Value().Log();
+      if (!it2.Value().IsFinite() || it2.Value().HasNans() || !it2.Value().IsPositive())
+    	std::cout<<"T2 is given not finite at "<<it2.Value()<<std::endl;
+      else
+    	logit2.Value() = it2.Value().Log();
+      if (!it3.Value().IsFinite() || it3.Value().HasNans() || !it3.Value().IsPositive())
+    	std::cout<<"T3 is given not finite at "<<it3.Value()<<std::endl;
+      else
+    	logit3.Value() = it3.Value().Log();
+
+      ++logit1; ++logit2; ++logit3;
+      ++it1; ++it2; ++it3;
+    }
   }
   
   template<class TMesh>
@@ -142,21 +147,23 @@ namespace itk
   ::AfterThreadedGenerateData()
   {
 
-    // std::cout<<"structure: tensors EXP"<<std::endl;
+    std::cout<<"structure: tensors EXP"<<std::endl;
 
-    // typedef typename MeshType::PointDataContainer  PixelContainer;
-    // typename PixelContainer::Pointer pixels    = this->GetOutput()->GetPointData();
-    // typename PixelContainer::Iterator it       = pixels->Begin();
+    typedef typename MeshType::PointDataContainer  PixelContainer;
+    typename PixelContainer::Pointer logpixels = m_LogOutput->GetPointData();
+    typename PixelContainer::Pointer pixels    = this->GetOutput()->GetPointData();
+    typename PixelContainer::Iterator logit    = logpixels->Begin();
+    typename PixelContainer::Iterator it       = pixels->Begin();
 
-    // while( it != pixels->End() )
-    // {
-    //   if (!it.Value().IsFinite() || it.Value().HasNans())
-    // 	std::cout<<"T is given not finite at "<<it.Value()<<std::endl;
-    //   else
-    // 	it.Value() = it.Value().Exp();
-    //   ++it;
-    // }
-    
+    while( it != pixels->End() )
+    {
+      if (!it.Value().IsFinite() || it.Value().HasNans())
+    	std::cout<<"T is given not finite at "<<it.Value()<<std::endl;
+      else
+    	it.Value() = logit.Value().Exp();
+
+      ++it; ++logit;
+    } 
   }
 
   
@@ -225,9 +232,52 @@ namespace itk
 
     this->CopyInputMeshToOutputMeshPoints();
     
-    typename PixelContainer::Pointer outputdata   = PixelContainer::New();    
+    typename PixelContainer::Pointer outputdata = PixelContainer::New();    
     outputdata->Reserve (input1->GetNumberOfPoints());
     output->SetPointData (outputdata);
+    
+    typename PointContainer::Pointer logpoints = PointContainer::New();
+    typename PointContainer::Pointer logpoints1 = PointContainer::New();
+    typename PointContainer::Pointer logpoints2 = PointContainer::New();
+    typename PointContainer::Pointer logpoints3 = PointContainer::New();
+    typename PixelContainer::Pointer logpixels = PixelContainer::New();
+    typename PixelContainer::Pointer logpixels1 = PixelContainer::New();
+    typename PixelContainer::Pointer logpixels2 = PixelContainer::New();
+    typename PixelContainer::Pointer logpixels3 = PixelContainer::New();
+    logpoints->Reserve (input1->GetNumberOfPoints());
+    logpoints1->Reserve (input1->GetNumberOfPoints());
+    logpoints2->Reserve (input1->GetNumberOfPoints());
+    logpoints3->Reserve (input1->GetNumberOfPoints());
+    logpixels->Reserve (input1->GetNumberOfPoints());
+    logpixels1->Reserve (input1->GetNumberOfPoints());
+    logpixels2->Reserve (input1->GetNumberOfPoints());
+    logpixels3->Reserve (input1->GetNumberOfPoints());
+    
+    m_LogOutput->SetPoints (logpoints);
+    m_LogGradient1->SetPoints (logpoints1);
+    m_LogGradient2->SetPoints (logpoints2);
+    m_LogGradient3->SetPoints (logpoints3);
+    m_LogOutput->SetPointData (logpixels);
+    m_LogGradient1->SetPointData (logpixels1);
+    m_LogGradient2->SetPointData (logpixels2);
+    m_LogGradient3->SetPointData (logpixels3);
+
+    typename PointContainer::ConstIterator  in_it  = input1->GetPoints()->Begin();
+    typename PointContainer::Iterator      out_it  = logpoints->Begin();
+    typename PointContainer::Iterator      out_it1  = logpoints1->Begin();
+    typename PointContainer::Iterator      out_it2  = logpoints2->Begin();
+    typename PointContainer::Iterator      out_it3  = logpoints3->Begin();
+    PointType  p;
+    
+    while(in_it != input1->GetPoints()->End())
+    {
+      p = in_it.Value();
+      out_it.Value() = p;
+      out_it1.Value() = p;
+      out_it2.Value() = p;
+      out_it3.Value() = p;
+      ++in_it; ++out_it; ++out_it1; ++out_it2; ++out_it3;
+    }
     
   }
   

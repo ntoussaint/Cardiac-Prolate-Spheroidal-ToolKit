@@ -88,7 +88,6 @@ namespace itk
       t1 = this->vec2tensor (gradl.get_row (0)),
       t2 = this->vec2tensor (gradl.get_row (1)),
       t3 = this->vec2tensor (gradl.get_row (2));
-
     
     // std::cout<<"at index "<<index<<" :"<<std::endl;
     // std::cout<<"t1\n"<<t1.Exp()<<std::endl;
