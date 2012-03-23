@@ -660,6 +660,11 @@ namespace itk
       ds = std::sqrt ( ds );
       length += ds;
       pt += step;
+      if (pt[2] > (2 * vnl_math::pi))
+        pt[2] -= 2 * vnl_math::pi;
+      if (pt[2] < 0)
+        pt[2] += 2 * vnl_math::pi;
+
     }
 
     return length;
