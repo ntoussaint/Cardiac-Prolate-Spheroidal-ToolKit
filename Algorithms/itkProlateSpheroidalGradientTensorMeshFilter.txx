@@ -67,7 +67,6 @@ namespace itk
     MeshType* output1 = m_LogOutput1;
     MeshType* output2 = m_LogOutput2;
     MeshType* output3 = m_LogOutput3;
-
     
     InternalMatrixType U     (input->GetNumberOfPoints(), 3);
     InternalMatrixType dUl   (input->GetNumberOfPoints(), TensorType::DegreesOfFreedom);
@@ -88,13 +87,30 @@ namespace itk
       t1 = this->vec2tensor (gradl.get_row (0)),
       t2 = this->vec2tensor (gradl.get_row (1)),
       t3 = this->vec2tensor (gradl.get_row (2));
+
+    // if ( (index == 1670) ||  (index == 1671))
+    // {
+    //   typename MeshType::ConstPointer originalinput = this->GetInput(0);
+    //   TensorType t (static_cast<ScalarType>(0.0));
+    //   originalinput->GetPointData (index, & t);
+    	
+    // std::cout<<"============ index "<<index<<" ============"<<std::endl;
     
-    // std::cout<<"at index "<<index<<" :"<<std::endl;
-    // std::cout<<"t1\n"<<t1.Exp()<<std::endl;
-    // std::cout<<"t2\n"<<t2.Exp()<<std::endl;
-    // std::cout<<"t3\n"<<t3.Exp()<<std::endl;
-    // std::cout<<"fa-s : "<<t1.Exp().GetFA()<<" : "<<t2.Exp().GetFA()<<" : "<<t3.Exp().GetFA()<<std::endl;
+    // std::cout<<"t : \n"<<t<<std::endl;
+    // std::cout<<"gradl : \n"<<gradl<<std::endl;
+    // std::cout<<"sigma : \n"<<Sigma<<std::endl;
+    // std::cout<<"t1 : \n"<<t1.Exp()<<std::endl;
+    // std::cout<<"t2 : \n"<<t2.Exp()<<std::endl;
+    // std::cout<<"t3 : \n"<<t3.Exp()<<std::endl;
+      
+    // std::cout<<"FA   = "<<t1.Exp().GetFA()<<" : "<<t2.Exp().GetFA()<<" : "<<t3.Exp().GetFA()<<std::endl;
+    // std::cout<<"Norm = "<<t1.Exp().GetNorm()<<" : "<<t2.Exp().GetNorm()<<" : "<<t3.Exp().GetNorm()<<std::endl;
+
+    // std::cout<<"U : \n"<<U<<std::endl;
+    // std::cout<<"dUl : \n"<<dUl<<std::endl;
+    
     // getchar();
+    // }
     
     output1->SetPointData (index, t1);
     output2->SetPointData (index, t2);
@@ -112,7 +128,7 @@ namespace itk
     typename PointContainer::Iterator p_it = points->Begin();
     typename PixelContainer::Iterator t_it = tensors->Begin();
 
-    MeshType* output1 = m_LogOutput1;
+    typename MeshType::ConstPointer input = this->GetInput(0);
     typename PointType::ValueType zeros[3] = {0,0,0};
     PointType p  (zeros);
     TensorType t (static_cast<ScalarType>(0.0));
@@ -121,8 +137,11 @@ namespace itk
     VectorType u_i;
     TensorType duil;
     
-    output1->GetPoint (index, & p);
-    output1->GetPointData (index, & t);
+    input->GetPoint (index, & p);
+    input->GetPointData (index, & t);
+
+    t = t.Log();
+    
     
     unsigned long counter = 0;
     

@@ -75,12 +75,24 @@ namespace itk
     gradl.set_row (0, this->tensor2vec (g1));
     gradl.set_row (1, this->tensor2vec (g2));
     gradl.set_row (2, this->tensor2vec (g3));
-
+    
     InternalMatrixType T = gradl * gradl.transpose();
-
+    
     TensorType out;
     out.SetVnlMatrix (T);
 
+    // std::cout<<"============ index "<<index<<" ============"<<std::endl;
+    // std::cout<<"g1 : \n"<<g1.Exp()<<std::endl;
+    // std::cout<<"g2 : \n"<<g2.Exp()<<std::endl;
+    // std::cout<<"g3 : \n"<<g3.Exp()<<std::endl;
+    // std::cout<<"gradl : \n"<<gradl<<std::endl;
+    // std::cout<<"out : \n"<<out<<std::endl;
+    // std::cout<<"out.Exp : \n"<<out.Exp()<<std::endl;
+      
+    // std::cout<<"FA   = "<<g1.Exp().GetFA()<<" : "<<g2.Exp().GetFA()<<" : "<<g3.Exp().GetFA()<<" : "<<out.Exp().GetFA()<<std::endl;
+    // std::cout<<"Norm = "<<g1.Exp().GetNorm()<<" : "<<g2.Exp().GetNorm()<<" : "<<g3.Exp().GetNorm()<<" : "<<out.Exp().GetNorm()<<std::endl;
+    // getchar();
+      
     logoutput->SetPointData (index, out);
   }
 
