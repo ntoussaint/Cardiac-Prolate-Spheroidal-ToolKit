@@ -58,8 +58,8 @@ namespace itk
       pix = itIn.Get();
       this->GetInput()->TransformIndexToPhysicalPoint(itIn.GetIndex(), x);
       
-      // if (pix.GetTrace() > vcl_numeric_limits<ScalarType>::epsilon())
-      if (pix.GetTrace() > 0.05)
+      if (pix.GetTrace() > vcl_numeric_limits<ScalarType>::epsilon())
+      // if (pix.GetTrace() > 0.05)
       {
 	pix = pix.ApplyMatrix(this->GetInput()->GetDirection());
 	this->GetOutput()->SetPoint (counter, x);

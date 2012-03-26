@@ -167,6 +167,7 @@ namespace itk
     
     MeshType::Pointer data = transformer->GetOutput();
     data->DisconnectPipeline();
+
     
     FilterType::Pointer structurefilter = FilterType::New();
     structurefilter->SetInput (0, data);

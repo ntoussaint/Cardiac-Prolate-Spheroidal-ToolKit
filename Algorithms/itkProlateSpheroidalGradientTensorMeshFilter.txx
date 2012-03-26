@@ -88,6 +88,31 @@ namespace itk
       t2 = this->vec2tensor (gradl.get_row (1)),
       t3 = this->vec2tensor (gradl.get_row (2));
 
+    // if (t1.GetTrace() > 10)
+    // {
+      
+    //   typename MeshType::ConstPointer originalinput = this->GetInput(0);
+    //   TensorType t (static_cast<ScalarType>(0.0));
+    //   originalinput->GetPointData (index, & t);
+    	
+    //   std::cout<<"============ index "<<index<<" ============"<<std::endl;
+      
+    //   std::cout<<"t : \n"<<t<<std::endl;
+    //   std::cout<<"gradl : \n"<<gradl<<std::endl;
+    //   std::cout<<"sigma : \n"<<Sigma<<std::endl;
+    //   std::cout<<"t1 : \n"<<t1.Exp()<<std::endl;
+    //   std::cout<<"t2 : \n"<<t2.Exp()<<std::endl;
+    //   std::cout<<"t3 : \n"<<t3.Exp()<<std::endl;
+      
+    //   std::cout<<"FA   = "<<t1.Exp().GetFA()<<" : "<<t2.Exp().GetFA()<<" : "<<t3.Exp().GetFA()<<std::endl;
+    //   std::cout<<"Norm = "<<t1.Exp().GetNorm()<<" : "<<t2.Exp().GetNorm()<<" : "<<t3.Exp().GetNorm()<<std::endl;
+      
+    //   std::cout<<"U : \n"<<U<<std::endl;
+    //   std::cout<<"dUl : \n"<<dUl<<std::endl;
+      
+    //   getchar();
+    // }
+    
     // if ( (index == 1670) ||  (index == 1671))
     // {
     //   typename MeshType::ConstPointer originalinput = this->GetInput(0);
@@ -257,12 +282,14 @@ namespace itk
     std::cout<<"gradient: tensors EXP"<<std::endl;
 
     typedef typename MeshType::PointDataContainer  PixelContainer;
+    typename PixelContainer::ConstPointer inputpixels = this->GetInput(0)->GetPointData();
     typename PixelContainer::Pointer pixels1    = this->GetOutput(0)->GetPointData();
     typename PixelContainer::Pointer pixels2    = this->GetOutput(1)->GetPointData();
     typename PixelContainer::Pointer pixels3    = this->GetOutput(2)->GetPointData();
     typename PixelContainer::Pointer logpixels1 =       m_LogOutput1->GetPointData();
     typename PixelContainer::Pointer logpixels2 =       m_LogOutput2->GetPointData();
     typename PixelContainer::Pointer logpixels3 =       m_LogOutput3->GetPointData();
+    typename PixelContainer::ConstIterator inputit =    inputpixels->Begin();
     typename PixelContainer::Iterator it1    =    pixels1->Begin();
     typename PixelContainer::Iterator it2    =    pixels2->Begin();
     typename PixelContainer::Iterator it3    =    pixels3->Begin();
@@ -272,19 +299,21 @@ namespace itk
 
     while( logit1 != logpixels1->End() )
     {
+      
       if (!logit1.Value().IsFinite() || logit1.Value().HasNans())
 	std::cout<<"T1 is given not finite at "<<logit1.Value()<<std::endl;
       else
-	it1.Value() = logit1.Value().Exp();
+	it1.Value() = inputit.Value().GetNorm() * logit1.Value().Exp();
       if (!logit2.Value().IsFinite() || logit2.Value().HasNans())
 	std::cout<<"T2 is given not finite at "<<logit2.Value()<<std::endl;
       else
-	it2.Value() = logit2.Value().Exp();
+	it2.Value() = inputit.Value().GetNorm() * logit2.Value().Exp();
       if (!logit3.Value().IsFinite() || logit3.Value().HasNans())
 	std::cout<<"T3 is given not finite at "<<logit3.Value()<<std::endl;
       else
-	it3.Value() = logit3.Value().Exp();
+	it3.Value() = inputit.Value().GetNorm() * logit3.Value().Exp();
       
+      ++inputit;
       ++it1; ++logit1;
       ++it2; ++logit2;
       ++it3; ++logit3;

@@ -66,33 +66,42 @@ namespace itk
     TensorType g1 (static_cast<ScalarType>(0.0));
     TensorType g2 (static_cast<ScalarType>(0.0));
     TensorType g3 (static_cast<ScalarType>(0.0));
+    TensorType out (static_cast<ScalarType>(0.0));
+    InternalMatrixType gradl (3, TensorType::DegreesOfFreedom);
     
     m_LogGradient1->GetPointData (index, &g1);
     m_LogGradient2->GetPointData (index, &g2);
     m_LogGradient3->GetPointData (index, &g3);
 
-    InternalMatrixType gradl (3, TensorType::DegreesOfFreedom);
-    gradl.set_row (0, this->tensor2vec (g1));
-    gradl.set_row (1, this->tensor2vec (g2));
-    gradl.set_row (2, this->tensor2vec (g3));
-    
-    InternalMatrixType T = gradl * gradl.transpose();
-    
-    TensorType out;
-    out.SetVnlMatrix (T);
+    if ( (g1.Exp().GetNorm() > 0.001) &&
+	 (g2.Exp().GetNorm() > 0.001) &&
+	 (g3.Exp().GetNorm() > 0.001)
+	 )
+    {
+      gradl.set_row (0, this->tensor2vec (g1));
+      gradl.set_row (1, this->tensor2vec (g2));
+      gradl.set_row (2, this->tensor2vec (g3));
+      
+      InternalMatrixType T = gradl * gradl.transpose();
+      
+      out.SetVnlMatrix (T);
+    }
+    else
+    {
+      // std::cout<<"found near zero gradient..."<<std::endl;
+      // std::cout<<"============ index "<<index<<" ============"<<std::endl;
+      // std::cout<<"g1 : \n"<<g1.Exp()<<std::endl;
+      // std::cout<<"g2 : \n"<<g2.Exp()<<std::endl;
+      // std::cout<<"g3 : \n"<<g3.Exp()<<std::endl;
+      // std::cout<<"gradl : \n"<<gradl<<std::endl;
+      // std::cout<<"out : \n"<<out<<std::endl;
+      // std::cout<<"out.Exp : \n"<<out.Exp()<<std::endl;
+      
+      // std::cout<<"FA   = "<<g1.Exp().GetFA()<<" : "<<g2.Exp().GetFA()<<" : "<<g3.Exp().GetFA()<<" : "<<out.Exp().GetFA()<<std::endl;
+      // std::cout<<"Norm = "<<g1.Exp().GetNorm()<<" : "<<g2.Exp().GetNorm()<<" : "<<g3.Exp().GetNorm()<<" : "<<out.Exp().GetNorm()<<std::endl;
+      // getchar();
+    }
 
-    // std::cout<<"============ index "<<index<<" ============"<<std::endl;
-    // std::cout<<"g1 : \n"<<g1.Exp()<<std::endl;
-    // std::cout<<"g2 : \n"<<g2.Exp()<<std::endl;
-    // std::cout<<"g3 : \n"<<g3.Exp()<<std::endl;
-    // std::cout<<"gradl : \n"<<gradl<<std::endl;
-    // std::cout<<"out : \n"<<out<<std::endl;
-    // std::cout<<"out.Exp : \n"<<out.Exp()<<std::endl;
-      
-    // std::cout<<"FA   = "<<g1.Exp().GetFA()<<" : "<<g2.Exp().GetFA()<<" : "<<g3.Exp().GetFA()<<" : "<<out.Exp().GetFA()<<std::endl;
-    // std::cout<<"Norm = "<<g1.Exp().GetNorm()<<" : "<<g2.Exp().GetNorm()<<" : "<<g3.Exp().GetNorm()<<" : "<<out.Exp().GetNorm()<<std::endl;
-    // getchar();
-      
     logoutput->SetPointData (index, out);
   }
 
@@ -163,8 +172,10 @@ namespace itk
 
     typedef typename MeshType::PointDataContainer  PixelContainer;
     typename PixelContainer::Pointer logpixels = m_LogOutput->GetPointData();
+    typename PixelContainer::ConstPointer inputpixels = this->GetInput(0)->GetPointData();
     typename PixelContainer::Pointer pixels    = this->GetOutput()->GetPointData();
     typename PixelContainer::Iterator logit    = logpixels->Begin();
+    typename PixelContainer::ConstIterator inputit = inputpixels->Begin();
     typename PixelContainer::Iterator it       = pixels->Begin();
 
     while( it != pixels->End() )
@@ -172,9 +183,9 @@ namespace itk
       if (!it.Value().IsFinite() || it.Value().HasNans())
     	std::cout<<"T is given not finite at "<<it.Value()<<std::endl;
       else
-    	it.Value() = logit.Value().Exp();
+    	it.Value() = inputit.Value().GetNorm() * logit.Value().Exp();
 
-      ++it; ++logit;
+      ++it; ++logit; ++inputit;
     } 
   }
 
