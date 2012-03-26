@@ -55,6 +55,10 @@ namespace itk
 
   int TensorMeshStructureCommand::Execute (int narg, const char* arg[])
   {
+
+
+    bool use_prolate = 0;
+    
     
     typedef double                                      ScalarType;
     typedef itk::TensorImageIO<ScalarType, 3, 3>        TensorIOType;
@@ -165,7 +169,13 @@ namespace itk
     transformer->SetInput (warper->GetOutput());
     transformer->Update();
     
-    MeshType::Pointer data = transformer->GetOutput();
+    MeshType::Pointer data;
+
+    if (use_prolate)
+      data = transformer->GetOutput();
+    else
+      data = image2mesh->GetOutput();
+    
     data->DisconnectPipeline();
 
     
@@ -173,7 +183,7 @@ namespace itk
     structurefilter->SetInput (0, data);
     structurefilter->SetInput (1, data);
     structurefilter->SetTransform (transform);
-    structurefilter->UsePiWorkAroundOn();
+    structurefilter->SetUsePiWorkAround(use_prolate);
     
     structurefilter->Update();
 
@@ -181,18 +191,29 @@ namespace itk
     structure->DisconnectPipeline();
     
     TransformerType::Pointer backtransformer = TransformerType::New();
-    backtransformer->SetTransform (backtransform);
-    backtransformer->SetInput (structure);
-    backtransformer->Update();
 
+    if (use_prolate)
+    {
+      backtransformer->SetTransform (backtransform);
+      backtransformer->SetInput (structure);
+      backtransformer->Update();
+    }
+    
     WarperType::Pointer backwarper = WarperType::New();
-    backwarper->SetDisplacementField (inversedisplacementfield);
-    backwarper->SetInverseDisplacementField (displacementfield);
-    backwarper->SetInput (backtransformer->GetOutput());
-    backwarper->Update();    
+    if (use_prolate)
+    {
+      backwarper->SetDisplacementField (inversedisplacementfield);
+      backwarper->SetInverseDisplacementField (displacementfield);
+      backwarper->SetInput (backtransformer->GetOutput());
+      backwarper->Update();    
+    }
     
     TensorMeshIOType::Pointer meshwriter = TensorMeshIOType::New();
-    meshwriter->SetInput (backwarper->GetOutput());
+    if (use_prolate)
+      meshwriter->SetInput (backwarper->GetOutput());
+    else
+      meshwriter->SetInput (structure);
+    
     meshwriter->SetFileName (outputfile);  
     meshwriter->Write();
 

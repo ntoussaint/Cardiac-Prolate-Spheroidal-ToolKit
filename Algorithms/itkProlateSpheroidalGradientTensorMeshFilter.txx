@@ -88,31 +88,6 @@ namespace itk
       t2 = this->vec2tensor (gradl.get_row (1)),
       t3 = this->vec2tensor (gradl.get_row (2));
 
-    // if (t1.GetTrace() > 10)
-    // {
-      
-    //   typename MeshType::ConstPointer originalinput = this->GetInput(0);
-    //   TensorType t (static_cast<ScalarType>(0.0));
-    //   originalinput->GetPointData (index, & t);
-    	
-    //   std::cout<<"============ index "<<index<<" ============"<<std::endl;
-      
-    //   std::cout<<"t : \n"<<t<<std::endl;
-    //   std::cout<<"gradl : \n"<<gradl<<std::endl;
-    //   std::cout<<"sigma : \n"<<Sigma<<std::endl;
-    //   std::cout<<"t1 : \n"<<t1.Exp()<<std::endl;
-    //   std::cout<<"t2 : \n"<<t2.Exp()<<std::endl;
-    //   std::cout<<"t3 : \n"<<t3.Exp()<<std::endl;
-      
-    //   std::cout<<"FA   = "<<t1.Exp().GetFA()<<" : "<<t2.Exp().GetFA()<<" : "<<t3.Exp().GetFA()<<std::endl;
-    //   std::cout<<"Norm = "<<t1.Exp().GetNorm()<<" : "<<t2.Exp().GetNorm()<<" : "<<t3.Exp().GetNorm()<<std::endl;
-      
-    //   std::cout<<"U : \n"<<U<<std::endl;
-    //   std::cout<<"dUl : \n"<<dUl<<std::endl;
-      
-    //   getchar();
-    // }
-    
     // if ( (index == 1670) ||  (index == 1671))
     // {
     //   typename MeshType::ConstPointer originalinput = this->GetInput(0);

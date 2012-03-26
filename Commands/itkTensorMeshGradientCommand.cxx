@@ -55,6 +55,10 @@ namespace itk
 
   int TensorMeshGradientCommand::Execute (int narg, const char* arg[])
   {
+
+    
+    bool use_prolate = 0;
+    
     
     typedef double                                      ScalarType;
     typedef itk::TensorImageIO<ScalarType, 3, 3>        TensorIOType;
@@ -166,14 +170,20 @@ namespace itk
     transformer->SetInput (warper->GetOutput());
     transformer->Update();
     
-    MeshType::Pointer data = transformer->GetOutput();
+    MeshType::Pointer data;
+
+    if (use_prolate)
+      data = transformer->GetOutput();
+    else
+      data = image2mesh->GetOutput();
+    
     data->DisconnectPipeline();
     
     FilterType::Pointer gradientfilter = FilterType::New();
     gradientfilter->SetInput (0, data);
     gradientfilter->SetInput (1, data);
     gradientfilter->SetTransform (transform);
-    gradientfilter->UsePiWorkAroundOn();
+    gradientfilter->SetUsePiWorkAround(use_prolate);
     
     gradientfilter->Update();
 
@@ -186,32 +196,56 @@ namespace itk
     gradient3->DisconnectPipeline();
 
     TransformerType::Pointer backtransformer = TransformerType::New();
-    backtransformer->SetTransform (backtransform);
-    backtransformer->SetInput (gradient2);
-    backtransformer->Update();
-
+    if (use_prolate)
+    {
+      backtransformer->SetTransform (backtransform);
+      backtransformer->SetInput (gradient2);
+      backtransformer->Update();
+    }
+    
     WarperType::Pointer backwarper = WarperType::New();
-    backwarper->SetDisplacementField (inversedisplacementfield);
-    backwarper->SetInverseDisplacementField (displacementfield);
-    backwarper->SetInput (backtransformer->GetOutput());
-    backwarper->Update();
+    if (use_prolate)
+    {
+      backwarper->SetDisplacementField (inversedisplacementfield);
+      backwarper->SetInverseDisplacementField (displacementfield);
+      backwarper->SetInput (backtransformer->GetOutput());
+      backwarper->Update();
+    }
     
     TensorMeshIOType::Pointer meshwriter = TensorMeshIOType::New();
-    meshwriter->SetInput (backwarper->GetOutput());
+    if (use_prolate)
+      meshwriter->SetInput (backwarper->GetOutput());
+    else
+       meshwriter->SetInput (gradient2);
     meshwriter->SetFileName ("gradient2.vtk");
     meshwriter->Write();
 
-    backtransformer->SetInput (gradient3);
-    backtransformer->Update();
-    backwarper->SetInput (backtransformer->GetOutput());
-    backwarper->Update();
+    
+    if (use_prolate)
+    {
+      backtransformer->SetInput (gradient3);
+      backtransformer->Update();
+      backwarper->Update();
+    }
+    if (use_prolate)
+      meshwriter->SetInput (backwarper->GetOutput());
+    else
+       meshwriter->SetInput (gradient3);
+    
     meshwriter->SetFileName ("gradient3.vtk");
     meshwriter->Write();
 
-    backtransformer->SetInput (gradient1);
-    backtransformer->Update();
-    backwarper->SetInput (backtransformer->GetOutput());
-    backwarper->Update();
+    if (use_prolate)
+    {
+      backtransformer->SetInput (gradient1);
+      backtransformer->Update();
+      backwarper->Update();
+    }
+    if (use_prolate)
+      meshwriter->SetInput (backwarper->GetOutput());
+    else
+       meshwriter->SetInput (gradient1);
+    
     meshwriter->SetFileName ("gradient1.vtk");
     meshwriter->Write();
 

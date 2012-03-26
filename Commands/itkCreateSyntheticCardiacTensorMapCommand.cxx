@@ -165,8 +165,8 @@ TensorType GetProlateTensor (PointType xi, double* range, double l_helix, double
   v.Fill (0.0); rota.Fill (0.0); rotb.Fill (0.0);
   
   v[2][0] = 1; v[0][1] = 1; v[1][2] = 1;
-  e[0][0] = 1.0; e[1][1] = e2; e[2][2] = 0.20;
-
+  e[0][0] = 1.0; e[1][1] = e2; e[2][2] = 0.2;
+  
   r = v * e * TensorType::MatrixType (v.GetTranspose());
   
   rota[0][0] =  1.0;
@@ -192,8 +192,7 @@ TensorType GetProlateTensor (PointType xi, double* range, double l_helix, double
   // std::cout<<"rota = \n"<<rota<<std::endl;
   // std::cout<<"rotb = \n"<<rotb<<std::endl;
   // std::cout<<"cp : "<<T.GetCp()<<std::endl;
-  // getchar();  
-  
+  // getchar();
   
   T = T.ApplyMatrix (rotb);
   T = T.ApplyMatrix (rota);
