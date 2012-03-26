@@ -57,7 +57,7 @@ namespace itk
   {
 
 
-    bool use_prolate = 0;
+    bool use_prolate = 1;
     
     
     typedef double                                      ScalarType;
