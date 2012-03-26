@@ -120,7 +120,7 @@ namespace itk
       std::cout<<"covariance:"<<std::flush;
       cov = this->ComputeCovarianceMatrix (meshtoproceed);
       
-      // std::cout<<"gradient:"<<std::flush;
+      std::cout<<"gradient:"<<std::flush;
       tensor = this->ComputeGradientTensor (meshtoproceed);
 
       zone = m_ImageToMeshFilter->GetOutput();
@@ -155,7 +155,9 @@ namespace itk
 
       std::cout<<std::endl<<"tensor :"<<std::endl;
       std::cout<<tensor<<std::endl;
-   
+
+      getchar();
+      
     }
     
     if (m_CoordinatesType == ProlateSpheroidal)
@@ -236,7 +238,8 @@ namespace itk
 	mesh->GetPoint (i, &p);
 	for (unsigned int j=0; j<3; j++) centre[j] += p[j];
       }
-      for (unsigned int j=0; j<3; j++) centre[j] /= static_cast<ScalarType>(mesh->GetNumberOfPoints());
+      if (mesh->GetNumberOfPoints() > 1)
+	for (unsigned int j=0; j<3; j++) centre[j] /= static_cast<ScalarType>(mesh->GetNumberOfPoints());
       
       m_Transform->EvaluateScaleFactors (centre.GetDataPointer(), scalefactors);    
       for (unsigned int j=0; j<3; j++) spacing[j] /= scalefactors[j];
@@ -244,7 +247,7 @@ namespace itk
       image->SetSpacing (spacing);
     }
 
-    this->WriteTensorImage (image, "tensorprolateimage.mha");
+    //this->WriteTensorImage (image, "tensorprolateimage.mha");
     
     typename GradientFilterType::Pointer gradientfilter = GradientFilterType::New();
     gradientfilter->SetInput (image);
