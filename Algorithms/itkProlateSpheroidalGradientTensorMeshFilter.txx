@@ -63,6 +63,8 @@ namespace itk
   ::EvaluateAtIndex(unsigned long index)
   {
 
+    
+    typename MeshType::ConstPointer originalinput = this->GetInput(0);
     MeshType* input   = m_LogInput;
     MeshType* output1 = m_LogOutput1;
     MeshType* output2 = m_LogOutput2;
@@ -72,50 +74,47 @@ namespace itk
     InternalMatrixType dUl   (input->GetNumberOfPoints(), TensorType::DegreesOfFreedom);
     
     typename PointType::ValueType zeros[3] = {0,0,0};
-    PointType p  (zeros);
-    output1->GetPoint (index, & p);
-    
-    this->EvaluateUAnddUl (index, U, dUl);
-    
-    InternalMatrixType Sigma = this->EvaluateSigma (p);    
-    
-    /// solve [ U Sigma ] . gradl = dUl
-    SolverType solver (U * Sigma);
-    InternalMatrixType gradl = solver.solve (dUl);
+    PointType  p  (zeros);
+    TensorType t (static_cast<ScalarType>(0.0));
+    originalinput->GetPoint (index, & p);
+    originalinput->GetPointData (index, & t);
 
-    TensorType
-      t1 = this->vec2tensor (gradl.get_row (0)),
-      t2 = this->vec2tensor (gradl.get_row (1)),
-      t3 = this->vec2tensor (gradl.get_row (2));
-
-    // if ( (index == 1670) ||  (index == 1671))
-    // {
-    //   typename MeshType::ConstPointer originalinput = this->GetInput(0);
-    //   TensorType t (static_cast<ScalarType>(0.0));
-    //   originalinput->GetPointData (index, & t);
-    	
-    // std::cout<<"============ index "<<index<<" ============"<<std::endl;
-    
-    // std::cout<<"t : \n"<<t<<std::endl;
-    // std::cout<<"gradl : \n"<<gradl<<std::endl;
-    // std::cout<<"sigma : \n"<<Sigma<<std::endl;
-    // std::cout<<"t1 : \n"<<t1.Exp()<<std::endl;
-    // std::cout<<"t2 : \n"<<t2.Exp()<<std::endl;
-    // std::cout<<"t3 : \n"<<t3.Exp()<<std::endl;
+    // If the input tensor is close to zero, the system is exploding
+    // ending with [inf] tensors
+    // Address this problem by only solving the system when the norm is greater than 0.0001
+    // Otherwise put zero as gradients
+    if (t.GetNorm() > 0.0001)
+    {
+      this->EvaluateUAnddUl (index, U, dUl);
       
-    // std::cout<<"FA   = "<<t1.Exp().GetFA()<<" : "<<t2.Exp().GetFA()<<" : "<<t3.Exp().GetFA()<<std::endl;
-    // std::cout<<"Norm = "<<t1.Exp().GetNorm()<<" : "<<t2.Exp().GetNorm()<<" : "<<t3.Exp().GetNorm()<<std::endl;
-
-    // std::cout<<"U : \n"<<U<<std::endl;
-    // std::cout<<"dUl : \n"<<dUl<<std::endl;
+      InternalMatrixType Sigma = this->EvaluateSigma (p);    
+      
+      /// solve [ U Sigma ] . gradl = dUl
+      SolverType solver (U * Sigma);
+      InternalMatrixType gradl = solver.solve (dUl);
+      
+      TensorType
+	t1 = this->vec2tensor (gradl.get_row (0)),
+	t2 = this->vec2tensor (gradl.get_row (1)),
+	t3 = this->vec2tensor (gradl.get_row (2));
+      
+      output1->SetPointData (index, t1);
+      output2->SetPointData (index, t2);
+      output3->SetPointData (index, t3);
+    }
+    // If the input tensor is close to zero, the system is exploding
+    // ending with [inf] tensors
+    // Address this problem by only solving the system when the norm is greater than 0.0001
+    // Otherwise put zero as gradients
+    else
+    {
+      output1->SetPointData (index, t);
+      output2->SetPointData (index, t);
+      output3->SetPointData (index, t);      
+    }
     
-    // getchar();
-    // }
-    
-    output1->SetPointData (index, t1);
-    output2->SetPointData (index, t2);
-    output3->SetPointData (index, t3);
   }
+  
 
   template<class TMesh>
   void
@@ -140,8 +139,10 @@ namespace itk
     input->GetPoint (index, & p);
     input->GetPointData (index, & t);
 
-    t = t.Log();
-    
+    // The input (sampling points) this->GetInput(0) is in the tensor space
+    // and the data m_LogInput is in the log-tensor space
+    // --> Log the input :
+    t = t.Log();    
     
     unsigned long counter = 0;
     
@@ -165,8 +166,8 @@ namespace itk
 	  u_i[1] += 2 * vnl_math::pi;
       }
 
-      U.set_row (counter, u_i.GetDataPointer());
-      dUl.set_row    (counter, this->tensor2vec (duil));
+      U.set_row   (counter, u_i.GetDataPointer());
+      dUl.set_row (counter, this->tensor2vec (duil));
       
       ++p_it;
       ++t_it;
@@ -180,7 +181,7 @@ namespace itk
   ProlateSpheroidalGradientTensorMeshFilter<TMesh>::EvaluateSigma (PointType p)
   {
     // we need to grab the prolate spheroidal transform
-    // and get the scaling factors
+    // and get the scale factors
     double h[3] = {1,1,1};
     InternalMatrixType m (3,3);
     m.set_identity();
@@ -274,19 +275,23 @@ namespace itk
 
     while( logit1 != logpixels1->End() )
     {
+      // Normalize by the norm of the initial tensor to stabilize the
+      // system when close to zero.
+      // ScalarType factor = inputit.Value().GetNorm();
+      ScalarType factor = 1.0;
       
       if (!logit1.Value().IsFinite() || logit1.Value().HasNans())
 	std::cout<<"T1 is given not finite at "<<logit1.Value()<<std::endl;
       else
-	it1.Value() = inputit.Value().GetNorm() * logit1.Value().Exp();
+	it1.Value() = factor * logit1.Value().Exp();
       if (!logit2.Value().IsFinite() || logit2.Value().HasNans())
 	std::cout<<"T2 is given not finite at "<<logit2.Value()<<std::endl;
       else
-	it2.Value() = inputit.Value().GetNorm() * logit2.Value().Exp();
+	it2.Value() = factor * logit2.Value().Exp();
       if (!logit3.Value().IsFinite() || logit3.Value().HasNans())
 	std::cout<<"T3 is given not finite at "<<logit3.Value()<<std::endl;
       else
-	it3.Value() = inputit.Value().GetNorm() * logit3.Value().Exp();
+	it3.Value() = factor * logit3.Value().Exp();
       
       ++inputit;
       ++it1; ++logit1;

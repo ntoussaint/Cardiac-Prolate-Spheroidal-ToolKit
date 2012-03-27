@@ -73,41 +73,31 @@ namespace itk
     m_LogGradient2->GetPointData (index, &g2);
     m_LogGradient3->GetPointData (index, &g3);
 
-    if ( (g1.Exp().GetNorm() > 0.001) &&
-	 (g2.Exp().GetNorm() > 0.001) &&
-	 (g3.Exp().GetNorm() > 0.001)
+    // If the input gradients are close to zero, the system is exploding
+    // ending with [inf] structure tensors
+    // Address this problem by only evaluating the structure when the norm is greater than 0.0001
+    // Otherwise put zero as structure tensor
+    if ( (g1.Exp().GetNorm() > 0.0001) &&
+	 (g2.Exp().GetNorm() > 0.0001) &&
+	 (g3.Exp().GetNorm() > 0.0001)
 	 )
     {
       gradl.set_row (0, this->tensor2vec (g1));
       gradl.set_row (1, this->tensor2vec (g2));
       gradl.set_row (2, this->tensor2vec (g3));
       
-      // InternalMatrixType T = gradl * gradl.transpose();
-      // out.SetVnlMatrix (T);
-      InternalMatrixType T (3,3,0);
-      T.put (0,0, g1.Exp().GetFA());
-      T.put (1,1, g2.Exp().GetFA());
-      T.put (2,2, g3.Exp().GetFA());
+      InternalMatrixType T = gradl * gradl.transpose();
       out.SetVnlMatrix (T);
-      out = out.Log();
-      
     }
     else
     {
-      // std::cout<<"found near zero gradient..."<<std::endl;
-      // std::cout<<"============ index "<<index<<" ============"<<std::endl;
-      // std::cout<<"g1 : \n"<<g1.Exp()<<std::endl;
-      // std::cout<<"g2 : \n"<<g2.Exp()<<std::endl;
-      // std::cout<<"g3 : \n"<<g3.Exp()<<std::endl;
-      // std::cout<<"gradl : \n"<<gradl<<std::endl;
-      // std::cout<<"out : \n"<<out<<std::endl;
-      // std::cout<<"out.Exp : \n"<<out.Exp()<<std::endl;
-      
-      // std::cout<<"FA   = "<<g1.Exp().GetFA()<<" : "<<g2.Exp().GetFA()<<" : "<<g3.Exp().GetFA()<<" : "<<out.Exp().GetFA()<<std::endl;
-      // std::cout<<"Norm = "<<g1.Exp().GetNorm()<<" : "<<g2.Exp().GetNorm()<<" : "<<g3.Exp().GetNorm()<<" : "<<out.Exp().GetNorm()<<std::endl;
-      // getchar();
+      InternalMatrixType T (3,3,0);
+      out.SetVnlMatrix (T);
+      out = out.Log();
     }
-
+    
+      
+    
     logoutput->SetPointData (index, out);
   }
 
@@ -186,10 +176,15 @@ namespace itk
 
     while( it != pixels->End() )
     {
+      // Normalize by the norm of the initial tensor to stabilize the
+      // system when close to zero.
+      // ScalarType factor = inputit.Value().GetNorm();
+      ScalarType factor = 1.0;
+      
       if (!it.Value().IsFinite() || it.Value().HasNans())
     	std::cout<<"T is given not finite at "<<it.Value()<<std::endl;
       else
-    	it.Value() = inputit.Value().GetNorm() * logit.Value().Exp();
+    	it.Value() = factor * logit.Value().Exp();
 
       ++it; ++logit; ++inputit;
     } 
@@ -307,7 +302,6 @@ namespace itk
       out_it3.Value() = p;
       ++in_it; ++out_it; ++out_it1; ++out_it2; ++out_it3;
     }
-    
   }
   
   template<class TMesh>
