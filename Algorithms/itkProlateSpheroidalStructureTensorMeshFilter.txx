@@ -92,8 +92,10 @@ namespace itk
     else
     {
       InternalMatrixType T (3,3,0);
+      T.put (0,0,-100);
+      T.put (1,1,-100);
+      T.put (2,2,-100);
       out.SetVnlMatrix (T);
-      out = out.Log();
     }
     
       

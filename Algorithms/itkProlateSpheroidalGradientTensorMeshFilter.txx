@@ -108,9 +108,15 @@ namespace itk
     // Otherwise put zero as gradients
     else
     {
+      InternalMatrixType T (3,3,0);
+      T.put (0,0,-100);
+      T.put (1,1,-100);
+      T.put (2,2,-100);
+      t.SetVnlMatrix (T);
+      
       output1->SetPointData (index, t);
       output2->SetPointData (index, t);
-      output3->SetPointData (index, t);      
+      output3->SetPointData (index, t);
     }
     
   }
