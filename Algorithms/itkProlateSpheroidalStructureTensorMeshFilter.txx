@@ -86,8 +86,10 @@ namespace itk
       gradl.set_row (1, this->tensor2vec (g2));
       gradl.set_row (2, this->tensor2vec (g3));
       
-      InternalMatrixType T = gradl * gradl.transpose();
-      out.SetVnlMatrix (T);
+      // InternalMatrixType T = gradl * gradl.transpose();
+      // out.SetVnlMatrix (T);
+      InternalMatrixType T = gradl.transpose() * gradl;
+      out = this->vec2tensor (T.get_row(0));
     }
     else
     {

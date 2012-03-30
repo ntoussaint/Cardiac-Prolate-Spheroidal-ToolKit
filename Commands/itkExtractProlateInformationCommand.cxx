@@ -285,7 +285,7 @@ namespace itk
     zonelimiter->SetAHASegmentationType (AHALimiterType::AHA_17_ZONES);
     zonelimiter->SetTransform (transform);
     zonelimiter->SetInverseDisplacementField (inversedisplacementfield);
-    zonelimiter->CanineDivisionsOn();
+    zonelimiter->CanineDivisionsOff();
     
     try
     {
@@ -410,7 +410,7 @@ namespace itk
 	    os << error.GetNorm();
 	    break;
 	  case 6:
-	    zone = zonelimiter->InWhichZoneIsPoint (mainpoint);
+	    zone = zonelimiter->InWhichZoneIsCartesianPoint (mainpoint);
 	    os << zone;
 	    break;
 	  case 7:
