@@ -1,6 +1,19 @@
 project(PTK)
 
 
+## #################################################################
+## Required dependencies
+## #################################################################
+
+find_package(ITK REQUIRED)
+find_package(VTK REQUIRED)
+find_package(TTK REQUIRED)
+
+include(${ITK_USE_FILE})
+include(${VTK_USE_FILE})
+include(${TTK_USE_FILE})
+
+
 set(${PROJECT_NAME}_VERSION_MAJOR 1 CACHE STRING "PTK major version number.")
 set(${PROJECT_NAME}_VERSION_MINOR 1 CACHE STRING "PTK minor version number.")
 set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "PTK build version number.")
@@ -53,23 +66,20 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
+
+include_directories(
+  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_SOURCE_DIR}/Numerics
+  ${PROJECT_SOURCE_DIR}/Algorithms
+  ${PROJECT_SOURCE_DIR}/Commands
+  ${PROJECT_SOURCE_DIR}/IPF
+)
+
 include_directories(
   ${PROJECT_BINARY_DIR}
   ${PROJECT_BINARY_DIR}/Commands
 )
 
-
-## #################################################################
-## Required dependencies
-## #################################################################
-
-find_package(ITK REQUIRED)
-find_package(VTK REQUIRED)
-find_package(TTK REQUIRED)
-
-include(${ITK_USE_FILE})
-include(${VTK_USE_FILE})
-include(${TTK_USE_FILE})
 
 ## #################################################################
 ## BUILD TYPE
