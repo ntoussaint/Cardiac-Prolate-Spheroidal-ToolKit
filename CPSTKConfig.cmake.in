@@ -1,0 +1,35 @@
+#-----------------------------------------------------------------------------
+#
+# CPSTKConfig.cmake - CPSTK CMake configuration file for external projects.
+#
+# This file is configured by CPSTK and used by the UseCPSTK.cmake module
+# to load CPSTK's settings for an external project.
+
+# The CPSTK source tree.
+SET(CPSTK_SOURCE_DIR "@CPSTK_SOURCE_DIR@")
+
+# The CPSTK include file directories.
+SET(CPSTK_INCLUDE_DIRS "@CPSTK_INCLUDE_DIRS_CONFIG@")
+
+# The CPSTK library directories.
+SET(CPSTK_LIBRARY_DIRS "@CPSTK_LIBRARY_DIRS_CONFIG@")
+
+# The C and C++ flags added by CPSTK to the cmake-configured flags.
+SET(CPSTK_REQUIRED_C_FLAGS "@CPSTK_REQUIRED_C_FLAGS@")
+SET(CPSTK_REQUIRED_CXX_FLAGS "@CPSTK_REQUIRED_CXX_FLAGS@")
+
+# The CPSTK version number
+SET(CPSTK_VERSION_MAJOR "@CPSTK_VERSION_MAJOR@")
+SET(CPSTK_VERSION_MINOR "@CPSTK_VERSION_MINOR@")
+
+# The location of the UseCPSTK.cmake file.
+SET(CPSTK_USE_FILE "@CPSTK_USE_FILE@")
+
+# The build settings file.
+SET(CPSTK_BUILD_SETTINGS_FILE "@CPSTK_BUILD_SETTINGS_FILE@")
+
+# Some specific settings.
+SET(CPSTK_USE_vtkINRIA3D "@USE_vtkINRIA3D@")
+SET(vtkINRIA3D_DIR "@vtkINRIA3D_DIR@")
+IF( CPSTK_USE_vtkINRIA3D )
+ENDIF( CPSTK_USE_vtkINRIA3D )

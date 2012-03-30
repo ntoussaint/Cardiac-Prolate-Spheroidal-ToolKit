@@ -1,4 +1,39 @@
+cmake_minimum_required(VERSION 2.4)
+IF(COMMAND cmake_policy)
+  cmake_policy(VERSION 2.4)
+  cmake_policy(SET CMP0005 OLD)
+  cmake_policy(SET CMP0003 NEW)
+ENDIF(COMMAND cmake_policy)
+
+
 project(CPSTK)
+
+
+
+# On Visual Studio 8 MS deprecated C. This removes all 1.276E1265 security
+# warnings
+IF(WIN32)
+  IF(NOT BORLAND)
+    IF(NOT CYGWIN)
+      IF(NOT MINGW)
+        IF(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
+          ADD_DEFINITIONS(
+            -D_CRT_FAR_MAPPINGS_NO_DEPRECATE
+            -D_CRT_IS_WCTYPE_NO_DEPRECATE
+            -D_CRT_MANAGED_FP_NO_DEPRECATE
+            -D_CRT_NONSTDC_NO_DEPRECATE
+            -D_CRT_SECURE_NO_DEPRECATE
+            -D_CRT_SECURE_NO_DEPRECATE_GLOBALS
+            -D_CRT_SETERRORMODE_BEEP_SLEEP_NO_DEPRECATE
+            -D_CRT_TIME_FUNCTIONS_NO_DEPRECATE
+            -D_CRT_VCCLRIT_NO_DEPRECATE
+            -D_SCL_SECURE_NO_DEPRECATE
+            )
+        ENDIF(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
+      ENDIF(NOT MINGW)
+    ENDIF(NOT CYGWIN)
+  ENDIF(NOT BORLAND)
+ENDIF(WIN32)
 
 
 ## #################################################################
@@ -12,6 +47,34 @@ find_package(TTK REQUIRED)
 include(${ITK_USE_FILE})
 include(${VTK_USE_FILE})
 include(${TTK_USE_FILE})
+
+
+
+## #################################################################
+## Configure path
+## #################################################################
+
+
+if(WIN32)
+  set(${PROJECT_NAME}_ARCHIVE_OUTPUT_DIRECTORY lib)
+  set(${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY bin)
+  set(${PROJECT_NAME}_LIBRARY_OUTPUT_DIRECTORY bin)
+else(WIN32)
+  set(${PROJECT_NAME}_ARCHIVE_OUTPUT_DIRECTORY lib)
+  set(${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY bin)
+  set(${PROJECT_NAME}_LIBRARY_OUTPUT_DIRECTORY lib)
+endif(WIN32)
+
+set(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_LIBRARY_OUTPUT_DIRECTORY})
+set(ARCHIVE_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_ARCHIVE_OUTPUT_DIRECTORY})
+set(RUNTIME_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
+
+set(LIBRARY_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_LIBRARY_OUTPUT_DIRECTORY})
+set(ARCHIVE_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_ARCHIVE_OUTPUT_DIRECTORY})
+set(RUNTIME_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
+set(EXECUTABLE_INSTALL_OUTPUT_PATH ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
+
 
 
 set(${PROJECT_NAME}_VERSION_MAJOR 1 CACHE STRING "CPSTK major version number.")
@@ -40,6 +103,7 @@ endif(NOT ITK_USE_REVIEW)
 # -----------------------------------------------------------------------------
 # Header file used to pass CMake settings to the source code
 # -----------------------------------------------------------------------------
+
 configure_file(${PROJECT_SOURCE_DIR}/cpstkConfigure.h.in
                ${PROJECT_BINARY_DIR}/cpstkConfigure.h CONFIGURE IMMEDIATE)
 
@@ -47,6 +111,10 @@ if(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
   install(FILES ${CPSTK_BINARY_DIR}/cpstkConfigure.h
       DESTINATION include)
 endif(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
+
+# To help using CPSTK with other projects
+configure_file(${CPSTK_SOURCE_DIR}/UseCPSTK.cmake.in
+               ${CPSTK_BINARY_DIR}/UseCPSTK.cmake COPYONLY IMMEDIATE)
 
 #-----------------------------------------------------------------------------
 # Add compiler flags CPSTK needs to work on this platform.  This must be
@@ -66,8 +134,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-
-include_directories(
+set(${PROJECT_NAME}_INCLUDE_DIRS
   ${PROJECT_SOURCE_DIR}
   ${PROJECT_SOURCE_DIR}/Numerics
   ${PROJECT_SOURCE_DIR}/Algorithms
@@ -76,9 +143,14 @@ include_directories(
 )
 
 include_directories(
+${${PROJECT_NAME}_INCLUDE_DIRS}
+)
+
+include_directories(
   ${PROJECT_BINARY_DIR}
   ${PROJECT_BINARY_DIR}/Commands
 )
+include (${PROJECT_SOURCE_DIR}/CPSTKConfig.cmake)
 
 
 ## #################################################################
