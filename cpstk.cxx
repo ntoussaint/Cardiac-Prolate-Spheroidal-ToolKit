@@ -39,7 +39,7 @@
 #include "itkTensorMeshStructureCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
-#include "ptkConfigure.h"
+#include "cpstkConfigure.h"
 #include "GetPot.h"
 
 int main (int narg, char *args[])
@@ -71,11 +71,11 @@ int main (int narg, char *args[])
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
   if( cl.size() == 1 || cl.search(2, "--help", "-h") )
   {
-    std::cout << "Software Prolate Spheroidal ToolKit (c)KCL 2012, version " << PTK_VERSION << "\n";
+    std::cout << "Software Cardiac Prolate Spheroidal ToolKit (c) 2012, version " << CPSTK_VERSION << "\n";
     std::cout << "\n";
     std::cout << "Author: Nicolas Toussaint (nicolas.toussaint@kcl.ac.uk)\n";
     std::cout << "\n";
-    std::cout << "King's College London freely grants the non-exclusive right to use the Software for RESEARCH\n"
+    std::cout << "The author freely grants the non-exclusive right to use the Software for RESEARCH\n"
                  "PURPOSES ONLY. Every user of the Software will communicate to the author\n"
                  "(nicolas.toussaint@kcl.ac.uk) their remarks as to the use of the Software.\n\n";
     std::cout << "Available commands:\n";
