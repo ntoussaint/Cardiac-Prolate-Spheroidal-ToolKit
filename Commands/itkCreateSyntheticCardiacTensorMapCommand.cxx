@@ -184,16 +184,6 @@ TensorType GetProlateTensor (PointType xi, double* range, double l_helix, double
   TensorType T;
   T.SetVnlMatrix ( r.GetVnlMatrix() );
   
-  // std::cout<<"x = \n"<<x<<std::endl;
-  // std::cout<<"a = \n"<<a<<std::endl;
-  // std::cout<<"b = \n"<<b<<std::endl;
-  // std::cout<<"v = \n"<<v<<std::endl;
-  // std::cout<<"r = \n"<<r<<std::endl;
-  // std::cout<<"rota = \n"<<rota<<std::endl;
-  // std::cout<<"rotb = \n"<<rotb<<std::endl;
-  // std::cout<<"cp : "<<T.GetCp()<<std::endl;
-  // getchar();
-  
   T = T.ApplyMatrix (rotb);
   T = T.ApplyMatrix (rota);
 
