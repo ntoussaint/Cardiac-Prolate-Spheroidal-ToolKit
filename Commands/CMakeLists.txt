@@ -1,4 +1,4 @@
-function(CreatePtkCommand command_name keyword description)
+function(CreateCpstkCommand command_name keyword description)
   set(COMMAND_NAME  "itk${command_name}Command")
   set(FACTORY_NAME  "itk${command_name}CommandFactory")
   
@@ -8,14 +8,14 @@ function(CreatePtkCommand command_name keyword description)
     -D MY_COMMAND_NAME=${command_name}
     -D MY_DESCRIPTION=${description} 
     -D MY_KEYWORD=${keyword}
-    -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/CreatePTKCommand.cmake
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/cmake/itkPtkCommandTemplate.h.in
-	    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/itkPtkCommandFactoryTemplate.h.in
-            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/itkPtkCommandFactoryTemplate.cxx.in
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/CreateCPSTKCommand.cmake
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/cmake/itkCpstkCommandTemplate.h.in
+	    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/itkCpstkCommandFactoryTemplate.h.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/itkCpstkCommandFactoryTemplate.cxx.in
 	    )
 	  
-  set(PTK_COMMAND_SRCS
-    ${PTK_COMMAND_SRCS}
+  set(CPSTK_COMMAND_SRCS
+    ${CPSTK_COMMAND_SRCS}
     ${COMMAND_NAME}.cxx
     ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.cxx
     PARENT_SCOPE
@@ -25,90 +25,90 @@ endfunction()
 
 
 
-CreatePtkCommand(TensorsToVTK
+CreateCpstkCommand(TensorsToVTK
   "itk2vtk" "Convert a tensor image or a list of tensor images into a vtkUnstructuredGrid structure"
   )
-CreatePtkCommand(RotateProlateSpheroid
+CreateCpstkCommand(RotateProlateSpheroid
   "rotate" "Rotate a Prolate Spheroid according to a vtk file describing the antero-posterior line"
   )
-CreatePtkCommand(ExtractProlateInformation
+CreateCpstkCommand(ExtractProlateInformation
   "extract" "Extract meaningful information in prolate spheroidal coordinates"
   )
-CreatePtkCommand(TensorImageToMesh
+CreateCpstkCommand(TensorImageToMesh
   "image2mesh" "Converts a tensor image into a tensor mesh structure"
   )
-CreatePtkCommand(TensorMeshToImage
+CreateCpstkCommand(TensorMeshToImage
   "mesh2image" "Converts a tensor mesh structure into a tensor image"
   )
-CreatePtkCommand(ExtrapolateTensorField
+CreateCpstkCommand(ExtrapolateTensorField
   "extrapolate" "Tensor Field Dense Approximation from Sparse Data"
   )
-CreatePtkCommand(CreateSyntheticCardiacTensorMap
+CreateCpstkCommand(CreateSyntheticCardiacTensorMap
   "synthesize" "Create a synthetic tensor map out of some cardiac LV fibre structure information"
   )
-CreatePtkCommand(FindClosestProlateTransform
+CreateCpstkCommand(FindClosestProlateTransform
   "find" "Find a prolate spheroid approximating an LV segmentation mesh"
   )
-CreatePtkCommand(CreateProlateDomain
+CreateCpstkCommand(CreateProlateDomain
   "domain" "Create an ellipsoidal domain image out of a prolate sph. transform"
   )
-CreatePtkCommand(TensorMeshStatistics
+CreateCpstkCommand(TensorMeshStatistics
   "stats" "Compute statistics in prolate sph. coordinates over a set of tensors"
   )
-CreatePtkCommand(CreateProlateAtlas
+CreateCpstkCommand(CreateProlateAtlas
   "atlas" "Create an tensor atlas from a set of tensors in prolate coordinates"
   )
-CreatePtkCommand(LimitImageToAHAZone
+CreateCpstkCommand(LimitImageToAHAZone
   "aha-image" "Crop an image to an AHA zone in the Prolate Spheroidal sense"
   )
-CreatePtkCommand(LimitTensorImageToAHAZone
+CreateCpstkCommand(LimitTensorImageToAHAZone
   "aha-tensors" "Crop a tensor image to an AHA zone in the Prolate Spheroidal sense"
   )
-CreatePtkCommand(ApplyTransformToImage
+CreateCpstkCommand(ApplyTransformToImage
   "apply-image" "Apply a rigid transformation to an image without resampling"
   )
-CreatePtkCommand(ApplyTransformToTensorImage
+CreateCpstkCommand(ApplyTransformToTensorImage
   "apply-tensors" "Apply a rigid transformation to tensor image without resampling"
   )
-CreatePtkCommand(ApplyTransformToMesh
+CreateCpstkCommand(ApplyTransformToMesh
   "apply-mesh" "Apply an affine transformation to a vtk mesh"
   )
-CreatePtkCommand(ResampleImage3
+CreateCpstkCommand(ResampleImage3
   "res-image" "Resample a 3D image to a reference field-of-view"
   )
-CreatePtkCommand(ResampleTensorImage3
+CreateCpstkCommand(ResampleTensorImage3
   "res-tensors" "Resample a 3D tensor image to a reference field-of-view"
   )
-CreatePtkCommand(ColorFibresWithProlateAngle
+CreateCpstkCommand(ColorFibresWithProlateAngle
   "colorify" "Colorify a fibre field with Prolate angular information"
   )
-CreatePtkCommand(OptimizeExtrapolationKernels
+CreateCpstkCommand(OptimizeExtrapolationKernels
   "optimize" "Find optimal extrapolation Prol. Sph. kernel sizes to minimize discrepancies in a LS sense"
   )
-CreatePtkCommand(ExtractKernelsEnveloppe
+CreateCpstkCommand(ExtractKernelsEnveloppe
   "enveloppe" "Extract the kernel distance enveloppes in n AHA zones"
   )
-CreatePtkCommand(TensorMeshGradient
+CreateCpstkCommand(TensorMeshGradient
   "gradient" "Compute the gradient of a tensor field in Prolate Spheroidal sense"
   )
-CreatePtkCommand(TensorMeshStructure
+CreateCpstkCommand(TensorMeshStructure
   "structure" "Compute the structure tensor field of a tensor field in Prolate Spheroidal sense"
   )
 
-add_library(PTKCommands ${PTK_BUILD_TYPE}
-  ${PTK_COMMAND_SRCS}
+add_library(CPSTKCommands ${CPSTK_BUILD_TYPE}
+  ${CPSTK_COMMAND_SRCS}
   )
 
-target_link_libraries(PTKCommands
+target_link_libraries(CPSTKCommands
   ${ITK_LIBRARIES}
-  PTKNumerics
+  CPSTKNumerics
   vtkCommon
   vtkIO
   ITKTensor
   )
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_LIBRARIES)
-  install(TARGETS PTKCommands
+  install(TARGETS CPSTKCommands
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

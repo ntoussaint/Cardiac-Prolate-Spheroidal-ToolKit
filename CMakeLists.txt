@@ -1,4 +1,4 @@
-project(PTK)
+project(CPSTK)
 
 
 ## #################################################################
@@ -14,9 +14,9 @@ include(${VTK_USE_FILE})
 include(${TTK_USE_FILE})
 
 
-set(${PROJECT_NAME}_VERSION_MAJOR 1 CACHE STRING "PTK major version number.")
-set(${PROJECT_NAME}_VERSION_MINOR 1 CACHE STRING "PTK minor version number.")
-set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "PTK build version number.")
+set(${PROJECT_NAME}_VERSION_MAJOR 1 CACHE STRING "CPSTK major version number.")
+set(${PROJECT_NAME}_VERSION_MINOR 1 CACHE STRING "CPSTK minor version number.")
+set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "CPSTK build version number.")
 set(${PROJECT_NAME}_VERSION
   "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
 
@@ -40,21 +40,21 @@ endif(NOT ITK_USE_REVIEW)
 # -----------------------------------------------------------------------------
 # Header file used to pass CMake settings to the source code
 # -----------------------------------------------------------------------------
-configure_file(${PROJECT_SOURCE_DIR}/ptkConfigure.h.in
-               ${PROJECT_BINARY_DIR}/ptkConfigure.h CONFIGURE IMMEDIATE)
+configure_file(${PROJECT_SOURCE_DIR}/cpstkConfigure.h.in
+               ${PROJECT_BINARY_DIR}/cpstkConfigure.h CONFIGURE IMMEDIATE)
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
-  install(FILES ${PTK_BINARY_DIR}/ptkConfigure.h
+  install(FILES ${CPSTK_BINARY_DIR}/cpstkConfigure.h
       DESTINATION include)
 endif(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
 
 #-----------------------------------------------------------------------------
-# Add compiler flags PTK needs to work on this platform.  This must be
+# Add compiler flags CPSTK needs to work on this platform.  This must be
 # done AFTER the call to CMAKE_EXPORT_BUILD_SETTINGS.
-set(PTK_REQUIRED_C_FLAGS)
-set(PTK_REQUIRED_CXX_FLAGS)
-SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   ${PTK_REQUIRED_C_FLAGS}")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PTK_REQUIRED_CXX_FLAGS}")
+set(CPSTK_REQUIRED_C_FLAGS)
+set(CPSTK_REQUIRED_CXX_FLAGS)
+SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   ${CPSTK_REQUIRED_C_FLAGS}")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CPSTK_REQUIRED_CXX_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # Set any extra compilation flags here
@@ -85,13 +85,13 @@ include_directories(
 ## BUILD TYPE
 ## #################################################################
 
-set(PTK_BUILD_TYPE
+set(CPSTK_BUILD_TYPE
 STATIC
 )
 
 if (NOT WIN32)
   if (ITK_BUILD_SHARED)
-    set (PTK_BUILD_TYPE SHARED)
+    set (CPSTK_BUILD_TYPE SHARED)
   endif (ITK_BUILD_SHARED)
 endif (NOT WIN32)
 
@@ -105,13 +105,13 @@ add_subdirectory(Algorithms)
 add_subdirectory(Numerics)
 add_subdirectory(Commands)
 
-add_executable(ptk
-  ptk.cxx
+add_executable(cpstk
+  cpstk.cxx
   )
 
-target_link_libraries(ptk
-  PTKCommands
-  PTKProgramFactory
+target_link_libraries(cpstk
+  CPSTKCommands
+  CPSTKProgramFactory
   ${ITK_LIBRARIES}
   )
 
@@ -120,8 +120,52 @@ target_link_libraries(ptk
 ## #################################################################
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_RUNTIME)
-  install(TARGETS ptk
+  install(TARGETS cpstk
     BUNDLE DESTINATION bin
     RUNTIME DESTINATION bin
     )
 endif(NOT ${PROJECT_NAME}_INSTALL_NO_RUNTIME)
+
+
+#-----------------------------------------------------------------------------
+# doxygen (and other?) documentation
+
+find_package(Doxygen)
+if (DOXYGEN)
+  option( LINK_EXTERNAL_DOC "Should the documentation be linked with external sources such as ITK?" NO )
+  set(MY_LINK_EXTERNAL_DOC ${LINK_EXTERNAL_DOC})
+  set(MY_DOXYGEN_BUILD_DIR ${PROJECT_BINARY_DIR}/Doxygen)
+  
+  
+  configure_file (
+    ${PROJECT_SOURCE_DIR}/Doxygen/doxygen.config.in
+    ${MY_DOXYGEN_BUILD_DIR}/doxygen.config
+  )
+
+  if (MY_LINK_EXTERNAL_DOC)
+    exec_program(${CMAKE_COMMAND} ${MY_DOXYGEN_BUILD_DIR}
+      ARGS -E tar xvz ${PROJECT_SOURCE_DIR}/Doxygen/vtkNightlyDoc.tag.tar.gz
+    )
+    exec_program(${CMAKE_COMMAND} ${MY_DOXYGEN_BUILD_DIR}
+      ARGS -E tar xvz ${PROJECT_SOURCE_DIR}/Doxygen/KWWidgetsNightlyDoc.tag.tar.gz
+    )
+    exec_program(${CMAKE_COMMAND} ${MY_DOXYGEN_BUILD_DIR}
+      ARGS -E tar xvz ${PROJECT_SOURCE_DIR}/Doxygen/InsightDoxygen.tag.tar.gz
+    )
+  else (MY_LINK_EXTERNAL_DOC)
+    exec_program(${CMAKE_COMMAND}
+      ARGS -E remove ${MY_DOXYGEN_BUILD_DIR}/vtkNightlyDoc.tag
+    )
+    exec_program(${CMAKE_COMMAND}
+      ARGS -E remove ${MY_DOXYGEN_BUILD_DIR}/KWWidgetsNightlyDoc.tag
+    )
+    exec_program(${CMAKE_COMMAND}
+      ARGS -E remove ${MY_DOXYGEN_BUILD_DIR}/InsightDoxygen.tag
+    )
+  endif (MY_LINK_EXTERNAL_DOC)
+
+  add_custom_target(doc
+    ${DOXYGEN}
+    ${MY_DOXYGEN_BUILD_DIR}/doxygen.config
+  )
+endif(DOXYGEN) 

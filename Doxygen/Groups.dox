@@ -1,0 +1,36 @@
+/**
+  \defgroup Deprecated Deprecated objects
+  The classes on this group will be removed soon. Their funcionality is now provided 
+  by other classes or changes in the toolkit have made them useless. Please report to
+  their documentation and look in to their "Deprecated" section. This section should
+  indicate what to do to replace this class in your code.
+*/
+
+/**
+  \defgroup ImageProcessing Image Processing
+
+  All classes, structs, and binaries that concern image processing tools should be 
+  included in this group. That implies all registration, segmentation and similar 
+  algorithms
+*/
+
+/**
+  \defgroup ImageRegistration Image Registration
+  \ingroup ImageProcessing
+
+  All classes, structs and other files that involve registration of images.
+*/
+
+
+/** 
+  \defgroup TensorProcessing Tensor processing
+  
+  All classes, structs and other files that involve tensor processing. More information 
+  can be found on the \ref CardiacDTIPage page
+  
+  \note These objects may need the additional download of the external tool called
+  TensorToolKit. 
+*/
+   
+   
+

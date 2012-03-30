@@ -1,0 +1,45 @@
+/**
+ *
+ * \mainpage  Imaging Sciences SVN repository (C / C++ subdirectory)
+ *
+ * \image html kclLogo.png
+ *
+ * \section intro Introduction
+ *
+ * This is the King's College London Imaging Sciences software subversion repository 
+ * c++ documentation, synchronised to the Imaging Science SVN Repository. It is 
+ * a closed source project only dedicated to students and staff of King's 
+ * College Division of Imaging Sciences.
+ * 
+ * This following commands downloads the imaging software (it will create a 
+ * folder named imaging)
+ * 
+ * svn checkout https://www.isd.kcl.ac.uk/svn/imaging/
+ * 
+ * Alternatively you can use : 
+ * 
+ * svn checkout https://www.isd.kcl.ac.uk/svn/imaging/ my/output/src/directory
+ *
+ *
+ * \section homepage Home Page
+ *
+ * The Home Page of King's College London Division of Imaging Sciences
+ * can be found at:
+ *
+ * http://www.kcl.ac.uk/schools/medicine/research/imaging/
+ *
+ * The wiki and subversion browser can be found at:
+ * 
+ * https://trac/projects/imaging/
+ * 
+ * Note that you will need your GIPL network username and password to log in to this page.
+ * 
+ * \note Go have a look at the new global pages: \ref CardiacDTIPage and \ref RegistrationPage !!
+ * and the awesome \ref lregPage !!
+ *  
+ * \section howto How to use this documentation
+ *
+ * This documentation describes the API of the library classes and objects, it contains pages gathering the classes, a search engine, a file index and many other things. Each c++ class has its own dedicated page, automatically generated from the source code. This documentation is linked to all he external libraries that we use, including the Insight ToolKit and the Vizualization ToolKit (http://www.kitware.com). Some classes use another opensource library called TensorToolKit (http://www-sop.inria.fr/asclepios/software/TensorToolKit/).
+ *
+ */
+

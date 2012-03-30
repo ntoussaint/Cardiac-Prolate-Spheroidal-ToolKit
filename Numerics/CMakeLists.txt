@@ -1,9 +1,9 @@
-add_library(PTKNumerics ${PTK_BUILD_TYPE}
+add_library(CPSTKNumerics ${CPSTK_BUILD_TYPE}
   itkKaiserBesselKernelFunction.cxx
   itkTensorMeshImageHybridCostFunction3.cxx
   itkNewUoaOptimizer.cxx
   )
-target_link_libraries(PTKNumerics
+target_link_libraries(CPSTKNumerics
   ${ITK_LIBRARIES}
   ITKTensor
   vtkIO
