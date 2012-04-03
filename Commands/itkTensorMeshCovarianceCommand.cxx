@@ -219,6 +219,7 @@ namespace itk
     std::cout<<"now try the covariance..."<<std::endl;
     
     std::cout<<"defining the limiter..."<<std::endl;
+    getchar();
     AHALimiterType::Pointer zonelimiter = AHALimiterType::New();
     zonelimiter->SetInput (reader->GetOutput());
     zonelimiter->SetTransform (transform);
@@ -226,8 +227,10 @@ namespace itk
     zonelimiter->SetInverseDisplacementField (inversedisplacementfield);
     zonelimiter->CanineDivisionsOff();
     zonelimiter->SetAHASegmentationType (AHALimiterType::AHA_17_ZONES);
+    zonelimiter->CalculateZones();
     
     std::cout<<"allocating the final structure tensors..."<<std::endl;
+    getchar();
     MeshType::Pointer               zonestructure = MeshType::New();
     MeshType::PointsContainer::Pointer points     = MeshType::PointsContainer::New();
     MeshType::PointDataContainer::Pointer tensors = MeshType::PointDataContainer::New();
@@ -237,6 +240,7 @@ namespace itk
     tensors->Reserve (zonelimiter->GetNumberOfAHAZones());
 
     std::cout<<"allocating vector of zone gradients (tensors)..."<<std::endl;
+    getchar();
     std::vector<MeshType::Pointer> zonesgradients1;
     std::vector<MeshType::Pointer> zonesgradients2;
     std::vector<MeshType::Pointer> zonesgradients3;
@@ -270,6 +274,7 @@ namespace itk
 
     
     std::cout<<"filling zone gradients (tensors)..."<<std::endl;
+    getchar();
     for (unsigned int i=0; i<gradient1->GetNumberOfPoints(); i++)
     {
       
