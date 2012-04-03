@@ -302,7 +302,7 @@ namespace itk
     }
     
     std::cout<<"evaluating the covariance for each zone..."<<std::endl;
-    for (unsigned int i=1; i<=zonesgradients1.size(); i++)
+    for (unsigned int i=1; i<zonesgradients1.size(); i++)
     {
       
       std::cout<<"====== zone "<<i<<" ====="<<std::endl;
