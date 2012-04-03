@@ -335,8 +335,8 @@ namespace itk
 	g3->GetPointData (j,&t3);
 
 	std::cout<<"gradients logs are : \n"
-		 <<t1.Log()<<std::endl;
-		 <<t2.Log()<<std::endl;
+		 <<t1.Log()<<std::endl
+		 <<t2.Log()<<std::endl
 		 <<t3.Log()<<std::endl;
 	
 	gradient[0] = t1.Log().GetNorm();
