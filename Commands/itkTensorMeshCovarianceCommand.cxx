@@ -219,7 +219,6 @@ namespace itk
     std::cout<<"now try the covariance..."<<std::endl;
     
     std::cout<<"defining the limiter..."<<std::endl;
-    getchar();
     AHALimiterType::Pointer zonelimiter = AHALimiterType::New();
     zonelimiter->SetInput (reader->GetOutput());
     zonelimiter->SetTransform (transform);
@@ -230,7 +229,6 @@ namespace itk
     zonelimiter->CalculateZones();
     
     std::cout<<"allocating the final structure tensors..."<<std::endl;
-    getchar();
     MeshType::Pointer               zonestructure = MeshType::New();
     MeshType::PointsContainer::Pointer points     = MeshType::PointsContainer::New();
     MeshType::PointDataContainer::Pointer tensors = MeshType::PointDataContainer::New();
@@ -240,7 +238,6 @@ namespace itk
     tensors->Reserve (zonelimiter->GetNumberOfAHAZones());
 
     std::cout<<"allocating vector of zone gradients (tensors) in "<<zonelimiter->GetNumberOfAHAZones()<<" zones..."<<std::endl;
-    getchar();
     std::vector<MeshType::Pointer> zonesgradients1;
     std::vector<MeshType::Pointer> zonesgradients2;
     std::vector<MeshType::Pointer> zonesgradients3;
@@ -274,7 +271,6 @@ namespace itk
 
     
     std::cout<<"filling zone gradients (tensors)..."<<std::endl;
-    getchar();
     for (unsigned int i=0; i<gradient1->GetNumberOfPoints(); i++)
     {
       
@@ -287,10 +283,10 @@ namespace itk
       gradient3->GetPointData (i, &g3);
       
       unsigned int z = zonelimiter->InWhichZoneIsPoint (p);
-      if (!z)
-      	std::cout<<"point "<<p<<" does not belong to any zone : "<<z<<std::endl;
-      else
-	std::cout<<"point "<<p<<" does belong to zone : "<<z<<std::endl;
+      // if (!z)
+      // 	std::cout<<"point "<<p<<" does not belong to any zone : "<<z<<std::endl;
+      // else
+      // 	std::cout<<"point "<<p<<" does belong to zone : "<<z<<std::endl;
 
       if (!z)
 	continue;
@@ -306,10 +302,10 @@ namespace itk
     }
     
     std::cout<<"evaluating the covariance for each zone..."<<std::endl;
-    for (unsigned int i=0; i<=zonesgradients1.size(); i++)
+    for (unsigned int i=1; i<=zonesgradients1.size(); i++)
     {
       
-      std::cout<<"====== zone "<<i+1<<" ====="<<std::endl;
+      std::cout<<"====== zone "<<i<<" ====="<<std::endl;
       
       MeshType::Pointer g1 = zonesgradients1[i];
       MeshType::Pointer g2 = zonesgradients2[i];
@@ -323,7 +319,7 @@ namespace itk
 	return EXIT_FAILURE;
       }
       
-      zonelimiter->SetAHAZone (i+1);
+      zonelimiter->SetAHAZone (i);
       MeshType::PointType p = zonelimiter->GetZoneCentralPointCartesian();
       
       DisplacementType meangradient;
