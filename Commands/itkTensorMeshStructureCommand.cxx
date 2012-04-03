@@ -261,10 +261,23 @@ namespace itk
 
       MeshType::PointType p = zonelimiter->GetZoneCentralPointCartesian();
       TensorType t (0.0);
+
+      double ratio = 1.3;
       
       for (unsigned int j=0; j<zone->GetNumberOfPoints(); j++)
       {
 	TensorType l (0.0); zone->GetPointData (j, &l);
+	TensorType::MatrixType U;
+	TensorType::MatrixType D;
+	D.Fill (0.0);
+	D[0][0] = l.GetEigenvalue (0);
+	D[1][1] = l.GetEigenvalue (1);
+	D[2][2] = l.GetEigenvalue (2) * (ratio);
+	for (unsigned int a=0; a<3; a++)
+	  for (unsigned int b=0; b<3; b++)
+	  U[a][b] = l.GetEigenvector (b)[a];
+	l.SetVnlMatrix (U * D * U.GetTranspose());
+      
 	t += l.Log();
       }
       
