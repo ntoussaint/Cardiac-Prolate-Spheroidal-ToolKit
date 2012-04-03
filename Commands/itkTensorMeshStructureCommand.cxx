@@ -273,15 +273,21 @@ namespace itk
 	t /= static_cast<ScalarType> (zone->GetNumberOfPoints());
 	t = t.Exp();
       }
+
+      std::cout<<"structure tensor at zone "<<i<<":"<<std::endl;
+      std::cout<<t<<std::endl;
       
       zonestructure->SetPoint (i-1, p);
       zonestructure->SetPointData (i-1, t);
     }
+    
 
+    std::cout<<"Writing zone structure tensors to "<<"zones-structure.vtk"<<"... "<<std::flush;
     TensorMeshIOType::Pointer outputwriter2 = TensorMeshIOType::New();
     outputwriter2->SetInput (zonestructure);
     outputwriter2->SetFileName ("zones-structure.vtk");
     outputwriter2->Update();
+    std::cout<<"done."<<std::endl;
     
     return EXIT_SUCCESS;
   
