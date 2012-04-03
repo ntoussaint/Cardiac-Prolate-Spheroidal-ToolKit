@@ -223,8 +223,8 @@ namespace itk
     AHALimiterType::Pointer zonelimiter = AHALimiterType::New();
     zonelimiter->SetInput (reader->GetOutput());
     zonelimiter->SetTransform (transform);
-    zonelimiter->SetDisplacementField (displacementfield);
-    zonelimiter->SetInverseDisplacementField (inversedisplacementfield);
+    zonelimiter->SetDisplacementField (inversedisplacementfield);
+    zonelimiter->SetInverseDisplacementField (displacementfield);
     zonelimiter->CanineDivisionsOff();
     zonelimiter->SetAHASegmentationType (AHALimiterType::AHA_17_ZONES);
     zonelimiter->CalculateZones();
