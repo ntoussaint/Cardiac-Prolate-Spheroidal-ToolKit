@@ -94,6 +94,9 @@ CreateCpstkCommand(TensorMeshGradient
 CreateCpstkCommand(TensorMeshStructure
   "structure" "Compute the structure tensor field of a tensor field in Prolate Spheroidal sense"
   )
+CreateCpstkCommand(TensorMeshCovariance
+  "covariance" "Compute the covariance tensor field of a tensor field in Prolate Spheroidal sense"
+  )
 
 add_library(CPSTKCommands ${CPSTK_BUILD_TYPE}
   ${CPSTK_COMMAND_SRCS}

@@ -37,6 +37,7 @@
 #include "itkExtractKernelsEnveloppeCommandFactory.h"
 #include "itkTensorMeshGradientCommandFactory.h"
 #include "itkTensorMeshStructureCommandFactory.h"
+#include "itkTensorMeshCovarianceCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 #include "cpstkConfigure.h"
@@ -67,6 +68,7 @@ int main (int narg, char *args[])
   itk::ExtractKernelsEnveloppeCommandFactory::RegisterOneFactory();
   itk::TensorMeshGradientCommandFactory::RegisterOneFactory();
   itk::TensorMeshStructureCommandFactory::RegisterOneFactory();
+  itk::TensorMeshCovarianceCommandFactory::RegisterOneFactory();
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
   if( cl.size() == 1 || cl.search(2, "--help", "-h") )
