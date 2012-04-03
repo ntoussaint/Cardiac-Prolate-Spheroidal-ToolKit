@@ -84,7 +84,8 @@ namespace itk
 	p[2] = p[2] - 2.0 * vnl_math::pi;
       }
 
-      for (unsigned int i=0 ;i<3; i++)
+      /* for (unsigned int i=0 ;i<3; i++) */
+      for (unsigned int i=1 ;i<3; i++)
       {
 	if ( (i == 2) && ( this->Minimum[2] > this->Maximum[2] ) )
 	{
