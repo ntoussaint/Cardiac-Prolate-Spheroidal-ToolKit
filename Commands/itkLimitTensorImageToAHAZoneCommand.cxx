@@ -67,7 +67,7 @@ namespace itk
     }
     const char*  inputfile                    = cl.follow("input.vtk",2,"-i","-I");
     const char*  prolatefile                  = cl.follow("prolate.pr",2,"-pr","-PR");
-    const char*  displacementfieldfile        = cl.follow("forward.mha",2,"-f","-F");
+    const char*  displacementfieldfile        = cl.follow("backward.mha",2,"-f","-F");
     const char*  outputfile                   = cl.follow("output.csv",2,"-o","-O");
     const unsigned int zone                   = cl.follow(0, 2,"-z","-Z");
 

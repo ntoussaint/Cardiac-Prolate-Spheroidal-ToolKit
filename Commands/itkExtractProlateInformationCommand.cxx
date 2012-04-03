@@ -60,7 +60,6 @@ namespace itk
     m_LongDescription +="\t h1 [scale factor in xi1 direction] \n";
     m_LongDescription +="\t h2 [scale factor in xi2 direction] \n";
     m_LongDescription +="\t h3 [scale factor in xi3 direction] \n";
-    
   }
 
   ExtractProlateInformationCommand::~ExtractProlateInformationCommand()
