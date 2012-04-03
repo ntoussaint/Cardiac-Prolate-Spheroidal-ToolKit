@@ -239,7 +239,7 @@ namespace itk
     points->Reserve (zonelimiter->GetNumberOfAHAZones());
     tensors->Reserve (zonelimiter->GetNumberOfAHAZones());
 
-    std::cout<<"allocating vector of zone gradients (tensors)..."<<std::endl;
+    std::cout<<"allocating vector of zone gradients (tensors) in "<<zonelimiter->GetNumberOfAHAZones()<<" zones..."<<std::endl;
     getchar();
     std::vector<MeshType::Pointer> zonesgradients1;
     std::vector<MeshType::Pointer> zonesgradients2;
@@ -289,11 +289,11 @@ namespace itk
       unsigned int z = zonelimiter->InWhichZoneIsPoint (p);
       if (!z)
       {
-	std::cerr<<"point "<<p<<"does not belong to any zone : "<<z<<std::endl;
-	continue;
+	std::cout<<"point "<<p<<"does not belong to any zone : "<<z<<std::endl;
+      }
       else
-	std::cerr<<"point "<<p<<"does belong to zone : "<<z<<std::endl;
-      
+	std::cout<<"point "<<p<<"does belong to zone : "<<z<<std::endl;
+
       unsigned int size = zonesgradients1[z-1]->GetNumberOfPoints();
       
       zonesgradients1[z-1]->GetPoints()->InsertElement (size, p);
