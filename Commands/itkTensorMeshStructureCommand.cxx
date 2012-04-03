@@ -30,7 +30,7 @@
 #include "itkTensorMeshToImageFilter.h"
 #include "itkWarpTensorMeshFilter.h"
 #include "itkProlateSpheroidalTransformTensorMeshFilter.h"
-
+#include "itkLimitToAHAZoneImageFilter.h"
 #include "GetPot.h"
 
 namespace itk
@@ -61,11 +61,13 @@ namespace itk
     
     
     typedef double                                      ScalarType;
-    typedef itk::TensorImageIO<ScalarType, 3, 3>        TensorIOType;
-    typedef itk::TensorMeshIO<ScalarType, 3, 3>         TensorMeshIOType;
+    typedef TensorImageIO<ScalarType, 3, 3>             TensorIOType;
+    typedef TensorMeshIO<ScalarType, 3, 3>              TensorMeshIOType;
     typedef TensorMeshIOType::TensorMeshType            MeshType;
+    typedef Image<ScalarType, 3>                        ImageType;
+    typedef ImageFileReader<ImageType>                  ImageReaderType;
     
-    typedef itk::ProlateSpheroidalStructureTensorMeshFilter<MeshType> FilterType;
+    typedef ProlateSpheroidalStructureTensorMeshFilter<MeshType> FilterType;
     
     typedef FilterType::TensorType                      TensorType;
     typedef FilterType::TransformType                   TransformType;
@@ -74,10 +76,13 @@ namespace itk
     typedef itk::Image<DisplacementType, 3>             DisplacementFieldType;
     typedef itk::ImageFileReader<DisplacementFieldType> DisplacementFileReaderType;
     typedef itk::TensorImageToMeshFilter<TensorType, 3> ImageToMeshFilterType;
+    typedef itk::TensorMeshToImageFilter<TensorType, 3> MeshToImageFilterType;
 
     typedef itk::WarpTensorMeshFilter<MeshType, DisplacementFieldType>  WarperType;
     typedef itk::ProlateSpheroidalTransformTensorMeshFilter<MeshType>   TransformerType;    
- 
+
+    typedef itk::LimitToAHAZoneImageFilter<TensorImageType>             AHALimiterType;    
+    
     GetPot   cl(narg, const_cast<char**>(arg)); // argument parser
     if( cl.size() == 1 || cl.search(2, "--help", "-h") ) 
     {
@@ -100,11 +105,15 @@ namespace itk
   
     std::cout << "Reading input tensor image: " << inputfile <<"... "<< std::flush;
     TensorIOType::Pointer reader = TensorIOType::New();
+    ImageReaderType::Pointer t_reader = ImageReaderType::New();
+    
     reader->SetFileName(inputfile);
+    t_reader->SetFileName(inputfile);
   
     try
     {
       reader->Read();
+      t_reader->Update();
     }
     catch(itk::ExceptionObject &e)
     {
@@ -207,16 +216,72 @@ namespace itk
       backwarper->SetInput (backtransformer->GetOutput());
       backwarper->Update();    
     }
-    
-    TensorMeshIOType::Pointer meshwriter = TensorMeshIOType::New();
-    if (use_prolate)
-      meshwriter->SetInput (backwarper->GetOutput());
-    else
-      meshwriter->SetInput (structure);
-    
-    meshwriter->SetFileName (outputfile);  
-    meshwriter->Write();
 
+    MeshType::Pointer output;
+    if (use_prolate)
+      output = backwarper->GetOutput();
+    else
+      output = structure;
+    
+    output->DisconnectPipeline();
+
+    MeshToImageFilterType::Pointer mesh2image = MeshToImageFilterType::New();
+    mesh2image->SetInput (output);
+    mesh2image->SetDomain (t_reader->GetOutput());
+    mesh2image->Update();
+    
+    TensorIOType::Pointer outputwriter = TensorIOType::New();
+    outputwriter->SetInput (mesh2image->GetOutput());
+    outputwriter->SetFileName (outputfile);  
+    outputwriter->Write();
+    
+    AHALimiterType::Pointer zonelimiter = AHALimiterType::New();
+    zonelimiter->SetInput (mesh2image->GetOutput());
+    zonelimiter->SetTransform (transform);
+    zonelimiter->SetInverseDisplacementField (displacementfield);
+    zonelimiter->CanineDivisionsOff();
+    zonelimiter->SetAHASegmentationType (AHALimiterType::AHA_17_ZONES);
+    
+    MeshType::Pointer               zonestructure = MeshType::New();
+    MeshType::PointsContainer::Pointer points     = MeshType::PointsContainer::New();
+    MeshType::PointDataContainer::Pointer tensors = MeshType::PointDataContainer::New();
+    zonestructure->SetPoints (points);
+    zonestructure->SetPointData (tensors);
+    points->Reserve (zonelimiter->GetNumberOfAHAZones());
+    tensors->Reserve (zonelimiter->GetNumberOfAHAZones());
+    
+    for (unsigned int i=1; i<=zonelimiter->GetNumberOfAHAZones(); i++)
+    {
+      zonelimiter->SetAHAZone (i);
+      ImageToMeshFilterType::Pointer zoneimage2mesh = ImageToMeshFilterType::New();
+      zoneimage2mesh->SetInput (zonelimiter->GetOutput());
+      zoneimage2mesh->Update();
+      MeshType::Pointer zone = zoneimage2mesh->GetOutput();
+
+      MeshType::PointType p = zonelimiter->GetZoneCentralPointCartesian();
+      TensorType t (0.0);
+      
+      for (unsigned int j=0; j<zone->GetNumberOfPoints(); j++)
+      {
+	TensorType l (0.0); zone->GetPointData (j, &l);
+	t += l.Log();
+      }
+      
+      if (zone->GetNumberOfPoints())
+      {
+	t /= static_cast<ScalarType> (zone->GetNumberOfPoints());
+	t = t.Exp();
+      }
+      
+      zonestructure->SetPoint (i-1, p);
+      zonestructure->SetPointData (i-1, t);
+    }
+
+    TensorMeshIOType::Pointer outputwriter2 = TensorMeshIOType::New();
+    outputwriter2->SetInput (zonestructure);
+    outputwriter2->SetFileName ("zones-structure.vtk");
+    outputwriter2->Update();
+    
     return EXIT_SUCCESS;
   
   }
