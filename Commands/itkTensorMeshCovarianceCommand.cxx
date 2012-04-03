@@ -344,6 +344,8 @@ namespace itk
       
       if (g1->GetNumberOfPoints())
 	meangradient /= static_cast<ScalarType> (g1->GetNumberOfPoints());
+
+      std::cout<<"the mean gradient is : "<<meangradient<<std::endl;
       
       vnl_matrix_fixed<ScalarType,3,3> covariancematrix (0.0);
       
