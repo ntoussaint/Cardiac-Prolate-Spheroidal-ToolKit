@@ -288,12 +288,13 @@ namespace itk
       
       unsigned int z = zonelimiter->InWhichZoneIsPoint (p);
       if (!z)
-      {
-	std::cout<<"point "<<p<<"does not belong to any zone : "<<z<<std::endl;
-      }
+      	std::cout<<"point "<<p<<" does not belong to any zone : "<<z<<std::endl;
       else
-	std::cout<<"point "<<p<<"does belong to zone : "<<z<<std::endl;
+	std::cout<<"point "<<p<<" does belong to zone : "<<z<<std::endl;
 
+      if (!z)
+	continue;
+      
       unsigned int size = zonesgradients1[z-1]->GetNumberOfPoints();
       
       zonesgradients1[z-1]->GetPoints()->InsertElement (size, p);
