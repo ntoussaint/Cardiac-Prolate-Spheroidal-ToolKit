@@ -223,8 +223,8 @@ namespace itk
     AHALimiterType::Pointer zonelimiter = AHALimiterType::New();
     zonelimiter->SetInput (reader->GetOutput());
     zonelimiter->SetTransform (transform);
-    zonelimiter->SetDisplacementField (inversedisplacementfield);
-    zonelimiter->SetInverseDisplacementField (displacementfield);
+    zonelimiter->SetDisplacementField (displacementfield);
+    zonelimiter->SetInverseDisplacementField (inversedisplacementfield);
     zonelimiter->CanineDivisionsOff();
     zonelimiter->SetAHASegmentationType (AHALimiterType::AHA_17_ZONES);
     zonelimiter->CalculateZones();
@@ -289,12 +289,10 @@ namespace itk
       unsigned int z = zonelimiter->InWhichZoneIsPoint (p);
       if (!z)
       {
+	std::cerr<<"point "<<p<<"does not belong to any zone : "<<z<<std::endl;
 	continue;
-      }
       else
-      {
 	std::cerr<<"point "<<p<<"does belong to zone : "<<z<<std::endl;
-      }
       
       unsigned int size = zonesgradients1[z-1]->GetNumberOfPoints();
       
