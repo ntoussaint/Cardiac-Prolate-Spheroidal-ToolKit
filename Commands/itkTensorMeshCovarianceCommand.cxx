@@ -318,6 +318,8 @@ namespace itk
 	std::cerr<<"the gradients don't have the same number of points..."<<std::endl;
 	return EXIT_FAILURE;
       }
+
+      std::cout<<"number of gradients in zone : "<<g1->GetNumberOfPoints()<<std::endl;
       
       zonelimiter->SetAHAZone (i);
       MeshType::PointType p = zonelimiter->GetZoneCentralPointCartesian();
@@ -332,9 +334,9 @@ namespace itk
 	g2->GetPointData (j,&t2);
 	g3->GetPointData (j,&t3);
 	
-	gradient[0] = t1.GetNorm();
-	gradient[1] = t2.GetNorm();
-	gradient[2] = t3.GetNorm();
+	gradient[0] = t1.Log().GetNorm();
+	gradient[1] = t2.Log().GetNorm();
+	gradient[2] = t3.Log().GetNorm();
 
 	gradients.push_back (gradient);
 	meangradient += gradient;
@@ -356,7 +358,8 @@ namespace itk
 
       TensorType covariance (0.0);
       covariance.SetVnlMatrix (covariancematrix);
-
+      covariance = covariance.Exp();
+      
       zonestructure->SetPoint (i-1, p);
       zonestructure->SetPointData (i-1, covariance);
     }
