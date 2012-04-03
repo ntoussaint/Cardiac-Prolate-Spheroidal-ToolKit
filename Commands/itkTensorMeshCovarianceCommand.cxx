@@ -358,7 +358,7 @@ namespace itk
 
       TensorType covariance (0.0);
       covariance.SetVnlMatrix (covariancematrix);
-      covariance = covariance.Exp();
+      //covariance = covariance.Exp();
       
       zonestructure->SetPoint (i-1, p);
       zonestructure->SetPointData (i-1, covariance);
