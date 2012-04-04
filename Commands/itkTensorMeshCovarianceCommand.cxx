@@ -371,13 +371,14 @@ namespace itk
 	  for (unsigned int l=0; l<3; l++)
 	    covariancematrix[k][l] += (gradient[k] - meangradient[k])*(gradient[l] - meangradient[k]);
       }
+      
       if (gradients.size())
 	covariancematrix /= (double)(gradients.size());
       
       TensorType covariance (0.0);
       covariance.SetVnlMatrix (covariancematrix);
       
-      covariance = covariance.Sqrt();
+      covariance = covariance.Exp();
       
       zonestructure->SetPoint (i-1, meanpoint);
       zonestructure->SetPointData (i-1, covariance);
