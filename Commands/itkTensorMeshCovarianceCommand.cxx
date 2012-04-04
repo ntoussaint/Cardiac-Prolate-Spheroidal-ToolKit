@@ -350,8 +350,9 @@ namespace itk
 	gradient[2] = t3.Log().GetNorm();
 
 	gradients.push_back (gradient);
-	meanpoint    += p;
-	meangradient += gradient;
+	for (unsigned int u=0; u<3; u++)
+	  meanpoint[u] += p[u];
+	meangradient   += gradient;
       }
       
       if (gradients.size())
