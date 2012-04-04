@@ -367,18 +367,35 @@ namespace itk
 	  for (unsigned int l=0; l<3; l++)
 	    covariancematrix[k][l] += (gradient[k] - meangradient[k])*(gradient[l] - meangradient[k]);
       }
-
+      if (gradients.size())
+	covariancematrix /= (double)(gradients.size());
+      
       TensorType covariance (0.0);
       covariance.SetVnlMatrix (covariancematrix);
-      //covariance = covariance.Exp();
+      
+      covariance = covariance.Sqrt();
       
       zonestructure->SetPoint (i-1, p);
       zonestructure->SetPointData (i-1, covariance);
     }
 
+    TransformType::Pointer inversetransform = TransformType::New();
+    transform->GetInverse (inversetransform);
+
+    TransformerType::Pointer transformer2 = TransformerType::New();
+    transformer2->SetTransform (inversetransform);
+    transformer2->SetInput (zonestructure);
+    transformer2->Update();
+
+    WarperType::Pointer warper2 = WarperType::New();
+    warper2->SetDisplacementField (inversedisplacementfield);
+    warper2->SetInverseDisplacementField (displacementfield);
+    warper2->SetInput (transformer2->GetOutput());
+    warper2->Update();
+    
     std::cout<<"Writing zone covariance tensors to "<<outputfile<<"... "<<std::flush;
     TensorMeshIOType::Pointer outputwriter2 = TensorMeshIOType::New();
-    outputwriter2->SetInput (zonestructure);
+    outputwriter2->SetInput (warper2->GetOutput());
     outputwriter2->SetFileName (outputfile);
     outputwriter2->Write();
     std::cout<<"done."<<std::endl;
