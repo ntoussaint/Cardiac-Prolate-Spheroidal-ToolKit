@@ -321,16 +321,18 @@ namespace itk
 
       std::cout<<"number of gradients in zone : "<<g1->GetNumberOfPoints()<<std::endl;
       
-      zonelimiter->SetAHAZone (i);
-      MeshType::PointType p = zonelimiter->GetZoneCentralPointCartesian();
+      MeshType::PointType meanpoint; meanpoint[0] = meanpoint[1] = meanpoint[2] = 0.0;
+      DisplacementType meangradient; meangradient[0] = meangradient[1] = meangradient[2] = 0.0;
       
-      DisplacementType meangradient;
       std::vector<DisplacementType> gradients;
-      unsigned int counter;
       
       for (unsigned int j=0; j<g1->GetNumberOfPoints(); j++)
       {
 	DisplacementType gradient;
+
+	MeshType::PointType p;
+	g1->GetPoint (j,&p);
+	
 	TensorType t1 (0.0), t2 (0.0), t3 (0.0);
 	g1->GetPointData (j,&t1);
 	g2->GetPointData (j,&t2);
@@ -347,15 +349,16 @@ namespace itk
 	gradient[1] = t2.Log().GetNorm();
 	gradient[2] = t3.Log().GetNorm();
 
-	std::cout<<"gradient is "<<gradient<<std::endl;
 	gradients.push_back (gradient);
+	meanpoint    += p;
 	meangradient += gradient;
       }
       
-      std::cout<<"the mean gradient is "<<meangradient<<std::endl;
       if (gradients.size())
 	meangradient /= (double)(gradients.size());
-      std::cout<<"the mean gradient is : "<<meangradient<<std::endl;
+      if (gradients.size())
+	for (unsigned int u = 0; u<3; u++)
+	  meanpoint[u] /= (double)(gradients.size());
       
       vnl_matrix_fixed<ScalarType,3,3> covariancematrix (0.0);
       
@@ -375,7 +378,7 @@ namespace itk
       
       covariance = covariance.Sqrt();
       
-      zonestructure->SetPoint (i-1, p);
+      zonestructure->SetPoint (i-1, meanpoint);
       zonestructure->SetPointData (i-1, covariance);
     }
 
