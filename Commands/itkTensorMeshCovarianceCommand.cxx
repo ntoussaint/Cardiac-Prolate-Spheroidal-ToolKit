@@ -337,12 +337,16 @@ namespace itk
 	std::cout<<"gradients logs are : \n"
 		 <<t1.Log()<<std::endl
 		 <<t2.Log()<<std::endl
-		 <<t3.Log()<<std::endl;
+		 <<t3.Log()<<std::endl<<std::endl;
+	std::cout<<"gradients log norms are : \n"
+		 <<t1.Log().GetNorm()<<" : "
+		 <<t2.Log().GetNorm()<<" : "
+		 <<t3.Log().GetNorm()<<std::endl<<std::endl<<std::endl;
 	
 	gradient[0] = t1.Log().GetNorm();
 	gradient[1] = t2.Log().GetNorm();
 	gradient[2] = t3.Log().GetNorm();
-
+	
 	gradients.push_back (gradient);
 	meangradient += gradient;
       }
