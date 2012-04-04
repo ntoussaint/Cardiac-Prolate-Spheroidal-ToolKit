@@ -334,23 +334,15 @@ namespace itk
 	g2->GetPointData (j,&t2);
 	g3->GetPointData (j,&t3);
 
-	std::cout<<"gradients logs are : \n"
-		 <<t1.Log()<<std::endl
-		 <<t2.Log()<<std::endl
-		 <<t3.Log()<<std::endl<<std::endl;
-	std::cout<<"gradients log norms are : \n"
-		 <<t1.Log().GetNorm()<<" : "
-		 <<t2.Log().GetNorm()<<" : "
-		 <<t3.Log().GetNorm()<<std::endl<<std::endl<<std::endl;
-	
 	gradient[0] = t1.Log().GetNorm();
 	gradient[1] = t2.Log().GetNorm();
 	gradient[2] = t3.Log().GetNorm();
-	
+	std::cout<<"gradient is "<<gradient<<std::endl;
 	gradients.push_back (gradient);
 	meangradient += gradient;
       }
       
+      std::cout<<"the mean gradient is "<<meangradient<<std::endl;
       if (g1->GetNumberOfPoints())
 	meangradient /= static_cast<ScalarType> (g1->GetNumberOfPoints());
 
