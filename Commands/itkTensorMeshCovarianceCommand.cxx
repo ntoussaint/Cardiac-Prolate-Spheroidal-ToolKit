@@ -326,6 +326,8 @@ namespace itk
       
       DisplacementType meangradient;
       std::vector<DisplacementType> gradients;
+      unsigned int counter;
+      
       for (unsigned int j=0; j<g1->GetNumberOfPoints(); j++)
       {
 	DisplacementType gradient;
@@ -334,18 +336,24 @@ namespace itk
 	g2->GetPointData (j,&t2);
 	g3->GetPointData (j,&t3);
 
+	if (t1.Log().GetNorm() == 173.205)
+	{
+	  std::cout<<"weird gradient at iteration "<<j<<std::endl;
+	  continue;
+	}
+	
 	gradient[0] = t1.Log().GetNorm();
 	gradient[1] = t2.Log().GetNorm();
 	gradient[2] = t3.Log().GetNorm();
+
 	std::cout<<"gradient is "<<gradient<<std::endl;
 	gradients.push_back (gradient);
 	meangradient += gradient;
       }
       
       std::cout<<"the mean gradient is "<<meangradient<<std::endl;
-      if (g1->GetNumberOfPoints())
-	meangradient /= static_cast<ScalarType> (g1->GetNumberOfPoints());
-
+      if (gradients.size())
+	meangradient /= (double)(gradients.size());
       std::cout<<"the mean gradient is : "<<meangradient<<std::endl;
       
       vnl_matrix_fixed<ScalarType,3,3> covariancematrix (0.0);
