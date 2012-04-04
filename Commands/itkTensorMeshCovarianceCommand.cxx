@@ -336,7 +336,8 @@ namespace itk
 	g2->GetPointData (j,&t2);
 	g3->GetPointData (j,&t3);
 
-	if (t1.Log().GetNorm() == 173.205)
+	if ( (std::abs (t1.GetNorm() - t2.GetNorm()) < vcl_numeric_limits<double>::epsilon()) &&
+	     (std::abs (t1.GetNorm() - t3.GetNorm()) < vcl_numeric_limits<double>::epsilon()) )
 	{
 	  std::cout<<"weird gradient at iteration "<<j<<std::endl;
 	  continue;
