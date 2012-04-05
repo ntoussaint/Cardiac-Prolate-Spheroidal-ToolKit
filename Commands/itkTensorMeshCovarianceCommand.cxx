@@ -369,7 +369,7 @@ namespace itk
 	
 	for (unsigned int k=0; k<3; k++)
 	  for (unsigned int l=0; l<3; l++)
-	    covariancematrix[k][l] += (gradient[k] - meangradient[k])*(gradient[l] - meangradient[k]);
+	    covariancematrix[k][l] += (gradient[k])*(gradient[l]);
       }
       
       if (gradients.size())
