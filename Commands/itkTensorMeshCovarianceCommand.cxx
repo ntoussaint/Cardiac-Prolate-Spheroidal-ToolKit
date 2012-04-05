@@ -191,6 +191,8 @@ namespace itk
     
     std::cout<<"defining the limiter..."<<std::endl;
     AHALimiterType::Pointer zonelimiter = AHALimiterType::New();
+    zonelimiter->DefineVentricleSizes(15, 105 * vnl_math::pi / 180.0);
+    
     zonelimiter->SetInput (reader->GetOutput());
     zonelimiter->SetTransform (transform);
     zonelimiter->SetDisplacementField (displacementfield);
