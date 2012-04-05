@@ -191,7 +191,7 @@ namespace itk
     
     std::cout<<"defining the limiter..."<<std::endl;
     AHALimiterType::Pointer zonelimiter = AHALimiterType::New();
-    zonelimiter->DefineVentricleSizes(15, 105 * vnl_math::pi / 180.0);
+    zonelimiter->SetVentricleSizes(15, 105 * vnl_math::pi / 180.0);
     
     zonelimiter->SetInput (reader->GetOutput());
     zonelimiter->SetTransform (transform);
@@ -245,7 +245,7 @@ namespace itk
     }
 
     std::cout<<"evaluating the covariance for each zone..."<<std::endl;
-    for (unsigned int z=1; z<zonestructures.size(); z++)
+    for (unsigned int z=1; z<=zonestructures.size(); z++)
     {
       
       std::cout<<"====== zone "<<z<<" ====="<<std::endl;
@@ -282,7 +282,7 @@ namespace itk
 	  meanpoint[u] /= (double)(gradients.size());
 
       std::cout<<"meangradient : "<<meangradient<<std::endl;
-      
+      std::cout<<"meanpoint : "<<meanpoint<<std::endl;
       
       vnl_matrix_fixed<ScalarType,3,3> covariancematrix (0.0);
       
@@ -300,6 +300,9 @@ namespace itk
       
       TensorType covariance (0.0);
       covariance.SetVnlMatrix (covariancematrix);
+
+      covariance = covariance.Sqrt();
+      covariance *= 10;
       
       zonecovariance->SetPoint (z-1, meanpoint);
       zonecovariance->SetPointData (z-1, covariance);
@@ -319,10 +322,21 @@ namespace itk
     warper2->SetInverseDisplacementField (displacementfield);
     warper2->SetInput (transformer2->GetOutput());
     warper2->Update();
+
+    MeshType::Pointer outputmesh = warper2->GetOutput();
+    outputmesh->DisconnectPipeline();
+    
+    std::cout<<"correcting the zone-centre position..."<<std::endl;
+    for (unsigned int i=0; i < zonecovariance->GetNumberOfPoints(); i++)
+    {
+      zonelimiter->SetAHAZone (i+1);
+      MeshType::PointType p = zonelimiter->GetZoneCentralPointCartesian();
+      outputmesh->SetPoint (i, p);
+    }
     
     std::cout<<"Writing zone covariance tensors to "<<outputfile<<"... "<<std::flush;
     TensorMeshIOType::Pointer outputwriter2 = TensorMeshIOType::New();
-    outputwriter2->SetInput (warper2->GetOutput());
+    outputwriter2->SetInput (outputmesh);
     outputwriter2->SetFileName (outputfile);
     outputwriter2->Write();
     std::cout<<"done."<<std::endl;
