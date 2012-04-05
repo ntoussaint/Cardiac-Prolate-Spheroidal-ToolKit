@@ -307,9 +307,9 @@ namespace itk
       
       std::cout<<"====== zone "<<i<<" ====="<<std::endl;
       
-      MeshType::Pointer g1 = zonesgradients1[i];
-      MeshType::Pointer g2 = zonesgradients2[i];
-      MeshType::Pointer g3 = zonesgradients3[i];
+      MeshType::Pointer g1 = zonesgradients1[i-1];
+      MeshType::Pointer g2 = zonesgradients2[i-1];
+      MeshType::Pointer g3 = zonesgradients3[i-1];
       
       if ( ( g1->GetNumberOfPoints() != g2->GetNumberOfPoints() ) ||
 	   ( g2->GetNumberOfPoints() != g3->GetNumberOfPoints() ) ||
