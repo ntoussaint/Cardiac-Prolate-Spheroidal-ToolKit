@@ -39,6 +39,7 @@ namespace itk
   ProlateSpheroidalGradientTensorMeshFilter<TMesh>
   ::ProlateSpheroidalGradientTensorMeshFilter()
   {
+    m_Factor = 1.0;
     m_UsePiWorkAround = 1;
     m_LogInput  = MeshType::New();
     m_LogOutput1 = MeshType::New();
@@ -88,7 +89,6 @@ namespace itk
       this->EvaluateUAnddUl (index, U, dUl);
       
       InternalMatrixType Sigma = this->EvaluateSigma (p);    
-      
       /// solve [ U Sigma ] . gradl = dUl
       SolverType solver (U * Sigma);
       InternalMatrixType gradl = solver.solve (dUl);
@@ -199,14 +199,14 @@ namespace itk
     	itkWarningMacro (<<"Prolate Spheroidal Transform is null, cannot estimate Sigma\n");
       }
       else
-    	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);
+    	m_Transform->EvaluateScaleFactors (p.GetDataPointer(), h);	
     }
-    
+
     m.put (0,0, 1.0/h[0]);
     m.put (1,1, 1.0/h[1]);
     m.put (2,2, 1.0/h[2]);
-
-    return m;
+    
+    return m_Factor * m;
   }
   
   

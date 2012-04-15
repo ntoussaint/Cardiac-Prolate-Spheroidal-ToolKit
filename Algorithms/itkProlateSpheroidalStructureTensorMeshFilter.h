@@ -80,11 +80,18 @@ namespace itk
   
     itkGetObjectMacro (Transform, TransformType);
     itkSetObjectMacro (Transform, TransformType);
+
+    itkGetObjectMacro (GradientFilter, GradientFilterType);
   
     itkGetMacro     (UsePiWorkAround, unsigned int);
     itkSetClampMacro(UsePiWorkAround, unsigned int, 0, 1);
     itkBooleanMacro (UsePiWorkAround);
 
+    double GetGradientUFactor(void)
+    { return m_GradientFilter->GetFactor(); }
+    void SetGradientUFactor (double f)
+    { m_GradientFilter->SetFactor (f); }
+  
     void GenerateOutputInformation();
 
     virtual void SetInput( unsigned int, const TMesh* mesh);
@@ -148,7 +155,7 @@ namespace itk
     typename TransformType::Pointer m_Transform;
 
     typename GradientFilterType::Pointer m_GradientFilter;
-
+  
   };
 
 } // end of namespace itk

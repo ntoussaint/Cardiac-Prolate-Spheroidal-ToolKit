@@ -91,6 +91,9 @@ namespace itk
 
     virtual void SetInput( unsigned int, const TMesh* mesh);
 
+    itkGetMacro (Factor, double);
+    itkSetClampMacro (Factor, double, 0.1, 100);
+  
   protected:
 
     ProlateSpheroidalGradientTensorMeshFilter();
@@ -149,6 +152,9 @@ namespace itk
     typename MeshType::Pointer m_LogOutput3;
 
     typename TransformType::Pointer m_Transform;
+
+    double m_Factor;
+  
 
   };
 
