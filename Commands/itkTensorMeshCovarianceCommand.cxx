@@ -43,6 +43,7 @@ namespace itk
     m_LongDescription += "\n\nUsage:\n";
     
     m_LongDescription += "-i    [input structure tensor image]\n";
+    m_LongDescription += "-d    [domain file]\n";
     m_LongDescription += "-pr   [prolate transform used]\n";
     m_LongDescription += "-f1   [forward displacement field (default : forward.mha)]\n";
     m_LongDescription += "-f2   [backward displacement field (default : backward.mha)]\n";  
@@ -91,6 +92,7 @@ namespace itk
     }
     const char* inputfile                    = cl.follow("input.mha",2,"-i","-I");
     const char* prolatefile                  = cl.follow("prolate.pr",2,"-pr","-PR");
+    const char* domainfile                   = cl.follow("nofile",2,"-d","-D");
     const char* displacementfieldfile        = cl.follow("forward.mha",2,"-f1","-F1");
     const char* inversedisplacementfieldfile = cl.follow("backward.mha",2,"-f2","-F2");
     const char* outputfile                   = cl.follow("output.mha",2,"-o","-O");
@@ -103,25 +105,37 @@ namespace itk
   
     std::cout << std::flush;
   
-    std::cout << "Reading input structure tensor image: " << inputfile <<"... "<< std::flush;
-    TensorIOType::Pointer reader = TensorIOType::New();
-    ImageReaderType::Pointer t_reader = ImageReaderType::New();
-    
-    reader->SetFileName(inputfile);
-    t_reader->SetFileName(inputfile);
-  
-    try
+    std::cout << "Reading input tensor image/mesh: " << inputfile <<"... "<< std::flush;
+    std::string extension = itksys::SystemTools::GetFilenameLastExtension(inputfile).c_str();
+
+    MeshType::Pointer data = NULL;
+    if (strcmp (extension.c_str(), ".vtk") == 0)
     {
+      TensorMeshIOType::Pointer reader = TensorMeshIOType::New();
+      reader->SetFileName (inputfile);
       reader->Read();
-      t_reader->Update();
+      data = reader->GetOutput();
     }
-    catch(itk::ExceptionObject &e)
+    else
     {
-      std::cerr << e << std::endl;
-      std::exit(EXIT_FAILURE);
+      TensorIOType::Pointer reader = TensorIOType::New();
+      reader->SetFileName(inputfile);    
+      reader->Read();
+
+      ImageToMeshFilterType::Pointer imagetomesh = ImageToMeshFilterType::New();
+      imagetomesh->SetInput (reader->GetOutput());
+      imagetomesh->Update();
+      data = imagetomesh->GetOutput();
     }
+    std::cout<<" Done."<<std::endl;
+
+    std::cout << "Reading domain : " << domainfile <<"... "<< std::flush;
+    ImageReaderType::Pointer reader = ImageReaderType::New();
+    reader->SetFileName(domainfile);
+    reader->Update();
+    ImageType::Pointer domain = reader->GetOutput();
     std::cout << " Done." << std::endl;
-  
+    
     std::cout << "Reading forward field: " << displacementfieldfile <<"... "<<std::flush;
     DisplacementFileReaderType::Pointer displacementreader = DisplacementFileReaderType::New();
     displacementreader->SetFileName(displacementfieldfile);
@@ -163,43 +177,49 @@ namespace itk
     TransformType::Pointer backtransform = TransformType::New();
     transform->GetInverse (backtransform);
     
-    ImageToMeshFilterType::Pointer image2mesh = ImageToMeshFilterType::New();
-    image2mesh->SetInput (reader->GetOutput());
-    image2mesh->Update();
-
+    std::cout<<"switching coordinates... "<<std::flush;
     WarperType::Pointer warper = WarperType::New();
     warper->SetDisplacementField (displacementfield);
     warper->SetInverseDisplacementField (inversedisplacementfield);
-    warper->SetInput (image2mesh->GetOutput());
+    warper->SetInput (data);
     warper->Update();
 
     TransformerType::Pointer transformer = TransformerType::New();
     transformer->SetTransform (transform);
     transformer->SetInput (warper->GetOutput());
     transformer->Update();
+    std::cout<<"done."<<std::endl;
     
-    MeshType::Pointer data;
+    MeshType::Pointer dataforcovariance;
 
     if (use_prolate)
-      data = transformer->GetOutput();
+      dataforcovariance = transformer->GetOutput();
     else
-      data = image2mesh->GetOutput();
+      dataforcovariance = data;
     
-    data->DisconnectPipeline();
+    dataforcovariance->DisconnectPipeline();
 
-    std::cout<<"now try the covariance..."<<std::endl;
+    
+    std::cout<<"transforming to image for AHA separation... "<<std::flush;
+    MeshToImageFilterType::Pointer mesh2image = MeshToImageFilterType::New();
+    mesh2image->SetInput (data);
+    mesh2image->SetDomain (domain);
+    mesh2image->Update();
     
     std::cout<<"defining the limiter..."<<std::endl;
     AHALimiterType::Pointer zonelimiter = AHALimiterType::New();
-    zonelimiter->SetVentricleSizes(15, 105 * vnl_math::pi / 180.0);
-    
-    zonelimiter->SetInput (reader->GetOutput());
+
+    zonelimiter->SetVentricleSizes(15, 95 * vnl_math::pi / 180.0);
+
+    zonelimiter->SetInput (mesh2image->GetOutput());
     zonelimiter->SetTransform (transform);
     zonelimiter->SetDisplacementField (displacementfield);
     zonelimiter->SetInverseDisplacementField (inversedisplacementfield);
     zonelimiter->CanineDivisionsOff();
     zonelimiter->SetAHASegmentationType (AHALimiterType::AHA_17_ZONES);
-    zonelimiter->CalculateZones();
+    std::cout<<"done."<<std::endl;
+    
+    std::cout<<"now try the covariance..."<<std::endl;    
 
     std::cout<<"allocating the final structure tensors..."<<std::endl;
     MeshType::Pointer               zonecovariance = MeshType::New();
@@ -223,15 +243,21 @@ namespace itk
     }
 
     std::cout<<"filling zone structure (tensors)..."<<std::endl;
-    for (unsigned int i=0; i<data->GetNumberOfPoints(); i++)
+    for (unsigned int i=0; i<dataforcovariance->GetNumberOfPoints(); i++)
     {
       MeshType::PointType p;
       TensorType s (0.0);
       p[0] = p[1] = p[2] = 0.0;
-      data->GetPoint (i, &p);
-      data->GetPointData (i, &s);
+      dataforcovariance->GetPoint (i, &p);
+      dataforcovariance->GetPointData (i, &s);
       
-      unsigned int z = zonelimiter->InWhichZoneIsPoint (p);
+      unsigned int z = 0;
+
+      if (use_prolate)
+	z = zonelimiter->InWhichZoneIsPoint (p);
+      else
+	z = zonelimiter->InWhichZoneIsCartesianPoint (p);
+	
       if (!z)
       {
 	std::cerr<<"point "<<p<<" does not belong to any zone : "<<z<<std::endl;
@@ -250,37 +276,35 @@ namespace itk
       
       std::cout<<"====== zone "<<z<<" ====="<<std::endl;
 
+      zonelimiter->SetAHAZone (z);
+      MeshType::PointType meanpoint = zonelimiter->GetZoneCentralPointProlate();
+      
       MeshType::Pointer zone = zonestructures[z-1];
       
       std::cout<<"number of structures in zone : "<<zone->GetNumberOfPoints()<<std::endl;
       
-      MeshType::PointType meanpoint; meanpoint[0] = meanpoint[1] = meanpoint[2] = 0.0;
       DisplacementType meangradient; meangradient[0] = meangradient[1] = meangradient[2] = 0.0;
       
       std::vector<DisplacementType> gradients;
  
       for (unsigned int i=0; i<zone->GetNumberOfPoints(); i++)
       {
-	MeshType::PointType p;
+	MeshType::PointType p; p[0] = p[1] = p[2] = 0.0;
 	zone->GetPoint (i,&p);
 	TensorType s (0.0);
 	zone->GetPointData (i,&s);
 
 	DisplacementType gradient = s.GetEigenvector (2);
-
+	gradient *= s.GetEigenvalue (2);
+	
 	gradients.push_back (gradient);
 
-	meangradient   += gradient;
-	for (unsigned int u=0; u<3; u++)
-	  meanpoint[u] += p[u];
+	meangradient += gradient;
       }
 
       if (gradients.size())
 	meangradient /= (double)(gradients.size());
-      if (gradients.size())
-	for (unsigned int u = 0; u<3; u++)
-	  meanpoint[u] /= (double)(gradients.size());
-
+      
       std::cout<<"meangradient : "<<meangradient<<std::endl;
       std::cout<<"meanpoint : "<<meanpoint<<std::endl;
       
@@ -302,7 +326,10 @@ namespace itk
       covariance.SetVnlMatrix (covariancematrix);
 
       covariance = covariance.Sqrt();
+      covariance = covariance.Sqrt();
       covariance *= 10;
+      // covariance = covariance.Inv();      
+      // covariance /= 10;
       
       zonecovariance->SetPoint (z-1, meanpoint);
       zonecovariance->SetPointData (z-1, covariance);
@@ -326,13 +353,13 @@ namespace itk
     MeshType::Pointer outputmesh = warper2->GetOutput();
     outputmesh->DisconnectPipeline();
     
-    std::cout<<"correcting the zone-centre position..."<<std::endl;
-    for (unsigned int i=0; i < zonecovariance->GetNumberOfPoints(); i++)
-    {
-      zonelimiter->SetAHAZone (i+1);
-      MeshType::PointType p = zonelimiter->GetZoneCentralPointCartesian();
-      outputmesh->SetPoint (i, p);
-    }
+    // std::cout<<"correcting the zone-centre position..."<<std::endl;
+    // for (unsigned int i=0; i < zonecovariance->GetNumberOfPoints(); i++)
+    // {
+    //   zonelimiter->SetAHAZone (i+1);
+    //   MeshType::PointType p = zonelimiter->GetZoneCentralPointCartesian();
+    //   outputmesh->SetPoint (i, p);
+    // }
     
     std::cout<<"Writing zone covariance tensors to "<<outputfile<<"... "<<std::flush;
     TensorMeshIOType::Pointer outputwriter2 = TensorMeshIOType::New();
