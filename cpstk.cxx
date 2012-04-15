@@ -38,6 +38,7 @@
 #include "itkTensorMeshGradientCommandFactory.h"
 #include "itkTensorMeshStructureCommandFactory.h"
 #include "itkTensorMeshCovarianceCommandFactory.h"
+#include "itkForwardTransformMeshCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 #include "cpstkConfigure.h"
@@ -69,6 +70,7 @@ int main (int narg, char *args[])
   itk::TensorMeshGradientCommandFactory::RegisterOneFactory();
   itk::TensorMeshStructureCommandFactory::RegisterOneFactory();
   itk::TensorMeshCovarianceCommandFactory::RegisterOneFactory();
+  itk::ForwardTransformMeshCommandFactory::RegisterOneFactory();
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
   if( cl.size() == 1 || cl.search(2, "--help", "-h") )

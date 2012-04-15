@@ -97,6 +97,12 @@ CreateCpstkCommand(TensorMeshStructure
 CreateCpstkCommand(TensorMeshCovariance
   "covariance" "Compute the covariance tensor field of a tensor field in Prolate Spheroidal sense"
   )
+CreateCpstkCommand(ForwardTransformMesh
+  "forward" "Transform a tensor image or mesh in Prolate Spheroidal Coordinates"
+  )
+CreateCpstkCommand(BackwardTransformMesh
+  "backward" "Transform a tensor image or mesh from Prolate Spheroidal Coordinates"
+  )
 
 add_library(CPSTKCommands ${CPSTK_BUILD_TYPE}
   ${CPSTK_COMMAND_SRCS}
