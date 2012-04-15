@@ -286,16 +286,19 @@ namespace itk
     zonelimiter->SetInverseDisplacementField (inversedisplacementfield);
     zonelimiter->CanineDivisionsOff();
     
-    try
+    if (tensorimage)
     {
-      zonelimiter->Update();
-    }
-    catch(itk::ExceptionObject &e)
-    {
-      std::cerr << e << std::endl;
-      std::exit(EXIT_FAILURE);
-    }
+      try
+      {
+	zonelimiter->Update();
+      }
+      catch(itk::ExceptionObject &e)
+      {
+	std::cerr << e << std::endl;
+	std::exit(EXIT_FAILURE);
+      }
 
+    }
     
     vtkDoubleArray* positions = vtkDoubleArray::New();
     positions->SetNumberOfComponents (3);
