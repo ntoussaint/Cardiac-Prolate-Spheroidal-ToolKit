@@ -24,7 +24,7 @@
 #include "itkFindClosestProlateTransformCommandFactory.h"
 #include "itkCreateProlateDomainCommandFactory.h"
 #include "itkTensorMeshStatisticsCommandFactory.h"
-#include "itkCreateProlateAtlasCommandFactory.h"
+#include "itkCumulateProlateSpheroidalDataSetsCommandFactory"
 #include "itkLimitImageToAHAZoneCommandFactory.h"
 #include "itkLimitTensorImageToAHAZoneCommandFactory.h"
 #include "itkApplyTransformToImageCommandFactory.h"
@@ -56,7 +56,7 @@ int main (int narg, char *args[])
   itk::FindClosestProlateTransformCommandFactory::RegisterOneFactory();
   itk::CreateProlateDomainCommandFactory::RegisterOneFactory();
   itk::TensorMeshStatisticsCommandFactory::RegisterOneFactory();
-  itk::CreateProlateAtlasCommandFactory::RegisterOneFactory();
+  itk::CumulateProlateSpheroidalDataSetsCommandFactory::RegisterOneFactory();
   itk::LimitImageToAHAZoneCommandFactory::RegisterOneFactory();
   itk::LimitTensorImageToAHAZoneCommandFactory::RegisterOneFactory();
   itk::ApplyTransformToImageCommandFactory::RegisterOneFactory();

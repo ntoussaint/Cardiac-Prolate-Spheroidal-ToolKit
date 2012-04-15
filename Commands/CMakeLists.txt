@@ -55,8 +55,8 @@ CreateCpstkCommand(CreateProlateDomain
 CreateCpstkCommand(TensorMeshStatistics
   "stats" "Compute statistics in prolate sph. coordinates over a set of tensors"
   )
-CreateCpstkCommand(CreateProlateAtlas
-  "atlas" "Create an tensor atlas from a set of tensors in prolate coordinates"
+CreateCpstkCommand(CumulateProlateSpheroidalDataSets
+  "cumulate" "Cumulate several datasets in one, and normalizing 1st component"
   )
 CreateCpstkCommand(LimitImageToAHAZone
   "aha-image" "Crop an image to an AHA zone in the Prolate Spheroidal sense"
