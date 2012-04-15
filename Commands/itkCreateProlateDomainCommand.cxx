@@ -297,8 +297,10 @@ namespace itk
   
     // double thickness = 16.0;
     // double thickness = 37.0;
-    double thickness = 14.0;
+    // double thickness = 14.0;
+    double thickness = 16.0;
     // double maxangle = 100.0;
+    // double maxangle = 93.0;
     double maxangle = 93.0;
     double mu1 = asinh ((transform->GetLambda2() - thickness/2.0) / transform->GetSemiFociDistance());
     double mu2 = asinh ((transform->GetLambda2() + thickness/2.0) / transform->GetSemiFociDistance());
