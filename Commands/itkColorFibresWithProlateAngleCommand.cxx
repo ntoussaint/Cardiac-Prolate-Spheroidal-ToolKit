@@ -487,7 +487,7 @@ namespace itk
     vtkDataSetWriter* writer = vtkDataSetWriter::New();
     writer->SetInput (output);
     writer->SetFileName (outputfile);
-    //writer->SetFileTypeToBinary();
+    writer->SetFileTypeToBinary();
     writer->Update();
   
     writer->Delete();
