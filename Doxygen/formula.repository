@@ -1,0 +1,53 @@
+\form#0:\[ \hat{m}_{\sigma}(D_{\xi}) = \exp \left( \frac{ \sum_{i=1}^N K_{\sigma} (\xi - \xi_i) \log(D_{\xi_i})}{\sum_{i=1}^N K_{\sigma}(\xi -\xi_i)} \right) \]
+\form#1:\[ \frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1 \]
+\form#2:$ a > b = c $
+\form#3:\[ \begin{array}{ccc} x = f_{1/2} \sinh({\xi}^1) \sin({\xi}^2) \cos({\xi}^3) \\ y = f_{1/2} \sinh({\xi}^1) \sin({\xi}^2) \sin({\xi}^3) \\ z = f_{1/2} \cosh({\xi}^1) \cos({\xi}^2) \end{array} \]
+\form#4:\[ f = \frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} - 1 \]
+\form#5:\[ g = \]
+\form#6:$ \frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1 $
+\form#7:$a > b = c$
+\form#8:$ ev_1 = longaxispoint - center $
+\form#9:$ ev_2 = shortaxispoint - center $
+\form#10:$ ev_3 = ev_1 \times ev_2 $
+\form#11:$ a = \|ev_1\| $
+\form#12:$ b = c = \|ev_2\| $
+\form#13:$f_{1/2}$
+\form#14:$l = \sqrt{a^2 - b^2}}$
+\form#15:$ e = \frac{\sqrt{a^2 - b^2}}{a} = l / a$
+\form#16:\[ J=\left[ \begin{array}{cccc} \frac{\partial x_{1}}{\partial p_{1}} & \frac{\partial x_{1}}{\partial p_{2}} & \cdots & \frac{\partial x_{1}}{\partial p_{m}}\ \ \frac{\partial x_{2}}{\partial p_{1}} & \frac{\partial x_{2}}{\partial p_{2}} & \cdots & \frac{\partial x_{2}}{\partial p_{m}}\ \ \vdots & \vdots & \ddots & \vdots \ \ \frac{\partial x_{n}}{\partial p_{1}} & \frac{\partial x_{n}}{\partial p_{2}} & \cdots & \frac{\partial x_{n}}{\partial p_{m}} \end{array}\right] \]
+\form#17:$ \xi $
+\form#18:$ \xi^1 $
+\form#19:$ \xi^2 $
+\form#20:$ \xi^3 $
+\form#21:$\xi$
+\form#22:$ n = g_1 = \left( \begin{array}{ccc} cosh({\xi}^1) sin({\xi}^2) cos({\xi}^3) \\ cosh({\xi}^1) sin({\xi}^2) sin({\xi}^3) \\ sinh({\xi}^1) cos({\xi}^2) \end{array} \right) $
+\form#23:\[ \begin{array}{ccc} x(0) = f_{1/2} \sinh({\xi}^1) \sin({\xi}^2) \cos({\xi}^3) \\ x(1) = f_{1/2} \sinh({\xi}^1) \sin({\xi}^2) \sin({\xi}^3) \\ x(2) = f_{1/2} \cosh({\xi}^1) \cos({\xi}^2) \end{array} \]
+\form#24:$\cos^2(x) + \sin^2(x) = 1$
+\form#25:$\cosh^2(x) - \sinh^2(x) = 1$
+\form#26:$ x(0)^2 + x(1)^2 = f_{1/2}^2 \sinh^2(\xi^1) \sin^2(\xi^2) $
+\form#27:$A = f_{1/2}^2 $
+\form#28:$ B = x(0)^2 + x(1)^2 $
+\form#29:$ C = x(2)^2 $
+\form#30:$ \alpha = \sin^2(\xi^2) $
+\form#31:$\alpha$
+\form#32:\[ A \alpha^2 + (-A + B + C) \alpha - B = 0 \]
+\form#33:$\Gamma_1$
+\form#34:$\xi^2$
+\form#35:$ \sin^2(\xi^1) = B / (A sin^2(\xi^2))$
+\form#36:$\xi^1$
+\form#37:$\xi^3$
+\form#38:$(x(1), x(2))$
+\form#39:$\xi^3 = \arccos \left( \frac{x(1)}{\|x\|} \right) $
+\form#40:$xi$
+\form#41:$ \left( \begin{array}{cc} \frac{1}{h_1} = \frac{1}{h_2} = f_{1/2} \sqrt( \left( \sinh^2(\xi_1) + \sin^2(\xi_2) \right) \frac{1}{h_3} = f_{1/2} \sinh(\xi_1) \sin(\xi_2) \end{array} \right) $
+\form#42:$ f = \frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} - 1 $
+\form#43:$x$
+\form#44:\[ g_1 = 2 \left( \begin{array}{ccc} a^{-2} x(0) \\ b^{-2} x(1) \\ c^{-2} x(2) \end{array} \right) \]
+\form#45:\[ g_1 = \left( \begin{array}{ccc} cosh({\xi}^1) sin({\xi}^2) cos({\xi}^3) \\ cosh({\xi}^1) sin({\xi}^2) sin({\xi}^3) \\ sinh({\xi}^1) cos({\xi}^2) \end{array} \right) \]
+\form#46:\begin{eqnarray*} & X^1 = C \sinh({\xi}^1) \sin({\xi}^2) \cos({\xi}^3) \\ & X^2 = C \sinh({\xi}^1) \sin({\xi}^2) \sin({\xi}^3) \\ & X^3 = C \cosh({\xi}^1) \cos({\xi}^2) \end{eqnarray*}
+\form#47:\[ w(k) = \left \{ \begin{matrix} \frac{I_0(\beta \sqrt{1 - (2k/N-1)^2})} {I_0(\beta)} & \mbox{if } 0 \leq k \leq N \\ \\ 0 & \mbox{otherwise} \\ \end{matrix} \right. \]
+\form#48:$I_0$
+\form#49:$\beta$
+\form#50:$N$
+\form#51:$ K_H$
+\form#52:\begin{equation*} \hat{m}_{H}(D_{\xi}) = \exp \left( \frac{ \sum_{i=1}^N K_{H} (\xi - \xi_i) \log(D_{\xi_i})}{\sum_{i=1}^N K_{H}(\xi -\xi_i)} \right) \end{equation*}
