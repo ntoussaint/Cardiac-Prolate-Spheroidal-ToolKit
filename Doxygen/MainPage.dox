@@ -1,4 +1,7 @@
 /**
+
+\mainpage cpstk : The Cardiac Prolate Spheroidal ToolKit
+
 \section CardiacDTIIntroduction Introduction 
 
 This <i> package </i> is meant to deal with the processing of <b> Diffusion Tensor Images (DTI) </b>, when they are applied to cardiac tissues.
