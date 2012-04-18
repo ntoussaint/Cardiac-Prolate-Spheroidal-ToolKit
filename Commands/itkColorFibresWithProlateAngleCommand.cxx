@@ -102,7 +102,7 @@ void CalculateVectorFromAngleJet (double angle, double* range, double* anglevect
   myangle = std::min (1.0, myangle);
   //fix me !
   // we wanna use the inverse of the jet colorbar
-  myangle = 1.0 - myangle;
+  //myangle = 1.0 - myangle;
   
   if (myangle >= 0 && myangle < 0.125)
   {
