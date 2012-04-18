@@ -93,8 +93,10 @@ void CreateGrid (TransformType::Pointer transform,
 
   unsigned int start_long_axis = 0;
   unsigned int stop_long_axis = N[1];
-  unsigned int start_circum = itk::Math::Round ((double)N[2] * 0.0 / 50.0);
-  unsigned int stop_circum = itk::Math::Round ((double)N[2] * 12.5 / 50.0);
+  // unsigned int start_circum = itk::Math::Round ((double)N[2] * 0.0 / 50.0);
+  // unsigned int stop_circum = itk::Math::Round ((double)N[2] * 12.5 / 50.0);
+  unsigned int start_circum = 0;
+  unsigned int stop_circum = N[2];
     
   N1[0] = 0;
   N1[1] = start_long_axis;
