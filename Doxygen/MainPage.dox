@@ -1,45 +1,40 @@
 /**
- *
- * \mainpage  Imaging Sciences SVN repository (C / C++ subdirectory)
- *
- * \image html kclLogo.png
- *
- * \section intro Introduction
- *
- * This is the King's College London Imaging Sciences software subversion repository 
- * c++ documentation, synchronised to the Imaging Science SVN Repository. It is 
- * a closed source project only dedicated to students and staff of King's 
- * College Division of Imaging Sciences.
- * 
- * This following commands downloads the imaging software (it will create a 
- * folder named imaging)
- * 
- * svn checkout https://www.isd.kcl.ac.uk/svn/imaging/
- * 
- * Alternatively you can use : 
- * 
- * svn checkout https://www.isd.kcl.ac.uk/svn/imaging/ my/output/src/directory
- *
- *
- * \section homepage Home Page
- *
- * The Home Page of King's College London Division of Imaging Sciences
- * can be found at:
- *
- * http://www.kcl.ac.uk/schools/medicine/research/imaging/
- *
- * The wiki and subversion browser can be found at:
- * 
- * https://trac/projects/imaging/
- * 
- * Note that you will need your GIPL network username and password to log in to this page.
- * 
- * \note Go have a look at the new global pages: \ref CardiacDTIPage and \ref RegistrationPage !!
- * and the awesome \ref lregPage !!
- *  
- * \section howto How to use this documentation
- *
- * This documentation describes the API of the library classes and objects, it contains pages gathering the classes, a search engine, a file index and many other things. Each c++ class has its own dedicated page, automatically generated from the source code. This documentation is linked to all he external libraries that we use, including the Insight ToolKit and the Vizualization ToolKit (http://www.kitware.com). Some classes use another opensource library called TensorToolKit (http://www-sop.inria.fr/asclepios/software/TensorToolKit/).
- *
+\section CardiacDTIIntroduction Introduction 
+
+This <i> package </i> is meant to deal with the processing of <b> Diffusion Tensor Images (DTI) </b>, when they are applied to cardiac tissues.
+
+<b> DTI </b> is an MR modality that measures water diffusion in living tissue. By measuring specific diffusion in several directions over the sphere, we are able to reconstruct the <b> spatial covariant matrix </b> of the global diffusion process. As this matrix has 6 degrees of freedom, we need 6 non-colinear directional measures of the diffusion. The covariant matrix is also called <b> tensor </b>, and consists in a symmetrix positive definite matrix. The set of symmetrix positive definite matrices does not form a vector space, and thus making difficult processing them (average, statistics, etc). 
+
+\section Curvilinear Coordinates
+
+The cardiac muscle, and especially the Left Ventricle (LV) has a very characteristic shape that is usually represented as a <i> truncated ellipsoid </i>. By taking this property into consideration, this package uses adapted curvilinear coordinates, also called <a href=http://en.wikipedia.org/wiki/Prolate_spheroidal_coordinates> Prolate Spheroid Coordinates (PPS)</a> in order to adapt any process to the cardiac LV shape. 
+
+
+PPS coordinates change of basis can be written as:
+\f{eqnarray*}{
+& X^1 = C \sinh({\xi}^1) \sin({\xi}^2) \cos({\xi}^3) \\
+& X^2 = C \sinh({\xi}^1) \sin({\xi}^2) \sin({\xi}^3) \\
+& X^3 = C \cosh({\xi}^1) \cos({\xi}^2)
+\f}
+
+
+\section How To Compile
+
+Most of the tools present in this package will need <a href=http://www.itk.org> ITK</a> and <a href=http://www.vtk.org> VTK</a> to be compiled properly. The tools related to tensors will need the TensorToolKit [yet to be released]. Sorry for this high external lib dependency.
+
+You also need to have <a href=http://www.cmake.org> CMake</a> installed in your computer in order to generate a makefile specific for your OS. 
+
+After installing external toolkits and generate the project, just hit <code> make </code> in your command prompt, or compile all targets from your favourite code editor.
+
+
+\section How To Use
+
+
+\section Reference
+
+If you use this work please reference this paper
+
+N. Toussaint, M. Sermesant, C. T. Stoeck, S. Kozerke and P. G. Batchelor. In-vivo  Human 3D Cardiac Fibre Architecture: Reconstruction Using Curvilinear Interpolation of Diffusion Tensor Images. In Proc. Medical Image Computing and Computer Assisted Intervention (MICCAI'10), Beijing, China, 2010. [pdf-file] [bibtex-entry] TO APPEAR
+
  */
 
