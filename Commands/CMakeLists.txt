@@ -61,8 +61,8 @@ CreateCpstkCommand(CumulateProlateSpheroidalDataSets
 CreateCpstkCommand(LimitImageToAHAZone
   "aha-image" "Crop an image to an AHA zone in the Prolate Spheroidal sense"
   )
-CreateCpstkCommand(LimitTensorImageToAHAZone
-  "aha-tensors" "Crop a tensor image to an AHA zone in the Prolate Spheroidal sense"
+CreateCpstkCommand(LimitTensorsToAHAZone
+  "aha-tensors" "Crop a tensor image or mesh to an AHA zone in the Prolate Spheroidal sense"
   )
 CreateCpstkCommand(ApplyTransformToImage
   "apply-image" "Apply a rigid transformation to an image without resampling"

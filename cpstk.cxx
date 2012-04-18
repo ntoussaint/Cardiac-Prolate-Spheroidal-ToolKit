@@ -24,9 +24,9 @@
 #include "itkFindClosestProlateTransformCommandFactory.h"
 #include "itkCreateProlateDomainCommandFactory.h"
 #include "itkTensorMeshStatisticsCommandFactory.h"
-#include "itkCumulateProlateSpheroidalDataSetsCommandFactory"
+#include "itkCumulateProlateSpheroidalDataSetsCommandFactory.h"
 #include "itkLimitImageToAHAZoneCommandFactory.h"
-#include "itkLimitTensorImageToAHAZoneCommandFactory.h"
+#include "itkLimitTensorsToAHAZoneCommandFactory.h"
 #include "itkApplyTransformToImageCommandFactory.h"
 #include "itkApplyTransformToTensorImageCommandFactory.h"
 #include "itkApplyTransformToMeshCommandFactory.h"
@@ -39,6 +39,7 @@
 #include "itkTensorMeshStructureCommandFactory.h"
 #include "itkTensorMeshCovarianceCommandFactory.h"
 #include "itkForwardTransformMeshCommandFactory.h"
+#include "itkBackwardTransformMeshCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 #include "cpstkConfigure.h"
@@ -58,7 +59,7 @@ int main (int narg, char *args[])
   itk::TensorMeshStatisticsCommandFactory::RegisterOneFactory();
   itk::CumulateProlateSpheroidalDataSetsCommandFactory::RegisterOneFactory();
   itk::LimitImageToAHAZoneCommandFactory::RegisterOneFactory();
-  itk::LimitTensorImageToAHAZoneCommandFactory::RegisterOneFactory();
+  itk::LimitTensorsToAHAZoneCommandFactory::RegisterOneFactory();
   itk::ApplyTransformToImageCommandFactory::RegisterOneFactory();
   itk::ApplyTransformToTensorImageCommandFactory::RegisterOneFactory();
   itk::ApplyTransformToMeshCommandFactory::RegisterOneFactory();
@@ -71,6 +72,7 @@ int main (int narg, char *args[])
   itk::TensorMeshStructureCommandFactory::RegisterOneFactory();
   itk::TensorMeshCovarianceCommandFactory::RegisterOneFactory();
   itk::ForwardTransformMeshCommandFactory::RegisterOneFactory();
+  itk::BackwardTransformMeshCommandFactory::RegisterOneFactory();
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
   if( cl.size() == 1 || cl.search(2, "--help", "-h") )
