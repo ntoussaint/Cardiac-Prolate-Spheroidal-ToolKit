@@ -60,6 +60,8 @@ namespace itk
     m_LongDescription +="\t h1 [scale factor in xi1 direction] \n";
     m_LongDescription +="\t h2 [scale factor in xi2 direction] \n";
     m_LongDescription +="\t h3 [scale factor in xi3 direction] \n";
+    m_LongDescription +="\t l2 [L2 norm of the tensors] \n";
+    m_LongDescription +="\t ta [transverse anisotropy] \n";
   }
 
   ExtractProlateInformationCommand::~ExtractProlateInformationCommand()
@@ -97,6 +99,8 @@ namespace itk
     else if (std::strcmp (typestring,"h1") == 0 )         type = 8;
     else if (std::strcmp (typestring,"h2") == 0 )         type = 9;
     else if (std::strcmp (typestring,"h3") == 0 )         type = 10;
+    else if (std::strcmp (typestring,"l2") == 0 )         type = 11;
+    else if (std::strcmp (typestring,"ta") == 0 )         type = 12;
 
     
     std::cout<<"computing the extraction of ";
@@ -135,6 +139,12 @@ namespace itk
 	  break;
 	case 10:
 	  std::cout<<"scale factor h3";
+	  break;
+	case 11:
+	  std::cout<<"L2 norm";
+	  break;
+	case 12:
+	  std::cout<<"transverse anisotropy";
 	  break;
     }
 
@@ -427,6 +437,12 @@ namespace itk
 	    break;
 	  case 10:
 	    os << scalefactor[2];
+	    break;
+	  case 11:
+	    os << prolatetensor.GetNorm();
+	    break;
+	  case 12:
+	    os << prolatetensor.GetEigenvalue(0) / prolatetensor.GetEigenvalue(1);
 	    break;
       }
       
