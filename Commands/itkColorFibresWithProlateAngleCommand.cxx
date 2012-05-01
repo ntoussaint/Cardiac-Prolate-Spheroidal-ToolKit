@@ -106,33 +106,33 @@ void CalculateVectorFromAngleJet (double angle, double* range, double* anglevect
   
   if (myangle >= 0 && myangle < 0.125)
   {
-    anglevector[0] = 0.5 + (myangle - 0.0) / 0.25;
+    anglevector[0] = 0;
     anglevector[1] = 0;
-    anglevector[2] = 0;
+    anglevector[2] = 0.5 + (myangle - 0.0) / 0.25;
   }
   else if (myangle >= 0.125 && myangle < 0.375)
   {
-    anglevector[0] = 1;
+    anglevector[0] = 0;
     anglevector[1] = 0.0 + (myangle - 0.125) / 0.25;
-    anglevector[2] = 0;
+    anglevector[2] = 1;
   }
   else if (myangle >= 0.375 && myangle < 0.625)
   {
-    anglevector[0] = 1.0 - (myangle - 0.375) / 0.25;
+    anglevector[0] = 0.0 + (myangle - 0.375) / 0.25;
     anglevector[1] = 1;
-    anglevector[2] = 0.0 + (myangle - 0.375) / 0.25;
+    anglevector[2] = 1.0 - (myangle - 0.375) / 0.25;
   }
   else if (myangle >= 0.625 && myangle < 0.875)
   {
-    anglevector[0] = 0;
+    anglevector[0] = 1;
     anglevector[1] = 1.0 - (myangle - 0.625) / 0.25;
-    anglevector[2] = 1;
+    anglevector[2] = 0;
   }
   else if (myangle >= 0.875 && myangle <= 1.0)
   {
-    anglevector[0] = 0;
+    anglevector[0] = 1.0 - (myangle - 0.875) / 0.25;
     anglevector[1] = 0;
-    anglevector[2] = 1.0 - (myangle - 0.875) / 0.25;
+    anglevector[2] = 0;
   }
 }
 
