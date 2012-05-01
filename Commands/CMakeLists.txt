@@ -100,6 +100,9 @@ CreateCpstkCommand(TensorMeshCovariance
 CreateCpstkCommand(ForwardTransformMesh
   "forward" "Transform a tensor image or mesh in Prolate Spheroidal Coordinates"
   )
+CreateCpstkCommand(ForwardTransformMesh2
+  "forward2" "Transform a tensor image or mesh in Prolate Spheroidal Coordinates"
+  )
 CreateCpstkCommand(BackwardTransformMesh
   "backward" "Transform a tensor image or mesh from Prolate Spheroidal Coordinates"
   )

@@ -39,6 +39,7 @@
 #include "itkTensorMeshStructureCommandFactory.h"
 #include "itkTensorMeshCovarianceCommandFactory.h"
 #include "itkForwardTransformMeshCommandFactory.h"
+#include "itkForwardTransformMesh2CommandFactory.h"
 #include "itkBackwardTransformMeshCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
@@ -72,6 +73,7 @@ int main (int narg, char *args[])
   itk::TensorMeshStructureCommandFactory::RegisterOneFactory();
   itk::TensorMeshCovarianceCommandFactory::RegisterOneFactory();
   itk::ForwardTransformMeshCommandFactory::RegisterOneFactory();
+  itk::ForwardTransformMesh2CommandFactory::RegisterOneFactory();
   itk::BackwardTransformMeshCommandFactory::RegisterOneFactory();
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
