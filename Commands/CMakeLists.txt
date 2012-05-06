@@ -25,9 +25,6 @@ endfunction()
 
 
 
-CreateCpstkCommand(TensorsToVTK
-  "itk2vtk" "Convert a tensor image or a list of tensor images into a vtkUnstructuredGrid structure"
-  )
 CreateCpstkCommand(RotateProlateSpheroid
   "rotate" "Rotate a Prolate Spheroid according to a vtk file describing the antero-posterior line"
   )
@@ -103,6 +100,9 @@ CreateCpstkCommand(ForwardTransformMesh
 CreateCpstkCommand(BackwardTransformMesh
   "backward" "Transform a tensor image or mesh from Prolate Spheroidal Coordinates"
   )
+CreateCpstkCommand(TensorsToVTK
+  "itk2vtk" "Convert a tensor image or a list of tensor images into a vtkUnstructuredGrid structure"
+  )
 
 add_library(CPSTKCommands ${CPSTK_BUILD_TYPE}
   ${CPSTK_COMMAND_SRCS}
@@ -110,6 +110,7 @@ add_library(CPSTKCommands ${CPSTK_BUILD_TYPE}
 
 target_link_libraries(CPSTKCommands
   ${ITK_LIBRARIES}
+  CPSTKProgramFactory
   CPSTKNumerics
   vtkCommon
   vtkIO
