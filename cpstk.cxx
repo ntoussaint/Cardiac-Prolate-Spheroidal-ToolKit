@@ -15,6 +15,7 @@
 
 =========================================================================*/
 #include "itkTensorsToVTKCommandFactory.h"
+#include "itkCreateProlateCoordinateImageCommandFactory.h"
 #include "itkRotateProlateSpheroidCommandFactory.h"
 #include "itkExtractProlateInformationCommandFactory.h"
 #include "itkTensorImageToMeshCommandFactory.h"
@@ -73,6 +74,7 @@ int main (int narg, char *args[])
   itk::TensorMeshCovarianceCommandFactory::RegisterOneFactory();
   itk::ForwardTransformMeshCommandFactory::RegisterOneFactory();
   itk::BackwardTransformMeshCommandFactory::RegisterOneFactory();
+  itk::CreateProlateCoordinateImageCommandFactory::RegisterOneFactory();
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
   if( cl.size() == 1 || cl.search(2, "--help", "-h") )
