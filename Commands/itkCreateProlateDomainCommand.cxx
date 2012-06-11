@@ -300,7 +300,7 @@ namespace itk
     // double thickness = 16.0;
     // double thickness = 37.0;
     // double thickness = 14.0;
-    double thickness = 16.0;
+    double thickness = 14.0;
     // double maxangle = 100.0;
     // double maxangle = 93.0;
     double maxangle = 93.0;
