@@ -243,6 +243,7 @@ namespace itk
     limiter->SetDisplacementField (displacementfield);
     limiter->SetInverseDisplacementField (inversedisplacementfield);
     limiter->SetAHASegmentationType (CostFunctionType::Interpolator2Type::LimiterType::AHA_17_ZONES);
+    limiter->SetVentricleSizes(15, 98 * vnl_math::pi / 180.0);
     limiter->CalculateZones();
   
     std::cout<<"defining bounds"<<std::endl;
