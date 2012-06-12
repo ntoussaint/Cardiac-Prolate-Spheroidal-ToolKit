@@ -54,6 +54,7 @@ namespace itk
     m_LongDescription += "-l    [lambda to use for smoothing ratio (default should be 0.01 but here set to 1.0)]\n";
     m_LongDescription += "-rhobegin [rho begin for the optimization (default is 0.03)]\n";
     m_LongDescription += "-rhoend   [rho end for the optimization (default is 0.005)]\n";
+    m_LongDescription += "-u    [initial position for the optimizer\n";
     m_LongDescription += "-k    [interpolation kernel to use [0: Gaussian][1: B-Spline][2: Kaiser-Bessel](default: 0)]\n";
     m_LongDescription += "-o    [output csv file]\n\n";
     m_LongDescription += "CAUTION : it is important to create the outfile prior to execution\n";
@@ -110,6 +111,7 @@ namespace itk
     const double rhobegin                     = cl.follow(0.03, 2,"-rhobegin","-RHOBEGIN");
     const double rhoend                       = cl.follow(0.005, 2,"-rhoend","-RHOEND");
     const unsigned int kerneltouse            = cl.follow(0, 2,"-k","-K");
+    const char* initialposition               = cl.follow("nofile", 2,"-u","-U");
   
     std::cout << "Processing optimization: " << std::endl;
     std::cout << "useprolatesystem: \t\t" << useprolatesystem << std::endl;
@@ -119,10 +121,11 @@ namespace itk
     std::cout << "inputfile: \t\t\t" << inputfile << std::endl;
     std::cout << "referencefile: \t\t\t" << referencefile << std::endl;
     std::cout << "outputcsvfile: \t\t\t" <<outputcsvfile << std::endl;
-    std::cout << "lambda:    \t\t\t" <<lambda << std::endl;
-    std::cout << "rhobegin:  \t\t\t" <<rhobegin << std::endl;
-    std::cout << "rhoend:    \t\t\t" <<rhoend << std::endl;
-    std::cout << "kerneltouse: \t\t" <<kerneltouse << std::endl;
+    std::cout << "lambda:       \t\t\t" <<lambda << std::endl;
+    std::cout << "rhobegin:     \t\t\t" <<rhobegin << std::endl;
+    std::cout << "rhoend:       \t\t\t" <<rhoend << std::endl;
+    std::cout << "kerneltouse:    \t\t" <<kerneltouse << std::endl;
+    std::cout << "initialposition:  \t" <<initialposition << std::endl;
   
     TransformType::Pointer transform = TransformType::New();
     if (useprolatesystem || force_reading_all)
@@ -246,7 +249,7 @@ namespace itk
     limiter->SetVentricleSizes(15, 98 * vnl_math::pi / 180.0);
     limiter->CalculateZones();
   
-    std::cout<<"defining bounds"<<std::endl;
+    std::cout<<"defining bounds/alphas"<<std::endl;
 
     ParametersType alphas;
     alphas.SetSize (3 * limiter->GetNumberOfAHAZones());
@@ -254,16 +257,50 @@ namespace itk
   
     OptimizerType::ScalesType scales (3 * limiter->GetNumberOfAHAZones());
 
+    if (std::strcmp (initialposition,"nofile"))
+    {
+      std::cout<<"reading initial position list : "<<initialposition<<std::endl;
+      std::ifstream inputliststream (initialposition);
+      if(inputliststream.fail())
+      {
+	std::cerr << "Unable to open file: " << initialposition << std::endl;
+	std::exit (EXIT_FAILURE);
+      }
+      unsigned int NumberOfKernels = 0;
+      inputliststream >> NumberOfKernels;
+      std::cout<<"encountered : "<<NumberOfKernels<<std::endl;
+      
+      std::string sline = "";
+      itksys::SystemTools::GetLineFromStream(inputliststream, sline);
+      
+      std::vector<double*> kernellist;
+      for (unsigned int N=0; N<NumberOfKernels; N++)
+      {
+	std::string line = "";
+	itksys::SystemTools::GetLineFromStream(inputliststream, line);
+	itksys_ios::istringstream parse ( line );
+	double* kernel = new double[3];
+	for (unsigned int i=0; i<3; i++)
+	  parse >> kernel[i];
+	alphas[3*N+0] = kernel[0];
+	alphas[3*N+1] = kernel[1];
+	alphas[3*N+2] = kernel[2];
+      }
+    }
+    
     for (unsigned int i=0; i<limiter->GetNumberOfAHAZones(); i++)
     {
       double prolatethickness = 0.233;
     
       if (useprolatesystem)
       {
-	alphas[3*i+0] = 2 * 0.0122985;
-	alphas[3*i+1] = 2 * 0.0736842;
-	alphas[3*i+2] = 2 * 0.118046;
-      
+	if (!std::strcmp (initialposition,"nofile"))
+	{
+	  alphas[3*i+0] = 2 * 0.0122985;
+	  alphas[3*i+1] = 2 * 0.0736842;
+	  alphas[3*i+2] = 2 * 0.118046;
+	}
+	
 	scales[3*i+0] = 1 / prolatethickness;
 	scales[3*i+1] = 1 / ( vnl_math::pi / 2.0 );
 	scales[3*i+2] = 1 / ( vnl_math::pi );
@@ -278,10 +315,14 @@ namespace itk
       }
       else
       {
-	alphas[3*i+0] = 2.0 * 1.0;
-	alphas[3*i+1] = 2.0 * 1.0;
-	alphas[3*i+2] = 2.0 * 1.0;
-      
+	
+	if (!std::strcmp (initialposition,"nofile"))
+	{
+	  alphas[3*i+0] = 2.0 * 1.0;
+	  alphas[3*i+1] = 2.0 * 1.0;
+	  alphas[3*i+2] = 2.0 * 1.0;
+	}
+	
 	scales[3*i+0] = 1/((double)(size[0]) * spacing[0]);
 	scales[3*i+1] = 1/((double)(size[1]) * spacing[1]);
 	scales[3*i+2] = 1/((double)(size[2]) * spacing[2]);
