@@ -109,6 +109,9 @@ CreateCpstkCommand(TensorsToVTK
 CreateCpstkCommand(CreateProlateCoordinateImage
   "coordinates" "Extract Prolate Coordinates from input and output it in an 3-compartment image"
   )
+CreateCpstkCommand(TestOptimizer
+  "test" "test the optimizer"
+  )
 
 add_library(CPSTKCommands ${CPSTK_BUILD_TYPE}
   ${CPSTK_COMMAND_SRCS}

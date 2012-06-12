@@ -111,7 +111,10 @@ namespace itk
       
       for (unsigned int i=0; i<m_SpaceDimension; i++)
       {
-	m_Bounds[0][i] = vcl_numeric_limits<ValueType>::min();
+	if (vcl_numeric_limits<ValueType>::is_signed)
+	  m_Bounds[0][i] = -vcl_numeric_limits<ValueType>::max();
+	else
+	  m_Bounds[0][i] = vcl_numeric_limits<ValueType>::min();
 	m_Bounds[1][i] = vcl_numeric_limits<ValueType>::max();
       }
     }    

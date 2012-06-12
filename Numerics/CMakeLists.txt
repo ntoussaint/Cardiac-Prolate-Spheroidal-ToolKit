@@ -1,6 +1,7 @@
 add_library(CPSTKNumerics ${CPSTK_BUILD_TYPE}
   itkKaiserBesselKernelFunction.cxx
   itkTensorMeshImageHybridCostFunction3.cxx
+  itkTestingCostFunction.cxx
   itkNewUoaOptimizer.cxx
   )
 target_link_libraries(CPSTKNumerics
