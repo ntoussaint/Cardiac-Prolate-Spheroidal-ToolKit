@@ -109,6 +109,9 @@ CreateCpstkCommand(TensorsToVTK
 CreateCpstkCommand(CreateProlateCoordinateImage
   "coordinates" "Extract Prolate Coordinates from input and output it in an 3-compartment image"
   )
+CreateCpstkCommand(ReorderDWIs
+  "reorder" "Reorders DWIs in a coherent manner starting with the b-0"
+  )
 
 add_library(CPSTKCommands ${CPSTK_BUILD_TYPE}
   ${CPSTK_COMMAND_SRCS}

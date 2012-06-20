@@ -74,8 +74,7 @@ namespace itk
     resampler->Update();
     
     image->SetPixelContainer (resampler->GetOutput()->GetPixelContainer());
-}
-
+  }
 
   ApplyTransformToImageCommand::ApplyTransformToImageCommand()
   {
