@@ -128,19 +128,8 @@ namespace itk
     std::cout<<"last mean diff. at : "<<last_meandwi_id<<std::endl;
 
 
-    if (replace) outputlist.push_back (inputlist[first_b0_id]);
-    else
-    {
-      for (int i=first_b0_id; i<=last_b0_id; i++)
-	outputlist.push_back (inputlist[i]);
-    }
-  
-    if (replace) ids.push_back (first_b0_id);
-    else
-    {
-      for (int i=first_b0_id; i<=last_b0_id; i++)
-	ids.push_back (i);
-    }
+    outputlist.push_back (inputlist[first_b0_id]);
+    ids.push_back (first_b0_id);
   
     std::cout<<"b-0 ids now inserted, size is : "<<ids.size()<<std::endl;
     for (unsigned int i=0; i<inputlist.size(); i++)
@@ -219,10 +208,78 @@ namespace itk
       ++itB0;
     }
   }
+  template <typename Image4DType, typename ImageType, typename GradientListType>
+  void EstimateArithmeticcMean ( typename Image4DType::Pointer input, typename ImageType::Pointer b0, GradientListType gradientlist, double factor, typename ImageType::Pointer mean)
+  {
+    std::cout<<"arithmetic mean with a = "<<factor<<std::endl;
+    
+    mean->SetRegions (b0->GetLargestPossibleRegion());
+    mean->SetOrigin(b0->GetOrigin());
+    mean->SetSpacing(b0->GetSpacing());  
+    mean->SetDirection(b0->GetDirection());
+    mean->Allocate();
+    mean->FillBuffer(static_cast<typename ImageType::PixelType>(0.0));
+
+    typedef ExtractImageFilter< Image4DType, ImageType > ExtractorType;
+    typename ExtractorType::Pointer  extractor  = ExtractorType::New();
+    typename Image4DType::SizeType   buffersize = input->GetLargestPossibleRegion().GetSize(); buffersize[3] = 0;
+    typename Image4DType::IndexType  bufferstart;  bufferstart.Fill (0);
+    typename Image4DType::RegionType bufferregion; bufferregion.SetSize (buffersize); bufferregion.SetIndex (bufferstart);
+    extractor->SetInput (input);
+
+    unsigned int numberofdwis = 0;
+
+    // 1) ACCUMULATE DWI SIGNAL FOR ARITHMETIC MEAN CALCULATION
+    for (unsigned int i = 0; i < gradientlist.size(); i++)
+    {
+      if (!itk::NumericTraits<double>::IsPositive (gradientlist[i].GetNorm()))
+	continue;
+
+      numberofdwis++;
+    
+      bufferstart[3] = i;
+      bufferregion.SetIndex (bufferstart);
+      extractor->SetExtractionRegion (bufferregion);
+      try
+      {
+	extractor->Update();
+      }
+      catch(itk::ExceptionObject &e)
+      {
+	std::cerr << e;
+	exit(EXIT_FAILURE);
+      }
+      typename ImageType::Pointer buffer = extractor->GetOutput();
+      
+      typename itk::ImageRegionIterator<ImageType> itIn(buffer, buffer->GetLargestPossibleRegion());
+      typename itk::ImageRegionIterator<ImageType> itMean(mean, mean->GetLargestPossibleRegion());
+      
+      while (!itIn.IsAtEnd())
+      {
+	// accumulating the pixel values (geometric mean)
+	itMean.Set (itMean.Get() + itIn.Get());
+	// iterate
+	++itIn;
+	++itMean;
+      }
+    }
+    
+    typename itk::ImageRegionIterator<ImageType> itMean(mean, mean->GetLargestPossibleRegion());
+
+    // 2) ACTUAL DWI ARITHMETIC MEAN CALCULATION
+    while (!itMean.IsAtEnd())
+    {
+      itMean.Set (factor * itMean.Get() / (double)(numberofdwis));      
+      ++itMean;
+    }
+  }
+
 
   template <typename Image4DType, typename ImageType, typename GradientListType>
   void EstimateGeometricMean ( typename Image4DType::Pointer input, typename ImageType::Pointer b0, GradientListType gradientlist, double factor, typename ImageType::Pointer mean)
   {
+    std::cout<<"geometric mean with f = "<<factor<<std::endl;
+
     mean->SetRegions (b0->GetLargestPossibleRegion());
     mean->SetOrigin(b0->GetOrigin());
     mean->SetSpacing(b0->GetSpacing());  
@@ -258,7 +315,6 @@ namespace itk
       bufferstart[3] = i;
       bufferregion.SetIndex (bufferstart);
       extractor->SetExtractionRegion (bufferregion);
-      std::cout<<"extracting id "<<i<<"... ";
       try
       {
 	extractor->Update();
@@ -268,7 +324,6 @@ namespace itk
 	std::cerr << e;
 	exit(EXIT_FAILURE);
       }
-      std::cout << " Done." << std::endl;
       typename ImageType::Pointer buffer = extractor->GetOutput();
       
       typename itk::ImageRegionIterator<ImageType> itIn(buffer, buffer->GetLargestPossibleRegion());
@@ -290,14 +345,13 @@ namespace itk
 	++itB0;
       }
     }
-  
     
     double expectedvalue = 0;
     unsigned int counter = 0;
     typename itk::ImageRegionIterator<ImageType> itMean(mean, mean->GetLargestPossibleRegion());
     typename itk::ImageRegionIterator<ImageType> itGeom(geometriccoefficientimage, geometriccoefficientimage->GetLargestPossibleRegion());
     typename itk::ImageRegionIterator<ImageType> itB0(b0, b0->GetLargestPossibleRegion());
-      
+    
     // 2) ACTUAL DWI GEOMETRIC MEAN CALCULATION AND GEOMETRIC COEFFICIENT EXPECTED VALUE
     while (!itMean.IsAtEnd())
     {
@@ -315,9 +369,9 @@ namespace itk
       ++itMean;
       ++itGeom;
     }
-
+    
     expectedvalue /= (double)(counter);
-
+    
     // 3) CORRECTION OF THE GEOMETRIC MEAN BY FACTOR AND EXPECTED VALUE
     itMean.GoToBegin();
     itGeom.GoToBegin();
@@ -325,10 +379,7 @@ namespace itk
     
     while (!itMean.IsAtEnd())
     {
-      // if ( (itGeom.Get() > 0) && (itGeom.Get() < std::sqrt (2) ) )
       itMean.Set ( itMean.Get() * std::exp (factor * expectedvalue + itGeom.Get()) );
-      // else
-      // 	itMean.Set ( itB0 );
 	
       // iterate
       ++itMean;
@@ -347,6 +398,7 @@ namespace itk
     coeffwriter->SetInput(geometriccoefficientimage);
     coeffwriter->Update();
   }
+
 
   template <typename Image4DType, typename ImageType, typename GradientListType>
   void FillOutput( typename Image4DType::Pointer input, typename ImageType::Pointer firstimage, GradientListType gradientlist, std::vector<int> ids, typename Image4DType::Pointer output)
@@ -378,7 +430,6 @@ namespace itk
       bufferstart[3] = id;
       bufferregion.SetIndex (bufferstart);
       extractor->SetExtractionRegion (bufferregion);
-      std::cout<<"extracting id "<<id<<"... ";
       try
       {
 	extractor->Update();
@@ -388,7 +439,6 @@ namespace itk
 	std::cerr << e;
 	exit(EXIT_FAILURE);
       }
-      std::cout << " Done." << std::endl;
 
       typename ImageType::Pointer buffer = extractor->GetOutput();
 
@@ -420,7 +470,8 @@ namespace itk
     m_LongDescription = "\n\nUsage:\n";
     m_LongDescription +="-i [input image]\n";
     m_LongDescription +="-g [gradient file]\n";
-    m_LongDescription +="-t [0/1] (replace B-0 with calculated mean-diffusivity ?)\n";
+    m_LongDescription +="-t [0/1/2] (replace B-0 with calculated mean-diffusivity )\n";
+    m_LongDescription +="-a arithmetic factor (1.0 is unchanged)\n";
     m_LongDescription +="-f geometric factor (0.0 is unchanged)\n";
     m_LongDescription +="-o [output file base (.mha and .grad used])\n";
   }
@@ -438,8 +489,8 @@ namespace itk
       return -1;
     }
     
-    const bool IsInputPresent    = cl.search(2,"-i","-I");
-    const bool IsOutputPresent   = cl.search(2,"-o","-O");
+    const bool IsInputPresent        = cl.search(2,"-i","-I");
+    const bool IsOutputPresent       = cl.search(2,"-o","-O");
     const bool IsGradientsPresent    = cl.search(2,"-g","-G");
     if(!IsInputPresent || !IsGradientsPresent || !IsOutputPresent )
     {
@@ -447,11 +498,12 @@ namespace itk
       return EXIT_FAILURE;
     }
 
-    const char* fileIn   = cl.follow("NoFile",2,"-i","-I");
-    const char* fileGrad = cl.follow("NoFile",2,"-g","-G");
-    const char* fileOut  = cl.follow("NoFile",2,"-o","-O");
-    const bool  replace  = cl.follow(1,2,"-t","-T");
-    const double  factor = cl.follow(0.0, 2, "-f", "-F");
+    const char*        fileIn          = cl.follow("NoFile",2,"-i","-I");
+    const char*        fileGrad        = cl.follow("NoFile",2,"-g","-G");
+    const char*        fileOut         = cl.follow("NoFile",2,"-o","-O");
+    const unsigned int replacementtype = cl.follow(0, 2,"-t","-T");
+    const double       afactor         = cl.follow(1.0, 2, "-a", "-A");
+    const double       gfactor         = cl.follow(0.0, 2, "-f", "-F");
 
     typedef double                                            ScalarType;  
     typedef itk::Image<ScalarType, 4>                         Image4DType;
@@ -493,20 +545,39 @@ namespace itk
     itk::GradientFileReader::VectorListType inputgradients = gradientreader->GetGradientList();  
 
 
-    // ESTIMATE THE OUTPUT GRADIENT LIST
+    // INSTANTIATE
     itk::GradientFileReader::VectorListType outputgradients;
     std::vector<int> ids;
-    EstimateOutputGradientList<itk::GradientFileReader::VectorListType> (inputgradients, replace, outputgradients, ids);
+    ImageType::Pointer b0image             = ImageType::New();
+    ImageType::Pointer arithmeticmeanimage = ImageType::New();    
+    ImageType::Pointer geometricmeanimage  = ImageType::New();
+    
+
+    // ESTIMATE THE OUTPUT GRADIENT LIST
+    EstimateOutputGradientList<itk::GradientFileReader::VectorListType> (inputgradients, replacementtype, outputgradients, ids);
 
     // EXTRACT THE B0 IMAGE
-    ImageType::Pointer b0image = ImageType::New();
     ExtractB0Image<Image4DType,ImageType,itk::GradientFileReader::VectorListType> (inputimage, inputgradients, b0image);  
 
-    // CALCULATE THE GEOMETRIC MEAN OF THE DIFFUSION MIMAGES
-    ImageType::Pointer geometricmeanimage = ImageType::New();
-    EstimateGeometricMean<Image4DType,ImageType,itk::GradientFileReader::VectorListType>(inputimage, b0image, inputgradients, factor, geometricmeanimage);
-
-    ImageType::Pointer firstimage = replace ? geometricmeanimage : b0image;
+    ImageType::Pointer firstimage;
+    switch (replacementtype)
+    {
+	case 1:
+	  // CALCULATE THE ARITHMETIC MEAN OF THE DIFFUSION MIMAGES
+	  EstimateArithmeticcMean<Image4DType,ImageType,itk::GradientFileReader::VectorListType>(inputimage, b0image, inputgradients, afactor, arithmeticmeanimage);
+    	  firstimage = arithmeticmeanimage;
+	  break;
+	case 2:
+	  // CALCULATE THE GEOMETRIC MEAN OF THE DIFFUSION MIMAGES
+	  EstimateGeometricMean<Image4DType,ImageType,itk::GradientFileReader::VectorListType>(inputimage, b0image, inputgradients, gfactor, geometricmeanimage);
+	  firstimage = geometricmeanimage;
+	  break;
+	case 0:
+	default:
+	  firstimage = b0image;
+	  break;
+    }
+    
 
     // FILL OUTPUT WITH THE RIGHT IMAGES
     Image4DType::Pointer output = Image4DType::New();
