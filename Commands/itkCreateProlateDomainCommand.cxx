@@ -79,7 +79,6 @@ void CreateGrid (TransformType::Pointer transform,
   N[0] = throughwalldivisions + 1;
   N[1] = longdivisions + 1;
   N[2] = circumdivisions + 1;
-
   
   // unsigned int start_long_axis = itk::Math::Round ((double)N[1] / 6.0);
   // unsigned int stop_long_axis = itk::Math::Round ((double)N[1] / 2.5);
@@ -300,10 +299,10 @@ namespace itk
     // double thickness = 16.0;
     // double thickness = 37.0;
     // double thickness = 14.0;
-    double thickness = 14.0;
+    double thickness = 11.0;
     // double maxangle = 100.0;
     // double maxangle = 93.0;
-    double maxangle = 93.0;
+    double maxangle = 95.0;
     double mu1 = asinh ((transform->GetLambda2() - thickness/2.0) / transform->GetSemiFociDistance());
     double mu2 = asinh ((transform->GetLambda2() + thickness/2.0) / transform->GetSemiFociDistance());
     double nu1 = 0.0;
