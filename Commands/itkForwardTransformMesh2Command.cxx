@@ -35,8 +35,6 @@ namespace itk
     m_LongDescription += "\n\nUsage:\n";
     m_LongDescription +="-i    [input tensor image/mesh (default : input.vtk)]\n";    
     m_LongDescription +="-pr   [prolate transform used]\n";
-    m_LongDescription +="-f1   [forward displacement field (default : forward.mha)]\n";
-    m_LongDescription +="-f2   [backward displacement field (default : backward.mha)]\n";
     m_LongDescription +="-o    [output vtk unstructured tensor mesh]\n";    
   }
 
@@ -54,28 +52,28 @@ namespace itk
     }
     
     const char* inputfile                    = cl.follow("input.vtk",2,"-i","-I");
-    const char* prolatefile                  = cl.follow("prolate.lms",2,"-pr","-PR");
-    const char* outputfile                   = cl.follow("output.csv",2,"-o","-O");
+    const char* prolatefile                  = cl.follow("prolate.tr",2,"-pr","-PR");
+    const char* outputfile                   = cl.follow("output.vtk",2,"-o","-O");
 
     // typedefs
-    typedef double                                                         ScalarType;
-    typedef itk::TensorImageIO<ScalarType, 3, 3>                           TensorImageIOType;
-    typedef itk::TensorMeshIO <ScalarType, 3, 3>                           TensorMeshIOType;
+    typedef double                                                    ScalarType;
+    typedef TensorImageIO<ScalarType, 3, 3>                           TensorImageIOType;
+    typedef TensorMeshIO <ScalarType, 3, 3>                           TensorMeshIOType;
 
-    typedef TensorImageIOType::TensorImageType                             TensorImageType;
-    typedef TensorImageType::PixelType                                     TensorType;
+    typedef TensorImageIOType::TensorImageType                        TensorImageType;
+    typedef TensorImageType::PixelType                                TensorType;
 
-    typedef itk::Vector<ScalarType, 3>                                         DisplacementType;
-    typedef itk::Image<DisplacementType, 3>                                DisplacementFieldType;
-    typedef itk::ImageFileReader<DisplacementFieldType>                    DisplacementFileReaderType;
+    typedef Vector<ScalarType, 3>                                     DisplacementType;
+    typedef Image<DisplacementType, 3>                                DisplacementFieldType;
+    typedef ImageFileReader<DisplacementFieldType>                    DisplacementFileReaderType;
 
-    typedef TensorMeshIOType::TensorMeshType                               MeshType;
-    typedef itk::WarpTensorMeshFilter<MeshType, DisplacementFieldType>     WarperType;
-    typedef itk::TensorImageToMeshFilter<TensorType, 3>                    TensorImageToMeshFilterType;
+    typedef TensorMeshIOType::TensorMeshType                          MeshType;
+    typedef WarpTensorMeshFilter<MeshType, DisplacementFieldType>     WarperType;
+    typedef TensorImageToMeshFilter<TensorType, 3>                    TensorImageToMeshFilterType;
 
-    typedef itk::ProlateSpheroidalTransformTensorMeshFilter<MeshType>      TransformerType;
-    typedef TransformerType::TransformType                                 TransformType;
-    typedef TransformType::InputPointType                                  PointType;
+    typedef ProlateSpheroidalTransformTensorMeshFilter<MeshType>      TransformerType;
+    typedef TransformerType::TransformType                            TransformType;
+    typedef TransformType::InputPointType                             PointType;
 
     // instantiation
     TransformType::Pointer                 transform              = TransformType::New();

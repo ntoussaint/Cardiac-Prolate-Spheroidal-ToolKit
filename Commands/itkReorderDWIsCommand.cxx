@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ImagingSciences
-  Module:    $Id: itkReorderDWIs.cxx 1 2010-05-21 14:00:33Z nt08 $
+  Module:    $Id: itkReorderDWIsCommand.cxx 1 2010-05-21 14:00:33Z nt08 $
   Language:  C++
   Author:    $Author: nt08 $
   Date:      $Date: 2010-05-21 14:00:33 +0000 (Fri, 21 May 2010) $
@@ -18,20 +18,8 @@
 
 /**
  * 
- * \file itkReorderDWIs.cxx
+ * \file itkReorderDWIsCommand.cxx
  *
- * \brief  Apply a simple transform to an image, in ITK format. 
- * 
- * This tool takes an image and a transform in ITK format as inputs.
- * The transform is applied to the "header" of the image, meaning
- * it will only transform the origin and 3x3 direction of the input
- * image. Therefore, the input transform has to be a derivative of
- * a MatrixOffsetTransformBase, i.e. an affine transform
- *
- * \note This tool does *NOT* check if the input transform matrix
- * is rigid. If it is not the case the output image could have direction
- * vectors that are *NOT* orthogonal to eachother. 
- * 
  * \author Nicolas Toussaint, King's College London, nicolas.toussaint@kcl.ac.uk
  * 
  * \url http://www.kcl.ac.uk/schools/medicine/research/imaging/
@@ -486,7 +474,7 @@ namespace itk
     if( cl.size() == 1 || cl.search(2, "--help", "-h") )
     {
       std::cout << std::endl << this->GetLongDescription() << std::endl;
-      return -1;
+      return EXIT_FAILURE;
     }
     
     const bool IsInputPresent        = cl.search(2,"-i","-I");
