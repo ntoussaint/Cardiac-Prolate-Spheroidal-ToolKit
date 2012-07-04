@@ -43,6 +43,7 @@
 #include "itkForwardTransformMesh2CommandFactory.h"
 #include "itkBackwardTransformMeshCommandFactory.h"
 #include "itkReorderDWIsCommandFactory.h"
+#include "itkCropImageCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 #include "cpstkConfigure.h"
@@ -79,6 +80,7 @@ int main (int narg, char *args[])
   itk::BackwardTransformMeshCommandFactory::RegisterOneFactory();
   itk::CreateProlateCoordinateImageCommandFactory::RegisterOneFactory();
   itk::ReorderDWIsCommandFactory::RegisterOneFactory();
+  itk::CropImageCommandFactory::RegisterOneFactory();
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
   if( cl.size() == 1 || cl.search(2, "--help", "-h") )
