@@ -113,7 +113,7 @@ CreateCpstkCommand(ReorderDWIs
   "reorder" "Reorders DWIs in a coherent manner starting with the b-0"
   )
 CreateCpstkCommand(CropImage
-  "crop" "crop a 4D to a certain diameter around the central long axis"
+  "crop" "crop a 3D or 4D image to a certain diameter around the central long axis"
   )
 
 add_library(CPSTKCommands ${CPSTK_BUILD_TYPE}

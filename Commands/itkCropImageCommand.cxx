@@ -117,7 +117,7 @@ namespace itk
   
   CropImageCommand::CropImageCommand()
   {
-    m_ShortDescription = "crop a 4D to a certain diameter around the central long axis";
+    m_ShortDescription = "crop a 3D or 4D image to a certain diameter around the central long axis";
     m_LongDescription = m_ShortDescription;
     m_LongDescription += "\n\nUsage:\n";
     m_LongDescription +="-i    [input 4D DWI image (default : input.mha)]\n";    
