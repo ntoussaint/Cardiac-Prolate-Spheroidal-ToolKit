@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.4)
-IF(COMMAND cmake_policy)
+if(COMMAND cmake_policy)
   cmake_policy(VERSION 2.4)
   cmake_policy(SET CMP0005 OLD)
   cmake_policy(SET CMP0003 NEW)
-ENDIF(COMMAND cmake_policy)
+endif(COMMAND cmake_policy)
 
 
 project(CPSTK)
@@ -12,12 +12,12 @@ project(CPSTK)
 
 # On Visual Studio 8 MS deprecated C. This removes all 1.276E1265 security
 # warnings
-IF(WIN32)
-  IF(NOT BORLAND)
-    IF(NOT CYGWIN)
-      IF(NOT MINGW)
-        IF(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
-          ADD_DEFINITIONS(
+if(WIN32)
+  if(NOT BORLAND)
+    if(NOT CYGWIN)
+      if(NOT MINGW)
+        if(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
+          add_definitions(
             -D_CRT_FAR_MAPPINGS_NO_DEPRECATE
             -D_CRT_IS_WCTYPE_NO_DEPRECATE
             -D_CRT_MANAGED_FP_NO_DEPRECATE
@@ -29,11 +29,11 @@ IF(WIN32)
             -D_CRT_VCCLRIT_NO_DEPRECATE
             -D_SCL_SECURE_NO_DEPRECATE
             )
-        ENDIF(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
-      ENDIF(NOT MINGW)
-    ENDIF(NOT CYGWIN)
-  ENDIF(NOT BORLAND)
-ENDIF(WIN32)
+        endif(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
+      endif(NOT MINGW)
+    endif(NOT CYGWIN)
+  endif(NOT BORLAND)
+endif(WIN32)
 
 
 ## #################################################################
@@ -238,3 +238,7 @@ if (DOXYGEN)
     ${MY_DOXYGEN_BUILD_DIR}/doxygen.config
   )
 endif(DOXYGEN) 
+
+
+
+add_subdirectory(SymmetricElasticLogDemons)
