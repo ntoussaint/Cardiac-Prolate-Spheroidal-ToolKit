@@ -573,13 +573,16 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage,TMovingImage,TField>
     this->GraftOutput( m_Multiplier->GetOutput() );
     }
 
-
-  // Smooth the velocity field
-  if( this->GetSmoothVelocityField() )
-    {
+  
+  //Smooth the velocity field
+  if ( this->GetElasticSmoothVelocityField() )
+  {
+    this->ElasticSmoothVelocityField();
+  }
+  else if( this->GetSmoothVelocityField() )
+  {
     this->SmoothVelocityField();
-    }
-
+  }
 }
 
 

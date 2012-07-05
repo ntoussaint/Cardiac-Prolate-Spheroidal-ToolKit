@@ -235,11 +235,15 @@ LogDomainDemonsRegistrationFilter<TFixedImage,TMovingImage,TField>
 
 
   //Smooth the velocity field
-  if( this->GetSmoothVelocityField() )
-    {
+  if ( this->GetElasticSmoothVelocityField() )
+  {
+    this->ElasticSmoothVelocityField();
+  }
+  else if( this->GetSmoothVelocityField() )
+  {
     this->SmoothVelocityField();
-    }
-
+  }
+  
 }
 
 

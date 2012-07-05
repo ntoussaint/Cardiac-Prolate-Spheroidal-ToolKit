@@ -45,6 +45,10 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
   
   m_InverseExponentiator = FieldExponentiatorType::New();
   m_InverseExponentiator->ComputeInverseOn();
+
+  m_ElasticSmoothVelocityField = false;
+  m_ElasticSmoothingFilter = ElasticVectorSmoothingFilterType::New();
+  m_Kappa = 1.0;
 }
 
 
@@ -371,6 +375,45 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
   m_StopRegistrationFlag = false;
 }
 
+
+
+// -----------------------------------------------------------------------------
+// Smooth velocity using an elastic-like filter
+template <class TFixedImage, class TMovingImage, class TField>
+void
+LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+::ElasticSmoothVelocityField()
+{
+  if ( !m_ElasticSmoothVelocityField )
+  {
+    std::cerr << "[WARNING] Trying to use elastic regularisation without enabling it explicitly." << std::endl;
+    std::cerr << "          Gaussian regularisation is used instead" << std::endl;
+    this->SmoothVelocityField();
+    return;
+  }
+
+  m_ElasticSmoothingFilter->SetKappa( m_Kappa );
+  m_ElasticSmoothingFilter->SetSigma( this->m_StandardDeviations[0] );
+
+  m_ElasticSmoothingFilter->MaskElasticSmoothingOff();
+  
+  m_ElasticSmoothingFilter->SetInput( this->GetOutput() );
+  m_ElasticSmoothingFilter->GraftOutput( this->GetOutput() );
+  try
+  {
+    m_ElasticSmoothingFilter->Update();
+  }
+  catch( itk::ExceptionObject& err )
+  {
+    std::cerr << "[ERROR] Impossible to perform elastic-like regularisation. Performing Gaussian smoothing instead." << std::endl;
+    std::cout << err << std::endl;
+    this->SmoothVelocityField();
+  }
+
+  this->GraftOutput( m_ElasticSmoothingFilter->GetOutput() );
+}
+
+  
 
 // Smooth velocity using a separable Gaussian kernel
 template <class TFixedImage, class TMovingImage, class TField>

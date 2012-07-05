@@ -4,6 +4,7 @@
 #include "itkDenseFiniteDifferenceImageFilter.h"
 #include "itkExponentialDeformationFieldImageFilter2.h"
 #include "itkPDEDeformableRegistrationFunction.h"
+#include "itkDiscreteElasticVectorSmoothingFilter.h"
 
 namespace itk {
 
@@ -152,6 +153,14 @@ public:
   itkSetMacro( SmoothVelocityField, bool );
   itkGetConstMacro( SmoothVelocityField, bool );
   itkBooleanMacro( SmoothVelocityField );
+  /**  Set/Get whether the velocity field is
+   *   elastically regularised */
+  itkSetMacro( ElasticSmoothVelocityField, bool );
+  itkGetConstMacro( ElasticSmoothVelocityField, bool );
+  itkBooleanMacro( ElasticSmoothVelocityField );
+  /** Set elastic parameter kappa */
+  itkSetMacro( Kappa, double );
+  itkGetConstMacro( Kappa, double );
   
   /** Set the Gaussian smoothing standard deviations for the
    * velocity field. The values are set with respect to pixel
@@ -221,6 +230,13 @@ protected:
   itkSetObjectMacro( Exponentiator, FieldExponentiatorType );
   itkGetObjectMacro( Exponentiator, FieldExponentiatorType );
 
+  /** Elastic regulariser type */
+  typedef DiscreteElasticVectorSmoothingFilter< TField, TMovingImage >   ElasticVectorSmoothingFilterType;
+  typedef typename ElasticVectorSmoothingFilterType::Pointer     ElasticVectorSmoothingFilterPointer;
+
+  itkSetObjectMacro( ElasticSmoothingFilter, ElasticVectorSmoothingFilterType );
+  itkGetObjectMacro( ElasticSmoothingFilter, ElasticVectorSmoothingFilterType );
+  
   /** Supplies the halting criteria for this class of filters.  The
    * algorithm will stop after a user-specified number of iterations. */
   virtual bool Halt()
@@ -246,6 +262,11 @@ protected:
    * using a Gaussian operator. The amount of smoothing can be specified
    * by setting the StandardDeviations. */
   virtual void SmoothVelocityField();
+
+  /** Utility to smooth the velocity field (represented in the Output)
+   * using an Elastic-like operator. The amount of smoothing can be specified
+   * by setting the StandardDeviations and Kappa. */
+  virtual void ElasticSmoothVelocityField();
 
   /** Utility to smooth the UpdateBuffer using a Gaussian operator.
    * The amount of smoothing can be specified by setting the
@@ -287,8 +308,11 @@ private:
 
   /** Modes to control smoothing of the update and velocity fields */
   bool                      m_SmoothVelocityField;
+  bool                      m_ElasticSmoothVelocityField;
   bool                      m_SmoothUpdateField;
-  
+
+  double                    m_Kappa;
+    
   /** Temporary field used for smoothing the velocity field. */
   VelocityFieldPointer      m_TempField;
 
@@ -303,6 +327,7 @@ private:
 
   FieldExponentiatorPointer m_Exponentiator;
   FieldExponentiatorPointer m_InverseExponentiator;
+  ElasticVectorSmoothingFilterPointer m_ElasticSmoothingFilter;
 };
 
 
