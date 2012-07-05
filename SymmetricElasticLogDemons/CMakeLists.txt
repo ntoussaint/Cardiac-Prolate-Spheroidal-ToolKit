@@ -13,11 +13,5 @@ find_package(ITK REQUIRED)
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
-add_executable(LogDomainDemonsRegistration 
-  LogDomainDemonsRegistration.cxx
-)
-target_link_libraries(LogDomainDemonsRegistration
-  ITKCommon
-  ITKIO
-  ITKStatistics
-)
+add_executable(ElasticLogDomainDemonsRegistration ElasticLogDomainDemonsRegistration.cxx )
+target_link_libraries(ElasticLogDomainDemonsRegistration ITKCommon ITKIO ITKStatistics )
