@@ -41,13 +41,28 @@ endif(WIN32)
 ## #################################################################
 
 find_package(ITK REQUIRED)
-find_package(VTK REQUIRED)
-find_package(TTK REQUIRED)
-
 include(${ITK_USE_FILE})
-include(${VTK_USE_FILE})
-include(${TTK_USE_FILE})
 
+unset(CPSTK_THIRD_PARTY_PACKAGES)
+set(CPSTK_THIRD_PARTY_PACKAGES
+  VTK
+  TTK
+)
+
+set(CPSTK_PACKAGES_MISSING 0)
+
+foreach (package ${CPSTK_THIRD_PARTY_PACKAGES})
+  find_package(${package} QUIET)
+  if(${package}_FOUND)
+    include(${${package}_USE_FILE})
+  else(${package}_FOUND)
+    set(CPSTK_PACKAGES_MISSING 1)
+    set(CPSTK_MISSING_PACKAGES 
+      ${package} 
+      ${CPSTK_MISSING_PACKAGES}
+      )
+  endif(${package}_FOUND)
+endforeach (package) 
 
 
 ## #################################################################
@@ -74,8 +89,6 @@ set(LIBRARY_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_LIB
 set(ARCHIVE_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_ARCHIVE_OUTPUT_DIRECTORY})
 set(RUNTIME_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
 set(EXECUTABLE_INSTALL_OUTPUT_PATH ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
-
-
 
 set(${PROJECT_NAME}_VERSION_MAJOR 1 CACHE STRING "CPSTK major version number.")
 set(${PROJECT_NAME}_VERSION_MINOR 1 CACHE STRING "CPSTK minor version number.")
@@ -142,11 +155,6 @@ set(${PROJECT_NAME}_INCLUDE_DIRS
 include_directories(
 ${${PROJECT_NAME}_INCLUDE_DIRS}
 )
-
-include_directories(
-  ${PROJECT_BINARY_DIR}
-  ${PROJECT_BINARY_DIR}/Commands
-)
 include (${PROJECT_SOURCE_DIR}/CPSTKConfig.cmake)
 
 
@@ -168,36 +176,41 @@ endif (NOT WIN32)
 ## #################################################################
 ## Actual CMakeLists code
 ## #################################################################
-
-add_subdirectory(IPF)
-add_subdirectory(Algorithms)
-add_subdirectory(Numerics)
-add_subdirectory(Commands)
-
-add_executable(cpstk
-  cpstk.cxx
-  )
-
-target_link_libraries(cpstk
-  CPSTKCommands
-  CPSTKProgramFactory
-  ${ITK_LIBRARIES}
-  )
+  
+if(NOT ${CPSTK_PACKAGES_MISSING})
+  add_subdirectory(IPF)
+  add_subdirectory(Algorithms)
+  add_subdirectory(Numerics)
+  add_subdirectory(Commands)
+  
+  add_executable(cpstk
+    cpstk.cxx
+    )
+  target_link_libraries(cpstk
+    CPSTKCommands
+    CPSTKProgramFactory
+    ${ITK_LIBRARIES}
+    )
+else(NOT ${CPSTK_PACKAGES_MISSING})
+  message(WARNING "Some packages are missing to completely build ${PROJECT_NAME} : ${CPSTK_MISSING_PACKAGES}. ${PROJECT_NAME} won't be built")  
+endif(NOT ${CPSTK_PACKAGES_MISSING})
 
 ## #################################################################
 ## Installation
 ## #################################################################
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_RUNTIME)
-  install(TARGETS cpstk
-    BUNDLE DESTINATION bin
-    RUNTIME DESTINATION bin
-    )
-endif(NOT ${PROJECT_NAME}_INSTALL_NO_RUNTIME)
+  if (NOT ${CPSTK_PACKAGES_MISSING})
+    install(TARGETS cpstk
+      BUNDLE DESTINATION bin
+      RUNTIME DESTINATION bin
+      )
+  endif()
+endif()
 
 
 #-----------------------------------------------------------------------------
-# doxygen (and other?) documentation
+# doxygen documentation
 
 find_package(Doxygen)
 if (DOXYGEN)
@@ -238,7 +251,5 @@ if (DOXYGEN)
     ${MY_DOXYGEN_BUILD_DIR}/doxygen.config
   )
 endif(DOXYGEN) 
-
-
 
 add_subdirectory(SymmetricElasticLogDemons)
