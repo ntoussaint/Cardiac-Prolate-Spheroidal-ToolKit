@@ -10,7 +10,12 @@ project(LogDomainDemonsRegistration)
 
 find_package(ITK REQUIRED)
 
-add_executable(LogDomainDemonsRegistration LogDomainDemonsRegistration.cxx)
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+add_executable(LogDomainDemonsRegistration 
+  LogDomainDemonsRegistration.cxx
+)
 target_link_libraries(LogDomainDemonsRegistration
   ITKCommon
   ITKIO

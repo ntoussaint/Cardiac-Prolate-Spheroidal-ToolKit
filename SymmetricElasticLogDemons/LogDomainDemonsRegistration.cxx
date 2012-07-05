@@ -26,8 +26,6 @@
 #include <itkDisplacementFieldToWarpedGridFilter.h>
 #include <itkVTKPolyDataWriter.h>
 
-#include <itkRegistrationMethod.h>
-
 #include <metaCommand.h>
 
 #include <errno.h>

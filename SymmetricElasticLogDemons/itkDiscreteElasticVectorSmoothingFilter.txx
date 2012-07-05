@@ -79,8 +79,8 @@ GenerateData()
     if ( m_Verbose )
       std::cerr << "+ Elastic smoothing, kappa=" << m_Kappa << "\n";
 
-    typename ComponentImageType::SpacingType spacing = this->GetInput()->GetSpacing();
-
+    // typename ComponentImageType::SpacingType spacing = this->GetInput()->GetSpacing();
+    
     // Caches used during the computation of the elastic smoothing
     typename ComponentImageType::Pointer H[3];
     for ( unsigned int i = 0; i < 3; ++i )
