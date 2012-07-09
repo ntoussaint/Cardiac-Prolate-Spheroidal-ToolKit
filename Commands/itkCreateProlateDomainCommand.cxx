@@ -247,9 +247,12 @@ namespace itk
     m_LongDescription += m_ShortDescription;
     m_LongDescription += "\n\nUsage:\n";
     
-    m_LongDescription += "-i    [input  geometry (i.e. anatomy)]\n";
+    m_LongDescription += "-i    [input  geometry (i.e. anatomy/domain)]\n";
     m_LongDescription += "-t    [prolate transform]\n";
+    m_LongDescription += "-p    [phase (0: diastole / 1: systole)]\n";
     m_LongDescription += "-o    [output ellipsoidal image]\n";
+    m_LongDescription += "-w    [wall thickness in mm (default: diastole 12 / systole 17)]\n";
+    m_LongDescription += "-a    [basal angle in deg. (default: 95 deg.)]\n";
   }
 
   CreateProlateDomainCommand::~CreateProlateDomainCommand()
@@ -269,6 +272,25 @@ namespace itk
     std::string domainfile = cl.follow("nofile",2,"-i","-I");
     std::string transformfile = cl.follow("nofile",2,"-t","-T");
     std::string ellipsoiddomainfile = cl.follow("nofile",2,"-o","-O");
+    const bool phase = cl.follow(0,2,"-p","-P");
+    
+    double thickness = 0.0;
+    switch (phase)
+    {
+	case 1: // systole
+	  thickness = 17.0;
+	  break;
+	case 0: // diastole
+	default:
+	  thickness = 12.0;
+    }
+
+    if (cl.search(2,"-w","-W"))
+      thickness = cl.follow(12.0,2,"-p","-P");
+    
+    double maxangle = 95.0;
+    if (cl.search(2,"-a","-A"))
+      thickness = cl.follow(95.0,2,"-a","-A");    
     
     // read the input image
     ImageReaderType::Pointer imReader = ImageReaderType::New();
@@ -295,14 +317,6 @@ namespace itk
     transform = dynamic_cast<TransformType*>( transformreader->GetTransformList()->front().GetPointer() );
     std::cout<<"done."<<std::endl;
 
-  
-    // double thickness = 16.0;
-    // double thickness = 37.0;
-    // double thickness = 14.0;
-    double thickness = 11.0;
-    // double maxangle = 100.0;
-    // double maxangle = 93.0;
-    double maxangle = 95.0;
     double mu1 = asinh ((transform->GetLambda2() - thickness/2.0) / transform->GetSemiFociDistance());
     double mu2 = asinh ((transform->GetLambda2() + thickness/2.0) / transform->GetSemiFociDistance());
     double nu1 = 0.0;

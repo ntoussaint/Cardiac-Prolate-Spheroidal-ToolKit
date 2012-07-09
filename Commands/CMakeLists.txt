@@ -20,10 +20,8 @@ function(CreateCpstkCommand command_name keyword description)
     ${CMAKE_CURRENT_BINARY_DIR}/${FACTORY_NAME}.cxx
     PARENT_SCOPE
     )
-  
+
 endfunction()
-
-
 
 CreateCpstkCommand(RotateProlateSpheroid
   "rotate" "Rotate a Prolate Spheroid according to a vtk file describing the antero-posterior line"

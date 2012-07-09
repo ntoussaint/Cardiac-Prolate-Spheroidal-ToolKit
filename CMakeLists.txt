@@ -9,7 +9,6 @@ endif(COMMAND cmake_policy)
 project(CPSTK)
 
 
-
 # On Visual Studio 8 MS deprecated C. This removes all 1.276E1265 security
 # warnings
 if(WIN32)
@@ -144,17 +143,27 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
+
+#-----------------------------------------------------------------------------
+# Set the include directories
+# also include the binary directories as some source files are built there
+#-----------------------------------------------------------------------------
 set(${PROJECT_NAME}_INCLUDE_DIRS
   ${PROJECT_SOURCE_DIR}
   ${PROJECT_SOURCE_DIR}/Numerics
   ${PROJECT_SOURCE_DIR}/Algorithms
   ${PROJECT_SOURCE_DIR}/Commands
   ${PROJECT_SOURCE_DIR}/IPF
+  ${PROJECT_BINARY_DIR}
+  ${PROJECT_BINARY_DIR}/Commands
 )
 
 include_directories(
-${${PROJECT_NAME}_INCLUDE_DIRS}
+  ${${PROJECT_NAME}_INCLUDE_DIRS}
 )
+
+#-----------------------------------------------------------------------------
+# Include the external configuration file
 include (${PROJECT_SOURCE_DIR}/CPSTKConfig.cmake)
 
 

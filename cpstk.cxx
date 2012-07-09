@@ -14,36 +14,36 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#include "itkTensorsToVTKCommandFactory.h"
-#include "itkCreateProlateCoordinateImageCommandFactory.h"
+// #include "itkTensorsToVTKCommandFactory.h"
+// #include "itkCreateProlateCoordinateImageCommandFactory.h"
 #include "itkRotateProlateSpheroidCommandFactory.h"
-#include "itkExtractProlateInformationCommandFactory.h"
-#include "itkTensorImageToMeshCommandFactory.h"
-#include "itkTensorMeshToImageCommandFactory.h"
-#include "itkExtrapolateTensorFieldCommandFactory.h"
-#include "itkCreateSyntheticCardiacTensorMapCommandFactory.h"
-#include "itkFindClosestProlateTransformCommandFactory.h"
-#include "itkCreateProlateDomainCommandFactory.h"
-#include "itkTensorMeshStatisticsCommandFactory.h"
-#include "itkCumulateProlateSpheroidalDataSetsCommandFactory.h"
-#include "itkLimitImageToAHAZoneCommandFactory.h"
-#include "itkLimitTensorsToAHAZoneCommandFactory.h"
-#include "itkApplyTransformToImageCommandFactory.h"
-#include "itkApplyTransformToTensorImageCommandFactory.h"
-#include "itkApplyTransformToMeshCommandFactory.h"
-#include "itkResampleImage3CommandFactory.h"
-#include "itkResampleTensorImage3CommandFactory.h"
-#include "itkColorFibresWithProlateAngleCommandFactory.h"
-#include "itkOptimizeExtrapolationKernelsCommandFactory.h"
-#include "itkExtractKernelsEnveloppeCommandFactory.h"
-#include "itkTensorMeshGradientCommandFactory.h"
-#include "itkTensorMeshStructureCommandFactory.h"
-#include "itkTensorMeshCovarianceCommandFactory.h"
-#include "itkForwardTransformMeshCommandFactory.h"
-#include "itkForwardTransformMesh2CommandFactory.h"
-#include "itkBackwardTransformMeshCommandFactory.h"
-#include "itkReorderDWIsCommandFactory.h"
-#include "itkCropImageCommandFactory.h"
+// #include "itkExtractProlateInformationCommandFactory.h"
+// #include "itkTensorImageToMeshCommandFactory.h"
+// #include "itkTensorMeshToImageCommandFactory.h"
+// #include "itkExtrapolateTensorFieldCommandFactory.h"
+// #include "itkCreateSyntheticCardiacTensorMapCommandFactory.h"
+// #include "itkFindClosestProlateTransformCommandFactory.h"
+// #include "itkCreateProlateDomainCommandFactory.h"
+// #include "itkTensorMeshStatisticsCommandFactory.h"
+// #include "itkCumulateProlateSpheroidalDataSetsCommandFactory.h"
+// #include "itkLimitImageToAHAZoneCommandFactory.h"
+// #include "itkLimitTensorsToAHAZoneCommandFactory.h"
+// #include "itkApplyTransformToImageCommandFactory.h"
+// #include "itkApplyTransformToTensorImageCommandFactory.h"
+// #include "itkApplyTransformToMeshCommandFactory.h"
+// #include "itkResampleImage3CommandFactory.h"
+// #include "itkResampleTensorImage3CommandFactory.h"
+// #include "itkColorFibresWithProlateAngleCommandFactory.h"
+// #include "itkOptimizeExtrapolationKernelsCommandFactory.h"
+// #include "itkExtractKernelsEnveloppeCommandFactory.h"
+// #include "itkTensorMeshGradientCommandFactory.h"
+// #include "itkTensorMeshStructureCommandFactory.h"
+// #include "itkTensorMeshCovarianceCommandFactory.h"
+// #include "itkForwardTransformMeshCommandFactory.h"
+// #include "itkForwardTransformMesh2CommandFactory.h"
+// #include "itkBackwardTransformMeshCommandFactory.h"
+// #include "itkReorderDWIsCommandFactory.h"
+// #include "itkCropImageCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 #include "cpstkConfigure.h"
@@ -51,36 +51,36 @@
 
 int main (int narg, char *args[])
 {
-  itk::TensorsToVTKCommandFactory::RegisterOneFactory();
   itk::RotateProlateSpheroidCommandFactory::RegisterOneFactory();
-  itk::ExtractProlateInformationCommandFactory::RegisterOneFactory();
-  itk::TensorImageToMeshCommandFactory::RegisterOneFactory();
-  itk::TensorMeshToImageCommandFactory::RegisterOneFactory();
-  itk::ExtrapolateTensorFieldCommandFactory::RegisterOneFactory();
-  itk::CreateSyntheticCardiacTensorMapCommandFactory::RegisterOneFactory();
-  itk::FindClosestProlateTransformCommandFactory::RegisterOneFactory();
-  itk::CreateProlateDomainCommandFactory::RegisterOneFactory();
-  itk::TensorMeshStatisticsCommandFactory::RegisterOneFactory();
-  itk::CumulateProlateSpheroidalDataSetsCommandFactory::RegisterOneFactory();
-  itk::LimitImageToAHAZoneCommandFactory::RegisterOneFactory();
-  itk::LimitTensorsToAHAZoneCommandFactory::RegisterOneFactory();
-  itk::ApplyTransformToImageCommandFactory::RegisterOneFactory();
-  itk::ApplyTransformToTensorImageCommandFactory::RegisterOneFactory();
-  itk::ApplyTransformToMeshCommandFactory::RegisterOneFactory();
-  itk::ResampleImage3CommandFactory::RegisterOneFactory();
-  itk::ResampleTensorImage3CommandFactory::RegisterOneFactory();
-  itk::ColorFibresWithProlateAngleCommandFactory::RegisterOneFactory();
-  itk::OptimizeExtrapolationKernelsCommandFactory::RegisterOneFactory();
-  itk::ExtractKernelsEnveloppeCommandFactory::RegisterOneFactory();
-  itk::TensorMeshGradientCommandFactory::RegisterOneFactory();
-  itk::TensorMeshStructureCommandFactory::RegisterOneFactory();
-  itk::TensorMeshCovarianceCommandFactory::RegisterOneFactory();
-  itk::ForwardTransformMeshCommandFactory::RegisterOneFactory();
-  itk::ForwardTransformMesh2CommandFactory::RegisterOneFactory();
-  itk::BackwardTransformMeshCommandFactory::RegisterOneFactory();
-  itk::CreateProlateCoordinateImageCommandFactory::RegisterOneFactory();
-  itk::ReorderDWIsCommandFactory::RegisterOneFactory();
-  itk::CropImageCommandFactory::RegisterOneFactory();
+  // itk::TensorsToVTKCommandFactory::RegisterOneFactory();
+  // itk::ExtractProlateInformationCommandFactory::RegisterOneFactory();
+  // itk::TensorImageToMeshCommandFactory::RegisterOneFactory();
+  // itk::TensorMeshToImageCommandFactory::RegisterOneFactory();
+  // itk::ExtrapolateTensorFieldCommandFactory::RegisterOneFactory();
+  // itk::CreateSyntheticCardiacTensorMapCommandFactory::RegisterOneFactory();
+  // itk::FindClosestProlateTransformCommandFactory::RegisterOneFactory();
+  // itk::CreateProlateDomainCommandFactory::RegisterOneFactory();
+  // itk::TensorMeshStatisticsCommandFactory::RegisterOneFactory();
+  // itk::CumulateProlateSpheroidalDataSetsCommandFactory::RegisterOneFactory();
+  // itk::LimitImageToAHAZoneCommandFactory::RegisterOneFactory();
+  // itk::LimitTensorsToAHAZoneCommandFactory::RegisterOneFactory();
+  // itk::ApplyTransformToImageCommandFactory::RegisterOneFactory();
+  // itk::ApplyTransformToTensorImageCommandFactory::RegisterOneFactory();
+  // itk::ApplyTransformToMeshCommandFactory::RegisterOneFactory();
+  // itk::ResampleImage3CommandFactory::RegisterOneFactory();
+  // itk::ResampleTensorImage3CommandFactory::RegisterOneFactory();
+  // itk::ColorFibresWithProlateAngleCommandFactory::RegisterOneFactory();
+  // itk::OptimizeExtrapolationKernelsCommandFactory::RegisterOneFactory();
+  // itk::ExtractKernelsEnveloppeCommandFactory::RegisterOneFactory();
+  // itk::TensorMeshGradientCommandFactory::RegisterOneFactory();
+  // itk::TensorMeshStructureCommandFactory::RegisterOneFactory();
+  // itk::TensorMeshCovarianceCommandFactory::RegisterOneFactory();
+  // itk::ForwardTransformMeshCommandFactory::RegisterOneFactory();
+  // itk::ForwardTransformMesh2CommandFactory::RegisterOneFactory();
+  // itk::BackwardTransformMeshCommandFactory::RegisterOneFactory();
+  // itk::CreateProlateCoordinateImageCommandFactory::RegisterOneFactory();
+  // itk::ReorderDWIsCommandFactory::RegisterOneFactory();
+  // itk::CropImageCommandFactory::RegisterOneFactory();
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
   if( cl.size() == 1 || cl.search(2, "--help", "-h") )
