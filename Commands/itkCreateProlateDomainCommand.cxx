@@ -117,7 +117,7 @@ void CreateGrid (TransformType::Pointer transform,
 
   double zeta1factor = 40;
   double zeta2factor = 4;
-  
+
   for (unsigned int i=N1[0]; i<N2[0]; i++)
     for (unsigned int j=N1[1]; j<N2[1]; j++)
       for (unsigned int k=N1[2]; k<N2[2]; k++)
@@ -128,7 +128,8 @@ void CreateGrid (TransformType::Pointer transform,
 	point1[0] = bounds[0][0] + (double)i * ( (bounds[0][1] - bounds[0][0]) / (double)(N[0] - 1) );
 	point1[1] = bounds[1][0] + (double)j * ( (bounds[1][1] - bounds[1][0]) / (double)(N[1] - 1) );
 	point1[2] = bounds[2][0] + (double)k * ( (bounds[2][1] - bounds[2][0]) / (double)(N[2] - 1) );
-
+	if (point1[2] > 2.0 * vnl_math::pi) point1[2] =  2.0 * vnl_math::pi - vcl_numeric_limits<double>::epsilon();
+	
 	// pt = transform->TransformPoint (point1);
 	if (!stay_in_prolate)
 	  pt = transform->TransformPoint (point1);
@@ -154,7 +155,8 @@ void CreateGrid (TransformType::Pointer transform,
 	  point2[0] = bounds[0][0] + (double)(i+1) * ( (bounds[0][1] - bounds[0][0]) / (double)(N[0] - 1) );
 	  point2[1] = bounds[1][0] + (double)j * ( (bounds[1][1] - bounds[1][0]) / (double)(N[1] - 1) );
 	  point2[2] = bounds[2][0] + (double)k * ( (bounds[2][1] - bounds[2][0]) / (double)(N[2] - 1) );
-	  
+	  if (point2[2] > 2.0 * vnl_math::pi) point2[2] =  2.0 * vnl_math::pi - vcl_numeric_limits<double>::epsilon();
+
 	  // pt = transform->TransformPoint (point2);
 	  if (!stay_in_prolate)
 	    pt = transform->TransformPoint (point2);
@@ -181,7 +183,8 @@ void CreateGrid (TransformType::Pointer transform,
 	  point2[0] = bounds[0][0] + (double)i * ( (bounds[0][1] - bounds[0][0]) / (double)(N[0] - 1) );
 	  point2[1] = bounds[1][0] + (double)(j+1) * ( (bounds[1][1] - bounds[1][0]) / (double)(N[1] - 1) );
 	  point2[2] = bounds[2][0] + (double)k * ( (bounds[2][1] - bounds[2][0]) / (double)(N[2] - 1) );
-	  
+	  if (point2[2] > 2.0 * vnl_math::pi) point2[2] =  2.0 * vnl_math::pi - vcl_numeric_limits<double>::epsilon();
+
 	  // pt = transform->TransformPoint (point2);
 	  if (!stay_in_prolate)
 	    pt = transform->TransformPoint (point2);
@@ -208,7 +211,8 @@ void CreateGrid (TransformType::Pointer transform,
 	  point2[0] = bounds[0][0] + (double)i * ( (bounds[0][1] - bounds[0][0]) / (double)(N[0] - 1) );
 	  point2[1] = bounds[1][0] + (double)j * ( (bounds[1][1] - bounds[1][0]) / (double)(N[1] - 1) );
 	  point2[2] = bounds[2][0] + (double)(k+1) * ( (bounds[2][1] - bounds[2][0]) / (double)(N[2] - 1) );
-	  
+	  if (point2[2] > 2.0 * vnl_math::pi) point2[2] =  2.0 * vnl_math::pi - vcl_numeric_limits<double>::epsilon();
+
 	  // pt = transform->TransformPoint (point2);
 	  if (!stay_in_prolate)
 	    pt = transform->TransformPoint (point2);
@@ -286,11 +290,15 @@ namespace itk
     }
 
     if (cl.search(2,"-w","-W"))
-      thickness = cl.follow(12.0,2,"-p","-P");
+      thickness = cl.follow(12.0,2,"-w","-W");
     
     double maxangle = 95.0;
     if (cl.search(2,"-a","-A"))
-      thickness = cl.follow(95.0,2,"-a","-A");    
+      maxangle = cl.follow(95.0,2,"-a","-A");    
+
+    std::cout<<"found thickness of "<<thickness<<std::endl;
+    std::cout<<"found maxangle of "<<maxangle<<std::endl;
+    
     
     // read the input image
     ImageReaderType::Pointer imReader = ImageReaderType::New();
@@ -334,12 +342,12 @@ namespace itk
     transform->GetInverse (inversetransform);
   
     CreateGrid (inversetransform,
-		mu1, mu2,
-		nu1, nu2,
-		throughwalldivisions,
-		longdivisions,
-		circumdivisions,
-		grid);
+    		mu1, mu2,
+    		nu1, nu2,
+    		throughwalldivisions,
+    		longdivisions,
+    		circumdivisions,
+    		grid);
 
     vtkDataSetWriter* gridwriter = vtkDataSetWriter::New();
     gridwriter->SetInput (grid);
@@ -350,12 +358,12 @@ namespace itk
     vtkUnstructuredGrid* grid2 = vtkUnstructuredGrid::New();
   
     CreateGrid (inversetransform,
-		mu1, mu2,
-		nu1, nu2,
-		throughwalldivisions,
-		longdivisions,
-		circumdivisions,
-		grid2, 1);
+    		mu1, mu2,
+    		nu1, nu2,
+    		throughwalldivisions,
+    		longdivisions,
+    		circumdivisions,
+    		grid2, 1);
 
     gridwriter->SetInput (grid2);
     gridwriter->SetFileName ("grid-prolate.vtk");
