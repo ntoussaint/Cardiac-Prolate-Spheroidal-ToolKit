@@ -261,4 +261,4 @@ if (DOXYGEN)
   )
 endif(DOXYGEN) 
 
-add_subdirectory(SymmetricElasticLogDemons)
+add_subdirectory(Utils)
