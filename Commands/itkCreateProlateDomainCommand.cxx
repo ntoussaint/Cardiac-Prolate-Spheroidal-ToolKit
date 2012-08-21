@@ -52,6 +52,19 @@
 
 #include "GetPot.h"
 
+double asinh(double value){
+   
+ double returned;
+
+ if(value>0)
+    returned = log(value + sqrt(value * value + 1));
+ else
+    returned = -log(-value + sqrt(value * value + 1));
+
+ return(returned);
+
+}
+
 typedef unsigned short BinaryScalarType;
 typedef itk::Image<BinaryScalarType, 3> BinaryImageType;
 typedef double ScalarType;

@@ -347,7 +347,7 @@ namespace itk
       itMean.Set (geometricmean);
       itGeom.Set (itGeom.Get() / (double)(numberofdwis));
       
-      if ( (itGeom.Get() > 0) && (itGeom.Get() < std::sqrt (2) ) )
+      if ( (itGeom.Get() > 0) && (itGeom.Get() < std::sqrt (2.0) ) )
       {
 	counter++;
 	expectedvalue += itGeom.Get();

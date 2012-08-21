@@ -55,7 +55,7 @@ namespace itk
  *
  * \ingroup Functions
  */
-class ITKCommon_EXPORT KaiserBesselKernelFunction : public KernelFunction
+class ITK_EXPORT KaiserBesselKernelFunction : public KernelFunction
 {
 public:
   /** Standard class typedefs. */
