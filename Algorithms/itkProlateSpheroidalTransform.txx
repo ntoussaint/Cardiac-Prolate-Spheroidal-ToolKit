@@ -347,7 +347,7 @@ namespace itk
 	 ( (xsi[1] < 0.0) || (xsi[1] >     vnl_math::pi) ) ||
 	 ( (xsi[2] < 0.0) || (xsi[2] > 2 * vnl_math::pi) ) )
     {
-      itkWarningMacro (<<"inconsistent Prolate Coordinate : "<<xsi);
+      itkDebugMacro (<<"inconsistent Prolate Coordinate : "<<xsi);
     }
     
     // put the point back into the x-aligned aligned spheroid
