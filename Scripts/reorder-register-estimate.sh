@@ -2,7 +2,7 @@
 
 numberoflevels=$1 # use 3   if no idea
 factor=$2         # use 0.3 if no idea
-
+anatomy=$3        # use 'anatomy.mha' if no idea
 i=0
 rm -rf temp* t-*
 
@@ -24,13 +24,13 @@ do
     # the rest of the DWIs will be untouched.
     # The constructer calculated mean-diffusivity image(s) will be removed
     cpstk reorder -i $name -g $gradname -o temp -t 2 -f $factor
-    cp $name $name_without_ext-before.mha
+    cp -f $name $name_without_ext-before.mha
     # Actually reconstruct the tensors.
     ttk estimate -i temp.mha -g temp.grad -b 0 -o $name_without_ext-tensors-initial.mha
     
     # Unstack this 4D image to recover the mean-diffusivity image 
     # and store the DWIs as 'original'
-    itkUnstackImage4D -i $name -o original-dwi-
+    unstackimage -i $name -o original-dwi-
 
     cpstk reorder -i $name -g $gradname -o temp -t 1 -a 1.0
     
@@ -38,7 +38,7 @@ do
     for level in $(seq 1 1 $numberoflevels)
     do	
 	# Unstack this 4D image to recover the mean-diffusivity image
-	itkUnstackImage4D -i temp.mha -o t-
+	unstackimage -i temp.mha -o t-
 	# Take the mean-diffusivity image as reference for registration
 	cp -f t-000.mha reference.mha
 	j=0
@@ -48,19 +48,19 @@ do
 	    if [ "$level" -eq 1 ]
 	    then
 	        # Register each of the 'original' DWI to the j-est reference
-		itkSliceToSliceRegistration reference.mha $dwi temp-$j.mha temp-$j.mat
+		slicetosliceregistration -f reference.mha -m $dwi -o temp-$j
 	    else
 	        # Register each of the 'original' DWI to the j-est reference, using the previous translation as initialization
-		itkSliceToSliceRegistration reference.mha $dwi temp-$j.mha temp-$j.mat temp-$j.mat 
+		slicetosliceregistration -f reference.mha -m $dwi -o temp-$j -t temp-$j.mat 
 	    fi
 	    export inputs=${inputs}"\n"temp-$j.mha
 	    let j=$j+1
 	done
         
 	# Stack back all registered DWIs images
-	cp -f original-dwi-00.mha temp-0.mha
+	cp -f original-dwi-*00.mha temp-0.mha
 	echo -e $j $inputs > input.blist
-	itkStackImage -i input.blist -o temp.mha
+	stackimage -i input.blist -o temp.mha
 	# This is now the 4D image to use for tensor estimation
 	cp temp.mha $name_without_ext-after.mha
 	# Put the new j-est mean-diffusivity in front of the stack
@@ -73,6 +73,10 @@ do
 	rm -rf t-* geom* temp-increased.mha input.blist
 	
     done
-    
-    rm -rf temp* original-dwi* input.blist reference.mha test*
+
+    cpstk res-image -i $anatomy -r original-dwi-*00.mha -o reference.mha
+    slicetosliceregistration -f reference.mha -m original-dwi-*00.mha -o $name_without_ext-transformed -d 1
+    cpstk apply-tensors -i $name_without_ext-tensors.mha -t $name_without_ext-transformed.mat -o $name_without_ext-tensors-tr.mha
+
+    rm -rf temp* original-dwi* input.blist reference.mha
 done
