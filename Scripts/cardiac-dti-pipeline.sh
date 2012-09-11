@@ -20,7 +20,7 @@ echo -e $n $inputs > tensors.list
 
 cpstk itk2vtk -i tensors.list -o tensors.vtk
 
-# non-linear-registration.sh
+non-linear-registration.sh
 
 # ln -s ~/shells/optimal-kernels.csv kernels.csv
 
