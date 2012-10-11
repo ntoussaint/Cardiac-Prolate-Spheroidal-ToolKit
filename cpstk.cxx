@@ -40,7 +40,7 @@
 #include "itkTensorMeshStructureCommandFactory.h"
 #include "itkTensorMeshCovarianceCommandFactory.h"
 #include "itkForwardTransformMeshCommandFactory.h"
-#include "itkForwardTransformMesh2CommandFactory.h"
+#include "itkForwardTransformImageCommandFactory.h"
 #include "itkBackwardTransformMeshCommandFactory.h"
 #include "itkReorderDWIsCommandFactory.h"
 #include "itkCropImageCommandFactory.h"
@@ -76,7 +76,7 @@ int main (int narg, char *args[])
   itk::TensorMeshStructureCommandFactory::RegisterOneFactory();
   itk::TensorMeshCovarianceCommandFactory::RegisterOneFactory();
   itk::ForwardTransformMeshCommandFactory::RegisterOneFactory();
-  itk::ForwardTransformMesh2CommandFactory::RegisterOneFactory();
+  itk::ForwardTransformImageCommandFactory::RegisterOneFactory();
   itk::BackwardTransformMeshCommandFactory::RegisterOneFactory();
   itk::CreateProlateCoordinateImageCommandFactory::RegisterOneFactory();
   itk::ReorderDWIsCommandFactory::RegisterOneFactory();
