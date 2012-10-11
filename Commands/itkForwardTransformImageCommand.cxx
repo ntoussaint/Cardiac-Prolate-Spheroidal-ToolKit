@@ -50,11 +50,11 @@ namespace itk
     const char* displacementfieldfile        = cl.follow("forward.mha",2,"-f1","-F1");
     const char* inversedisplacementfieldfile = cl.follow("backward.mha",2,"-f2","-F2");
     const char* outputfile                   = cl.follow("output.csv",2,"-o","-O");
-
+    
     // define the future box boundaries :
-
+    
     double PSS_box_bounds[3][2];
-
+    
     PSS_box_bounds[0][0] = 0.3;
     PSS_box_bounds[0][1] = 0.6;
     
@@ -71,8 +71,6 @@ namespace itk
     PSS_box_size[0] = 50;
     PSS_box_size[1] = 100;
     PSS_box_size[2] = 100;
-    
-
     
     // typedefs
     typedef double                                                         ScalarType;
@@ -199,6 +197,7 @@ namespace itk
       ++itOut;
     }
 
+    // to trick the spacing so that the image is more viewable...
     spacing[0] *= 200;
     spacing[1] *= 90;
     spacing[2] *= 30;
