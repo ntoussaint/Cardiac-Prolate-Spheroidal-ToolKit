@@ -184,20 +184,18 @@ namespace itk
 
     while( it != pixels->End() )
     {
-      // Normalize by the norm of the initial tensor to stabilize the
-      // system when close to zero.
-      ScalarType factor = inputit.Value().GetNorm();
-      
       if (!logit.Value().IsFinite() || logit.Value().HasNans())
     	std::cout<<"log(T) is given not finite at "<<logit.Value()<<std::endl;
       else
       {
 	// allowed
     	it.Value() = logit.Value().Sqrt();
+
 	// Normalize by the norm of the initial tensor to stabilize the
 	// system when close to zero.
 	// not allowed
-	it.Value() = it.Value() / factor;
+	ScalarType factor = inputit.Value().GetNorm() / it.Value().GetNorm();      
+	it.Value() = factor * it.Value();
       }
       
       // else
