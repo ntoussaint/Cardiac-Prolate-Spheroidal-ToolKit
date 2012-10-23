@@ -190,17 +190,8 @@ namespace itk
       {
 	// allowed
     	it.Value() = logit.Value().Sqrt();
-
-	// The norm of the inertia tensors is very small, artificially increase
-	// it by a ad hoc factor 
-	// not allowed
-	ScalarType factor = 70.0;      
-	it.Value() = factor * it.Value();
       }
       
-      // else
-      // 	it.Value() = factor * logit.Value().Exp();
-
       ++it; ++logit; ++inputit;
     } 
   }
