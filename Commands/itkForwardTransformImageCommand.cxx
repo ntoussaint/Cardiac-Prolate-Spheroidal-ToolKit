@@ -178,7 +178,7 @@ namespace itk
     ImageType::PointType xi, p1, p2;
     itk::ContinuousIndex<ScalarType, 3> index;
 
-    InterpolatorType::Pointer interpolator = DisplacementInterpolatorType::New();
+    InterpolatorType::Pointer interpolator = InterpolatorType::New();
     interpolator->SetInputImage (inputimage);
     DisplacementInterpolatorType::Pointer displacementinterpolator = DisplacementInterpolatorType::New();
     displacementinterpolator->SetInputImage (inversedisplacementfield);
@@ -189,10 +189,12 @@ namespace itk
       
       outputimage->TransformIndexToPhysicalPoint (itOut.GetIndex(), xi);
       p1 = transform_inverse->TransformPoint (xi); // psi-1 operator
-      if (inversedisplacementfield->TransformPhysicalPointToIndex (p1, index))
+      if (displacementinterpolator->IsInsideBuffer (p1))
       {
 	p2 = p1 + displacementinterpolator->Evaluate (p1); // phi-1 operator
-	value = interpolator->Evaluate (p2); // ask the input image its value at p2 and put it in the box
+
+	if (interpolator->IsInsideBuffer (p2))
+	  value = interpolator->Evaluate (p2); // ask the input image its value at p2 and put it in the box
       }
       itOut.Set (value);
       ++itOut;
