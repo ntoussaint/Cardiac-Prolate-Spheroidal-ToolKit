@@ -353,8 +353,8 @@ namespace itk
 	// The norm of the inertia tensors is very small, artificially increase
 	// it by a ad hoc factor 
 	// not allowed
-	ScalarType factor = 70.0;      
-	t *= factor;
+	ScalarType adhocfactor = 70.0;      
+	t *= adhocfactor;
 
       }
 
