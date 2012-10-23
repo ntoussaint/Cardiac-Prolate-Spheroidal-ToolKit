@@ -72,7 +72,14 @@ namespace itk
     m_LogGradient1->GetPointData (index, &g1);
     m_LogGradient2->GetPointData (index, &g2);
     m_LogGradient3->GetPointData (index, &g3);
-
+    
+    std::cout<< "gradient tensors' norms : "
+	     << g1.GetNorm() <<" - "
+	     << g2.GetNorm() <<" - "
+	     << g3.GetNorm()
+	     << std::endl;
+    getchar();
+      
     // If the input gradients are close to zero, the system is exploding
     // ending with [inf] structure tensors
     // Address this problem by only evaluating the structure when the norm is greater than 0.0001

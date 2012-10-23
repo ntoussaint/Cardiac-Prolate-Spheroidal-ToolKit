@@ -286,13 +286,6 @@ namespace itk
       // ScalarType factor = inputit.Value().GetNorm();
       ScalarType factor = 1.0;
       
-      std::cout<< "gradient tensors' norms : "
-	       << it1.Value().GetNorm() <<" - "
-	       << it2.Value().GetNorm() <<" - "
-	       << it3.Value().GetNorm()
-	       << std::endl;
-      getchar();
-      
       if (!logit1.Value().IsFinite() || logit1.Value().HasNans())
 	std::cout<<"T1 is given not finite at "<<logit1.Value()<<std::endl;
       else
