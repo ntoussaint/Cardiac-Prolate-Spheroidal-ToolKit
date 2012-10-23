@@ -194,7 +194,7 @@ namespace itk
       else
       {
     	it.Value() = logit.Value().Sqrt();
-	it.Value() = 50.0 * it.Value().Sqrt();
+	it.Value() = 50.0 * it.Value();
       }
       
       // else

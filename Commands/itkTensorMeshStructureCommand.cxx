@@ -328,7 +328,7 @@ namespace itk
       MeshType::PointType p = zonelimiter->GetZoneCentralPointCartesian();
       TensorType t (0.0);
       
-      double ratio = 1.3;
+      double ratio = 1.0;
 
       std::cout<<"( N = "<<zone->GetNumberOfPoints()<<") "<<std::flush;
       for (unsigned int j=0; j<zone->GetNumberOfPoints(); j++)
