@@ -89,11 +89,7 @@ namespace itk
       
       InternalMatrixType T = gradl * gradl.transpose();
       out.SetVnlMatrix (T);
-
       
-      std::cout<< "gradient tensor's : \n" << out <<std::endl;
-      getchar();
-
       // if you want the 1st eigenvector of the covariance
       // of the structure tensor : you can try this :
       // InternalMatrixType T = gradl.transpose() * gradl;
@@ -196,7 +192,9 @@ namespace itk
       if (!it.Value().IsFinite() || it.Value().HasNans())
     	std::cout<<"T is given not finite at "<<it.Value()<<std::endl;
       else
-    	it.Value() = factor * logit.Value().Exp();
+    	it.Value() = 100.0 * logit.Value();
+      // else
+      // 	it.Value() = factor * logit.Value().Exp();
 
       ++it; ++logit; ++inputit;
     } 
