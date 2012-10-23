@@ -193,8 +193,8 @@ namespace itk
     	std::cout<<"log(T) is given not finite at "<<logit.Value()<<std::endl;
       else
       {
-    	it.Value() = 50.0 * logit.Value().Sqrt();
-	it.Value() = it.Value().Sqrt();
+    	it.Value() = logit.Value().Sqrt();
+	it.Value() = 50.0 * it.Value().Sqrt();
       }
       
       // else
