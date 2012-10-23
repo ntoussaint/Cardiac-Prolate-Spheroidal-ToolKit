@@ -172,7 +172,7 @@ namespace itk
   ::AfterThreadedGenerateData()
   {
 
-    std::cout<<"structure: tensors EXP"<<std::endl;
+    std::cout<<"structure: tensors SQRT"<<std::endl;
 
     typedef typename MeshType::PointDataContainer  PixelContainer;
     typename PixelContainer::Pointer logpixels = m_LogOutput->GetPointData();
@@ -186,15 +186,18 @@ namespace itk
     {
       // Normalize by the norm of the initial tensor to stabilize the
       // system when close to zero.
-      // ScalarType factor = inputit.Value().GetNorm();
-      ScalarType factor = 1.0;
+      ScalarType factor = inputit.Value().GetNorm();
       
       if (!logit.Value().IsFinite() || logit.Value().HasNans())
     	std::cout<<"log(T) is given not finite at "<<logit.Value()<<std::endl;
       else
       {
+	// allowed
     	it.Value() = logit.Value().Sqrt();
-	it.Value() = 50.0 * it.Value();
+	// Normalize by the norm of the initial tensor to stabilize the
+	// system when close to zero.
+	// not allowed
+	it.Value() = it.Value() / factor;
       }
       
       // else
