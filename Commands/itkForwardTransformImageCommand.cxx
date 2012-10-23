@@ -82,8 +82,9 @@ namespace itk
     typedef itk::ImageFileReader<DisplacementFieldType>                    DisplacementFileReaderType;
     typedef itk::ProlateSpheroidalTransform<ScalarType>                    TransformType;
     typedef TransformType::InputPointType                                  PointType;
-    typedef VectorLinearInterpolateImageFunction<DisplacementFieldType,double> DisplacementInterpolatorType;
-    
+    typedef VectorLinearInterpolateImageFunction<DisplacementFieldType,ScalarType> DisplacementInterpolatorType;
+    typedef itk::LinearInterpolateImageFunction<ImageType, ScalarType>  InterpolatorType;
+
     
     std::cout<<"reading input : "<<inputfile<<std::endl;
     ImageReaderType::Pointer reader = ImageReaderType::New();
@@ -175,10 +176,12 @@ namespace itk
     itk::ImageRegionIterator<ImageType> itOut (outputimage, outputimage->GetLargestPossibleRegion());
     itk::ImageRegionIterator<ImageType> itIn  (inputimage,  inputimage->GetLargestPossibleRegion());
     ImageType::PointType xi, p1, p2;
-    ImageType::IndexType index;
+    itk::ContinuousIndex<ScalarType, 3> index;
 
-    DisplacementInterpolatorType::Pointer interpolator = DisplacementInterpolatorType::New();
-    interpolator->SetInputImage (inversedisplacementfield);
+    InterpolatorType::Pointer interpolator = DisplacementInterpolatorType::New();
+    interpolator->SetInputImage (inputimage);
+    DisplacementInterpolatorType::Pointer displacementinterpolator = DisplacementInterpolatorType::New();
+    displacementinterpolator->SetInputImage (inversedisplacementfield);
     
     while (!itOut.IsAtEnd())
     {
@@ -188,10 +191,8 @@ namespace itk
       p1 = transform_inverse->TransformPoint (xi); // psi-1 operator
       if (inversedisplacementfield->TransformPhysicalPointToIndex (p1, index))
       {
-	p2 = p1 + interpolator->Evaluate (p1); // phi-1 operator
-	inputimage->TransformPhysicalPointToIndex (p2, index);
-	itIn.SetIndex (index);
-	value = itIn.Get();
+	p2 = p1 + displacementinterpolator->Evaluate (p1); // phi-1 operator
+	value = interpolator->Evaluate (p2); // ask the input image its value at p2 and put it in the box
       }
       itOut.Set (value);
       ++itOut;

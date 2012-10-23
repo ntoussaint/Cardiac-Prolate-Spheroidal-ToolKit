@@ -355,7 +355,6 @@ namespace itk
 	// not allowed
 	ScalarType adhocfactor = 70.0;      
 	t *= adhocfactor;
-
       }
 
       zonestructure->SetPoint (i-1, p);

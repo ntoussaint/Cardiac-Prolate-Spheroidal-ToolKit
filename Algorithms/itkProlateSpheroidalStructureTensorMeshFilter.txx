@@ -179,7 +179,6 @@ namespace itk
     typename PixelContainer::ConstPointer inputpixels = this->GetInput(0)->GetPointData();
     typename PixelContainer::Pointer pixels    = this->GetOutput()->GetPointData();
     typename PixelContainer::Iterator logit    = logpixels->Begin();
-    typename PixelContainer::ConstIterator inputit = inputpixels->Begin();
     typename PixelContainer::Iterator it       = pixels->Begin();
     
     while( it != pixels->End() )
@@ -187,12 +186,9 @@ namespace itk
       if (!logit.Value().IsFinite() || logit.Value().HasNans())
     	std::cout<<"log(T) is given not finite at "<<logit.Value()<<std::endl;
       else
-      {
-	// allowed
     	it.Value() = logit.Value().Sqrt();
-      }
       
-      ++it; ++logit; ++inputit;
+      ++it; ++logit;
     } 
   }
 
