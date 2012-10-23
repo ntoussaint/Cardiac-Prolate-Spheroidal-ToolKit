@@ -27,8 +27,7 @@ namespace itk
     m_LongDescription += "\n\nUsage:\n";
     m_LongDescription +="-i    [input scalar image (default : input.mha)]\n";    
     m_LongDescription +="-pr   [prolate transform used]\n";
-    m_LongDescription +="-f1   [forward displacement field (default : forward.mha)]\n";
-    m_LongDescription +="-f2   [backward displacement field (default : backward.mha)]\n";
+    m_LongDescription +="-f   [FORWARD displacement field (default : forward.mha)]\n";
     m_LongDescription +="-o    [output image in prolate coordinates]\n";    
   }
 
@@ -47,19 +46,17 @@ namespace itk
     
     const char* inputfile                    = cl.follow("input.mha",2,"-i","-I");
     const char* prolatefile                  = cl.follow("prolate.lms",2,"-pr","-PR");
-    const char* displacementfieldfile        = cl.follow("forward.mha",2,"-f1","-F1");
-    const char* inversedisplacementfieldfile = cl.follow("backward.mha",2,"-f2","-F2");
+    const char* displacementfieldfile        = cl.follow("forward.mha",2,"-f","-F");
     const char* outputfile                   = cl.follow("output.csv",2,"-o","-O");
     
     // define the future box boundaries :
     
     double PSS_box_bounds[3][2];
-    
-    PSS_box_bounds[0][0] = 0.3;
-    PSS_box_bounds[0][1] = 0.6;
+    PSS_box_bounds[0][0] = 0.382211 - 0.2;
+    PSS_box_bounds[0][1] = 0.610029 + 0.2;
     
     PSS_box_bounds[1][0] = 0.0;
-    PSS_box_bounds[1][1] = vnl_math::pi / 2.0;
+    PSS_box_bounds[1][1] = 102.0 * vnl_math::pi / 180.0;
     
     PSS_box_bounds[2][0] = 0.0;
     PSS_box_bounds[2][1] = 2.0 * vnl_math::pi;
@@ -68,9 +65,9 @@ namespace itk
 
     unsigned int PSS_box_size[3];
 
-    PSS_box_size[0] = 50;
-    PSS_box_size[1] = 100;
-    PSS_box_size[2] = 100;
+    PSS_box_size[0] = 75;
+    PSS_box_size[1] = 150;
+    PSS_box_size[2] = 150;
     
     // typedefs
     typedef double                                                         ScalarType;
@@ -98,7 +95,6 @@ namespace itk
     DisplacementFileReaderType::Pointer    displacementreader2    = DisplacementFileReaderType::New();
     // read the displacement field images
     DisplacementFieldType::Pointer displacementfield = NULL;
-    DisplacementFieldType::Pointer inversedisplacementfield = NULL;
 
     std::cout << "Reading forward field: " << displacementfieldfile << std::flush;
     displacementreader1->SetFileName(displacementfieldfile);
@@ -115,20 +111,6 @@ namespace itk
   
     displacementfield = displacementreader1->GetOutput();
   
-    std::cout << "Reading backward field: " << inversedisplacementfieldfile << std::flush;
-    displacementreader2->SetFileName(inversedisplacementfieldfile);
-    try
-    {
-      displacementreader2->Update();
-    }
-    catch(itk::ExceptionObject &e)
-    {
-      std::cerr << e << std::endl;
-      std::exit(EXIT_FAILURE);
-    }
-    std::cout << " Done." << std::endl;
-
-    inversedisplacementfield = displacementreader2->GetOutput();
   
     std::cout<<"reading transform "<<prolatefile<<"..."<<std::endl;
     itk::TransformFactory<TransformType>::RegisterTransform ();
@@ -181,7 +163,7 @@ namespace itk
     InterpolatorType::Pointer interpolator = InterpolatorType::New();
     interpolator->SetInputImage (inputimage);
     DisplacementInterpolatorType::Pointer displacementinterpolator = DisplacementInterpolatorType::New();
-    displacementinterpolator->SetInputImage (inversedisplacementfield);
+    displacementinterpolator->SetInputImage (displacementfield);
     
     while (!itOut.IsAtEnd())
     {

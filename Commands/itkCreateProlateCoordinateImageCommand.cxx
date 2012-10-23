@@ -36,156 +36,174 @@
 namespace itk
 {
     
-    CreateProlateCoordinateImageCommand::CreateProlateCoordinateImageCommand()
+  CreateProlateCoordinateImageCommand::CreateProlateCoordinateImageCommand()
+  {
+    m_ShortDescription = "Simply Create an image with 3-Component Prolate Coordinates from input domain";
+    m_LongDescription = m_ShortDescription;
+    m_LongDescription += "\n\nUsage:\n";
+    m_LongDescription +="-i    [input (tensor) image]\n";    
+    m_LongDescription +="-pr   [prolate transform used]\n";
+    m_LongDescription +="-f   [BACKWARD displacement field (default : backward.mha)]\n";
+    m_LongDescription +="-o    [output 3-component image]\n";        
+  }
+    
+  CreateProlateCoordinateImageCommand::~CreateProlateCoordinateImageCommand()
+  {}
+    
+  int CreateProlateCoordinateImageCommand::Execute (int narg, const char* arg[])
+  {   
+    GetPot cl(narg, const_cast<char**>(arg)); // argument parser
+    if( cl.size() == 1 || cl.search(2, "--help", "-h") )
     {
-        m_ShortDescription = "Simply Create an image with 3-Component Prolate Coordinates from input domain";
-        m_LongDescription = m_ShortDescription;
-        m_LongDescription += "\n\nUsage:\n";
-        m_LongDescription +="-i    [input (tensor) image]\n";    
-        m_LongDescription +="-pr   [prolate transform used]\n";
-        m_LongDescription +="-f   [BACKWARD displacement field (default : backward.mha)]\n";
-        m_LongDescription +="-o    [output 3-component image]\n";        
+      std::cout  << std::endl << this->GetLongDescription() << std::endl;
+      return -1;
     }
+      
+    const char* inputfile                    = cl.follow("input.mha",2,"-i","-I");
+    const char* prolatefile                  = cl.follow("prolate.tr",2,"-pr","-PR");
+    const char* inversedisplacementfieldfile = cl.follow("backward.mha",2,"-f","-F");
+    const char* outputfile                   = cl.follow("output.csv",2,"-o","-O");
     
-    CreateProlateCoordinateImageCommand::~CreateProlateCoordinateImageCommand()
-    {}
+    // typedefs
+    typedef double                                                         ScalarType;
+    typedef itk::Image<ScalarType,3>                                       ImageType;
+    typedef itk::ImageFileReader<ImageType>                                ImageReaderType;    
+    typedef itk::ImageFileWriter<ImageType>                                ImageWriterType;    
+    typedef itk::Vector<ScalarType, 3>                                     DisplacementType;
+    typedef itk::Image<DisplacementType, 3>                                DisplacementFieldType;
+    typedef itk::ImageFileReader<DisplacementFieldType>                    DisplacementFileReaderType;
+    typedef itk::ProlateSpheroidalTransform<ScalarType>                    TransformType;
+    typedef TransformType::InputPointType                                  PointType;
+    typedef VectorLinearInterpolateImageFunction<DisplacementFieldType,ScalarType> DisplacementInterpolatorType;
+    typedef itk::Image<ScalarType, 4>                                      Image4DType;
+    typedef itk::ImageFileWriter<Image4DType>                              Image4DFileWriterType;
+    typedef itk::ImageRegionConstIterator<ImageType>                       ImageIteratorType;
+    typedef itk::ImageRegionIterator<Image4DType>                          Image4DIteratorType;
     
-    int CreateProlateCoordinateImageCommand::Execute (int narg, const char* arg[])
+    std::cout<<"reading input : "<<inputfile<<std::endl;
+    ImageReaderType::Pointer reader = ImageReaderType::New();
+    reader->SetFileName(inputfile);    
+    reader->Update();  
+    ImageType::Pointer inputimage = reader->GetOutput();
+    std::cout<<" Done."<<std::endl;
+      
+    // instantiation
+    DisplacementFileReaderType::Pointer    displacementreader2    = DisplacementFileReaderType::New();
+    // read the displacement field images
+    DisplacementFieldType::Pointer inversedisplacementfield = NULL;
+      
+    std::cout << "Reading backward field: " << inversedisplacementfieldfile << std::flush;
+    displacementreader2->SetFileName(inversedisplacementfieldfile);
+    try
     {
-        
-        GetPot cl(narg, const_cast<char**>(arg)); // argument parser
-        if( cl.size() == 1 || cl.search(2, "--help", "-h") )
-        {
-            std::cout  << std::endl << this->GetLongDescription() << std::endl;
-            return -1;
-        }
-        
-        
-        const char* inputfile                    = cl.follow("input.mha",2,"-i","-I");
-        const char* prolatefile                  = cl.follow("prolate.tr",2,"-pr","-PR");
-        const char* displacementfieldfile = cl.follow("backward.mha",2,"-f2","-F2");
-        const char* outputfile                   = cl.follow("output.csv",2,"-o","-O");
-        
-        
-        // typedefs
-        typedef double                                                         ScalarType;
-        typedef itk::Vector<ScalarType, 3>                                     VectorType;
-        typedef itk::Image<ScalarType,3>                                       ImageType;
-        typedef itk::ImageFileReader<ImageType>                                ImageFileReaderType;
-        typedef itk::ImageFileWriter<ImageType>                                ImageFileWriterType;
-        typedef itk::Image<VectorType, 3>                                      VectorImageType;
-        typedef itk::ImageRegionIterator<ImageType>                            ImageIteratorType;
-        typedef itk::ImageRegionIterator<VectorImageType>                      IteratorType;
-        typedef VectorType                                                     DisplacementType;
-        typedef itk::Image<DisplacementType, 3>                                DisplacementFieldType;
-        typedef itk::ImageFileReader<DisplacementFieldType>                    DisplacementFileReaderType;
-        typedef itk::ImageFileWriter<DisplacementFieldType>                    DisplacementFileWriterType;
-        typedef itk::ProlateSpheroidalTransform<ScalarType>                    TransformType;
-        typedef TransformType::InputPointType                                  PointType;
-        typedef itk::LinearInterpolateImageFunction<VectorImageType, ScalarType> InterpolatorType;
-
-        std::cout << "Reading input image: " << inputfile << std::flush;  
-        ImageFileReaderType::Pointer reader = ImageFileReaderType::New();
-        reader->SetFileName(inputfile);
-        try
-        {
-            reader->Update();
-        }
-        catch(itk::ExceptionObject &e)
-        {
-            std::cerr << e << std::endl;
-            std::exit(EXIT_FAILURE);
-        }
-        std::cout << " Done." << std::endl;
-        ImageType::Pointer input = reader->GetOutput();
-        
-        std::cout<<"reading prolate transform"<<std::endl;
-        TransformType::Pointer transform = TransformType::New();  
-        itk::TransformFactory<TransformType>::RegisterTransform ();
-        itk::TransformFileReader::Pointer transformreader = itk::TransformFileReader::New();
-        transformreader->SetFileName( prolatefile );
-        transformreader->Update();
-        transform = dynamic_cast<TransformType*>( transformreader->GetTransformList()->front().GetPointer() );
-        std::cout << " Done." << std::endl;
-        
-        TransformType::Pointer inversetransform = TransformType::New();
-        transform->GetInverse (inversetransform);
-        
-        std::cout << "Reading backward field: " << displacementfieldfile << std::flush;  
-        DisplacementFileReaderType::Pointer    displacementreader = DisplacementFileReaderType::New();
-        displacementreader->SetFileName(displacementfieldfile);
-        try
-        {
-            displacementreader->Update();
-        }
-        catch(itk::ExceptionObject &e)
-        {
-            std::cerr << e << std::endl;
-            std::exit(EXIT_FAILURE);
-        }
-        std::cout << " Done." << std::endl;
-        DisplacementFieldType::Pointer displacementfield = displacementreader->GetOutput();
-        
-        InterpolatorType::Pointer interpolator = InterpolatorType::New();
-        interpolator->SetInputImage (displacementfield);
-        
-        DisplacementFieldType::Pointer outputimage = DisplacementFieldType::New();
-        outputimage->SetRegions (input->GetLargestPossibleRegion());
-        outputimage->SetOrigin(input->GetOrigin());
-        outputimage->SetSpacing(input->GetSpacing());  
-        outputimage->SetDirection(input->GetDirection());
-        outputimage->Allocate();
-        outputimage->FillBuffer (0.0);
-        
-        IteratorType itOut(outputimage, outputimage->GetLargestPossibleRegion());
-        ImageIteratorType itIn(input, input->GetLargestPossibleRegion());
-        
-        itk::ContinuousIndex<ScalarType, 3> index;
-        PointType x;
-        
-        DisplacementFieldType::DirectionType inversedirection (outputimage->GetDirection().GetTranspose());
-        
-        while(!itOut.IsAtEnd())
-        {
-            outputimage->TransformIndexToPhysicalPoint (itOut.GetIndex(), x);
-            bool isinside = displacementfield->TransformPhysicalPointToContinuousIndex (x, index);
-            
-            PointType coordinates;
-            for (unsigned int i=0; i<3; i++)
-                coordinates[i] = 0;
-            
-            if (isinside && itIn.Get())
-            {
-                DisplacementType d = interpolator->EvaluateAtContinuousIndex (index);
-                x += d;
-                
-                coordinates = transform->TransformPoint(x);                
-                coordinates = inversedirection * coordinates;
-            }
-            VectorType v;
-            for (unsigned int i=0; i<3; i++)                
-                v[i] = coordinates[i];
-            
-            itOut.Set (v);
-            ++itOut; ++itIn;
-        }
-        
-        std::cout << "Writing prolate coordinate map: " << outputfile <<"... "<<std::flush;
-        DisplacementFileWriterType::Pointer writer = DisplacementFileWriterType::New();
-        writer->SetFileName(outputfile);
-        writer->SetInput (outputimage);
-        try
-        {
-            writer->Update();
-        }
-        catch(itk::ExceptionObject &e)
-        {
-            std::cerr << e << std::endl;
-            std::exit(EXIT_FAILURE);
-        }
-        std::cout << " Done." << std::endl;
-        
-        return EXIT_SUCCESS;
+      displacementreader2->Update();
     }
+    catch(itk::ExceptionObject &e)
+    {
+      std::cerr << e << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+    std::cout << " Done." << std::endl;
     
+    inversedisplacementfield = displacementreader2->GetOutput();
+    
+    std::cout<<"reading transform "<<prolatefile<<"..."<<std::endl;
+    itk::TransformFactory<TransformType>::RegisterTransform ();
+    itk::TransformFileReader::Pointer transformreader = itk::TransformFileReader::New();
+    transformreader->SetFileName( prolatefile );
+    transformreader->Update();
+      
+    TransformType::Pointer transform = dynamic_cast<TransformType*>( transformreader->GetTransformList()->front().GetPointer() );
+    TransformType::Pointer transform_inverse = TransformType::New();
+    transform->GetInverse(transform_inverse);
+    std::cout << " Done." << std::endl;
+    
+    // create the output image geometry -> outputimage
+    Image4DType::Pointer outputimage = Image4DType::New();
+    Image4DType::RegionType region;
+    Image4DType::SizeType size;
+    Image4DType::SpacingType spacing;
+    Image4DType::PointType origin;
+    Image4DType::DirectionType direction;
+    direction.Fill (0.0);
+    
+    for (unsigned int i=0; i<3; i++)
+    {
+      size[i] = inputimage->GetLargestPossibleRegion().GetSize()[i];
+      spacing[i] = inputimage->GetSpacing()[i];
+      origin[i] = inputimage->GetOrigin()[i];
+      for (unsigned int j=0; j<3; j++)
+	direction[i][j] = inputimage->GetDirection()[i][j];
+    }
+    size[3] = 3;
+    spacing[3] = 1.0;
+    origin[3] = 0.0;
+    direction[3][3] = 1.0;
+    region.SetSize (size);
+    
+    outputimage->SetRegions (region);
+    outputimage->SetOrigin(origin);
+    outputimage->SetSpacing(spacing);  
+    outputimage->SetDirection(direction);
+    outputimage->Allocate();
+    outputimage->FillBuffer (0.0);
+    
+    itk::ImageRegionIterator<Image4DType> itOut (outputimage, outputimage->GetLargestPossibleRegion());
+    itk::ImageRegionIterator<ImageType> itIn  (inputimage,  inputimage->GetLargestPossibleRegion());
+    
+    itk::ContinuousIndex<ScalarType, 3> continuousindex;
+    Image4DType::IndexType outputindex;
+    ImageType::IndexType index;
+    
+    PointType x;
+    
+    DisplacementInterpolatorType::Pointer displacementinterpolator = DisplacementInterpolatorType::New();
+    displacementinterpolator->SetInputImage (inversedisplacementfield);
+      
+    while(!itIn.IsAtEnd())
+    {
+      if (!itIn.Get())
+      {
+	if(!itIn.IsAtEnd())
+	  ++itIn;
+	continue;
+      }
+      
+      inputimage->TransformIndexToPhysicalPoint (itIn.GetIndex(), x);
+      
+      bool isinside = displacementinterpolator->IsInsideBuffer (x);
+      if (!isinside)
+      {
+	if(!itIn.IsAtEnd())
+	  ++itIn;
+	continue;
+      }
+      inversedisplacementfield->TransformPhysicalPointToIndex (x, index);
+      inversedisplacementfield->TransformPhysicalPointToContinuousIndex (x, continuousindex);
+      DisplacementType d = displacementinterpolator->EvaluateAtContinuousIndex (continuousindex);
+      
+      x += d;
+      
+      PointType coordinates = transform->TransformPoint(x);
+      
+      for (unsigned int i=0; i<3; i++)
+	outputindex[i] = itIn.GetIndex()[i];
+      
+      for (unsigned int i=0; i<3; i++)
+      {
+	outputindex[3] = i;
+	itOut.SetIndex (outputindex);
+	itOut.Set (coordinates[i]);
+      }
+      ++itIn;
+    }
+    Image4DFileWriterType::Pointer writer = Image4DFileWriterType::New();
+    writer->SetInput (outputimage);
+    writer->SetFileName (outputfile);
+    writer->Update();
+    
+    
+    return EXIT_SUCCESS;
+  }
+  
 }
