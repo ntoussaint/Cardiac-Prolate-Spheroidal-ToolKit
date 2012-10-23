@@ -181,7 +181,7 @@ namespace itk
     typename PixelContainer::Iterator logit    = logpixels->Begin();
     typename PixelContainer::ConstIterator inputit = inputpixels->Begin();
     typename PixelContainer::Iterator it       = pixels->Begin();
-
+    
     while( it != pixels->End() )
     {
       if (!logit.Value().IsFinite() || logit.Value().HasNans())
@@ -191,10 +191,10 @@ namespace itk
 	// allowed
     	it.Value() = logit.Value().Sqrt();
 
-	// Normalize by the norm of the initial tensor to stabilize the
-	// system when close to zero.
+	// The norm of the inertia tensors is very small, artificially increase
+	// it by a ad hoc factor 
 	// not allowed
-	ScalarType factor = inputit.Value().GetNorm() / it.Value().GetNorm();      
+	ScalarType factor = 70.0;      
 	it.Value() = factor * it.Value();
       }
       
