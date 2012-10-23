@@ -98,14 +98,6 @@ namespace itk
 	t2 = this->vec2tensor (gradl.get_row (1)),
 	t3 = this->vec2tensor (gradl.get_row (2));
 
-      std::cout<< "gradient tensors' norms : "
-	       << t1.GetNorm() <<" - "
-	       << t2.GetNorm() <<" - "
-	       << t3.GetNorm()
-	       << std::endl;
-      getchar();
-      
-      
       output1->SetPointData (index, t1);
       output2->SetPointData (index, t2);
       output3->SetPointData (index, t3);
@@ -293,6 +285,13 @@ namespace itk
       // system when close to zero.
       // ScalarType factor = inputit.Value().GetNorm();
       ScalarType factor = 1.0;
+      
+      std::cout<< "gradient tensors' norms : "
+	       << it1.Value().GetNorm() <<" - "
+	       << it2.Value().GetNorm() <<" - "
+	       << it3.Value().GetNorm()
+	       << std::endl;
+      getchar();
       
       if (!logit1.Value().IsFinite() || logit1.Value().HasNans())
 	std::cout<<"T1 is given not finite at "<<logit1.Value()<<std::endl;
