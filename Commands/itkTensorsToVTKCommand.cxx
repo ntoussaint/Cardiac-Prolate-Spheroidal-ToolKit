@@ -26,7 +26,8 @@ namespace itk
     m_LongDescription = m_ShortDescription;
     m_LongDescription += "\n\nUsage:\n";
     m_LongDescription +="-i  [input tensor  image (or list of images (.list))]\n";    
-    m_LongDescription +="-m  [optional mask image]\n";    
+    m_LongDescription +="-m  [optional mask image]\n";
+    m_LongDescription +="-v  [output vectors instead of tensors (default 0)]\n";
     m_LongDescription +="-o  [output tensor mesh structure (vtk format)]\n";    
   }
 
@@ -46,6 +47,7 @@ namespace itk
     const char* input = cl.follow("nofile",2,"-I","-i");
     const char* output = cl.follow("nofile",2,"-O","-o");
     const char* mask = cl.follow("nofile",2,"-O","-o");
+    const bool vectors = cl.follow(0,2,"-V","-v");
     
     std::cout << "Processing itk-vtk convert with following arguments: " << std::endl;
     std::cout << "input: " << input << std::endl;
@@ -60,9 +62,11 @@ namespace itk
     typedef TensorImageType::PixelType                                     TensorType;
     typedef itk::ImageRegionIterator<TensorImageType>                      TensorIteratorType;
     typedef itk::Matrix<ScalarType, 3, 3>                                  MatrixType;
-    typedef itk::Vector<double, 3>                                         DisplacementType;
+    typedef itk::Vector<double, 3>                                         VectorType;
+    typedef VectorType                                                     DisplacementType;
     typedef TensorImageType::PointType                                     PointType;
     typedef std::vector<TensorType> TensorArrayType;
+    typedef std::vector<VectorType> VectorArrayType;
     typedef std::vector<PointType> PointArrayType;
     typedef itk::Image<unsigned short, 3> ImageType;
     typedef itk::ImageFileReader<ImageType> ImageReaderType;
@@ -120,9 +124,8 @@ namespace itk
     else
       filelist.push_back (inputstring);
     
-    
-    
     TensorArrayType vecT;
+    VectorArrayType vecV;
     PointArrayType vecP;
     
     for (unsigned int N=0; N<filelist.size(); N++)
@@ -165,6 +168,7 @@ namespace itk
 	  for (unsigned int j=0; j<3; j++)
 	    x[j] = dataset->GetPoint (i)[j];
 	  TensorType T;
+	  VectorType V;
 	  double* vals = dataset->GetPointData()->GetTensors()->GetTuple (i);
 	  
 	  T[0] = vals[0];
@@ -174,7 +178,12 @@ namespace itk
 	  T[4] = vals[5];
 	  T[5] = vals[8];
 	  
+	  V = T.GetEigenvector (2);
+	  V.Normalize();
+	  
 	  vecT.push_back(T);
+	  vecV.push_back (V);
+	  
 	  vecP.push_back(x);
 	}
 	
@@ -193,6 +202,7 @@ namespace itk
 	tensorimage->TransformIndexToPhysicalPoint(it.GetIndex(), x);
 	
 	TensorType T = it.Get();
+	VectorType V;
 	
 	bool isinside = 1;
 	
@@ -210,7 +220,11 @@ namespace itk
 	if (isinside && (T.GetTrace() > 0.0) && !T.HasNans())
 	{	
 	  T = T.ApplyMatrix(tensorimage->GetDirection());
+	  V = T.GetEigenvector (2);
+	  V.Normalize();
+	  
 	  vecT.push_back(T);
+	  vecV.push_back(V);
 	  vecP.push_back(x);
 	}
 	++it;
@@ -219,11 +233,16 @@ namespace itk
     }
     
     vtkUnstructuredGrid* crossvalidation = vtkUnstructuredGrid::New();
-    vtkDoubleArray* data = vtkDoubleArray::New();
+    vtkDoubleArray* data1 = vtkDoubleArray::New();
+    vtkDoubleArray* data2 = vtkDoubleArray::New();
+    
     vtkPoints* points = vtkPoints::New();
     points->SetNumberOfPoints (vecP.size());
-    data->SetNumberOfComponents (9);
-    data->SetNumberOfTuples (vecP.size());
+    
+    data1->SetNumberOfComponents (9);
+    data1->SetNumberOfTuples (vecP.size());
+    data2->SetNumberOfComponents (3);
+    data2->SetNumberOfTuples (vecP.size());
     
     for (unsigned int i=0; i<vecP.size(); i++)
     {
@@ -232,22 +251,32 @@ namespace itk
 		      vecP[i][2]};
       
       points->SetPoint (i, pt);
-      double vals[9];
-      vals[0] = vecT[i][0];
-      vals[1] = vecT[i][1];
-      vals[2] = vecT[i][3];
-      vals[3] = vecT[i][1];
-      vals[4] = vecT[i][2];
-      vals[5] = vecT[i][4];
-      vals[6] = vecT[i][3];
-      vals[7] = vecT[i][4];
-      vals[8] = vecT[i][5];
       
-      data->SetTuple (i, vals);
+      double vals1[9];
+      vals1[0] = vecT[i][0];
+      vals1[1] = vecT[i][1];
+      vals1[2] = vecT[i][3];
+      vals1[3] = vecT[i][1];
+      vals1[4] = vecT[i][2];
+      vals1[5] = vecT[i][4];
+      vals1[6] = vecT[i][3];
+      vals1[7] = vecT[i][4];
+      vals1[8] = vecT[i][5];
+      
+      double vals2[3];      
+      vals2[0] = vecV[i][0];
+      vals2[1] = vecV[i][1];
+      vals2[2] = vecV[i][2];
+      
+      data1->SetTuple (i, vals1);
+      data2->SetTuple (i, vals2);
     }
     
     crossvalidation->SetPoints (points);
-    crossvalidation->GetPointData()->SetTensors (data);
+    if (vectors)
+      crossvalidation->GetPointData()->SetVectors (data2);
+    else
+      crossvalidation->GetPointData()->SetTensors (data1);
     
     vtkDataSetWriter* writer = vtkDataSetWriter::New();
     writer->SetFileName (output);
@@ -256,7 +285,9 @@ namespace itk
     
     writer->Delete();
     points->Delete();
-    data->Delete();
+    data1->Delete();
+    data2->Delete();
+    
     crossvalidation->Delete();
     
     std::cout<<" done."<<std::endl;    

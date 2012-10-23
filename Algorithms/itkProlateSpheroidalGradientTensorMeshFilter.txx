@@ -97,6 +97,14 @@ namespace itk
 	t1 = this->vec2tensor (gradl.get_row (0)),
 	t2 = this->vec2tensor (gradl.get_row (1)),
 	t3 = this->vec2tensor (gradl.get_row (2));
+
+      std::cout<< "gradient tensors' norms : "
+	       << t1.GetNorm() <<" - "
+	       << t2.GetNorm() <<" - "
+	       << t3.GetNorm()
+	       << std::endl;
+      getchar();
+      
       
       output1->SetPointData (index, t1);
       output2->SetPointData (index, t2);
