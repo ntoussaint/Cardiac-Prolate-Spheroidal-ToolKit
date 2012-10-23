@@ -49,6 +49,8 @@ namespace itk
     m_LongDescription += "-f2   [backward displacement field (default : backward.mha)]\n";  
     m_LongDescription += "-o    [output structure tensor field]\n";
     m_LongDescription += "-f    [gradient evaluation factor (default=1.0)]\n";
+    m_LongDescription += "-th   [wall thickness in mm (default=12.0)]\n";
+    m_LongDescription += "-ma   [wall max angle in deg. (default=95.0)]\n";
   }
 
   TensorMeshStructureCommand::~TensorMeshStructureCommand()
