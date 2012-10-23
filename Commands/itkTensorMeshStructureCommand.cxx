@@ -96,7 +96,9 @@ namespace itk
     const char* displacementfieldfile        = cl.follow("forward.mha",2,"-f1","-F1");
     const char* inversedisplacementfieldfile = cl.follow("backward.mha",2,"-f2","-F2");
     const char* outputfile                   = cl.follow("output.mha",2,"-o","-O");
-    const double factor                   = cl.follow(1.0,2,"-f","-F");
+    const double factor                      = cl.follow(1.0,2,"-f","-F");
+    const double thickness                   = cl.follow(12,2,"-th","-th");
+    const double maxangle                    = cl.follow(95,2,"-ma","-MA");
   
     std::cout << "inputfile: \t\t\t" << inputfile << std::endl;
     std::cout << "factor: \t\t\t" << factor << std::endl;
@@ -298,6 +300,8 @@ namespace itk
     zonelimiter->SetDisplacementField (displacementfield);
     zonelimiter->SetInverseDisplacementField (inversedisplacementfield);
     zonelimiter->CanineDivisionsOff();
+    zonelimiter->SetVentricleSizes (thickness, maxangle * vnl_math::pi / 180.0);
+    
     zonelimiter->SetAHASegmentationType (AHALimiterType::AHA_17_ZONES);
     std::cout<<"done."<<std::endl;
 
