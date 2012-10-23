@@ -189,10 +189,14 @@ namespace itk
       // ScalarType factor = inputit.Value().GetNorm();
       ScalarType factor = 1.0;
       
-      if (!it.Value().IsFinite() || it.Value().HasNans())
-    	std::cout<<"T is given not finite at "<<it.Value()<<std::endl;
+      if (!logit.Value().IsFinite() || logit.Value().HasNans())
+    	std::cout<<"log(T) is given not finite at "<<logit.Value()<<std::endl;
       else
+      {
     	it.Value() = 100.0 * logit.Value();
+	it.Value() = it.Value().Sqrt();
+      }
+      
       // else
       // 	it.Value() = factor * logit.Value().Exp();
 
