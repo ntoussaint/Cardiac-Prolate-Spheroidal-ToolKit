@@ -73,12 +73,6 @@ namespace itk
     m_LogGradient2->GetPointData (index, &g2);
     m_LogGradient3->GetPointData (index, &g3);
     
-    std::cout<< "gradient tensors' norms : "
-	     << g1.GetNorm() <<" - "
-	     << g2.GetNorm() <<" - "
-	     << g3.GetNorm()
-	     << std::endl;
-    getchar();
       
     // If the input gradients are close to zero, the system is exploding
     // ending with [inf] structure tensors
@@ -95,6 +89,11 @@ namespace itk
       
       InternalMatrixType T = gradl * gradl.transpose();
       out.SetVnlMatrix (T);
+
+      
+      std::cout<< "gradient tensor's : \n" << out <<std::endl;
+      getchar();
+
       // if you want the 1st eigenvector of the covariance
       // of the structure tensor : you can try this :
       // InternalMatrixType T = gradl.transpose() * gradl;
