@@ -98,6 +98,9 @@ CreateCpstkCommand(ForwardTransformMesh
 CreateCpstkCommand(ForwardTransformImage
   "image2pss" "Transform a scalar image in a Prolate Spheroidal Coordinates box"
   )
+CreateCpstkCommand(BackwardTransformImage
+  "pss2image" "Transform Prolate Spheroidal Coordinates box into a scalar image"
+  )
 CreateCpstkCommand(BackwardTransformMesh
   "backward" "Transform a tensor image or mesh from Prolate Spheroidal Coordinates"
   )

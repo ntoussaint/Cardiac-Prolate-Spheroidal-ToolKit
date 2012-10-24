@@ -42,6 +42,7 @@
 #include "itkForwardTransformMeshCommandFactory.h"
 #include "itkForwardTransformImageCommandFactory.h"
 #include "itkBackwardTransformMeshCommandFactory.h"
+#include "itkBackwardTransformImageCommandFactory.h"
 #include "itkReorderDWIsCommandFactory.h"
 #include "itkCropImageCommandFactory.h"
 
@@ -78,6 +79,7 @@ int main (int narg, char *args[])
   itk::ForwardTransformMeshCommandFactory::RegisterOneFactory();
   itk::ForwardTransformImageCommandFactory::RegisterOneFactory();
   itk::BackwardTransformMeshCommandFactory::RegisterOneFactory();
+  itk::BackwardTransformImageCommandFactory::RegisterOneFactory();
   itk::CreateProlateCoordinateImageCommandFactory::RegisterOneFactory();
   itk::ReorderDWIsCommandFactory::RegisterOneFactory();
   itk::CropImageCommandFactory::RegisterOneFactory();

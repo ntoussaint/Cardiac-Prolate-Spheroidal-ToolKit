@@ -1,10 +1,10 @@
-#include "itkForwardTransformImageCommand.h"
+#include "itkBackwardTransformImageCommand.h"
 
 #include "itkProlateSpheroidalTransformTensorMeshFilter.h"
 
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
-
+#include <itkMinimumMaximumImageCalculator.h>
 #include "itkTransformFileReader.h"
 #include "itkTransformFactory.h"
 #include <itksys/SystemTools.hxx>
@@ -20,24 +20,21 @@
 namespace itk
 {
 
-  ForwardTransformImageCommand::ForwardTransformImageCommand()
+  BackwardTransformImageCommand::BackwardTransformImageCommand()
   {
-    m_ShortDescription = "Transform a scalar image in a Prolate Spheroidal Coordinates box";
+    m_ShortDescription = "Transform Prolate Spheroidal Coordinates box into a scalar image";
     m_LongDescription = m_ShortDescription;
     m_LongDescription += "\n\nUsage:\n";
     m_LongDescription +="-i    [input scalar image (default : input.mha)]\n";    
     m_LongDescription +="-pr   [prolate transform used]\n";
-    m_LongDescription +="-f    [FORWARD displacement field (default : forward.mha)]\n";
+    m_LongDescription +="-f    [BACKWARD displacement field (default : forward.mha)]\n";
     m_LongDescription +="-o    [output image in prolate coordinates]\n";    
-    m_LongDescription +="-w    [wall thickness in mm (default: 12 )]\n";
-    m_LongDescription +="-a    [basal angle in deg. (default: 95 deg.)]\n";
-    m_LongDescription +="-so    [override the output spacing to ease visualization. (default: 0)]\n";
   }
 
-  ForwardTransformImageCommand::~ForwardTransformImageCommand()
+  BackwardTransformImageCommand::~BackwardTransformImageCommand()
   {}
 
-  int ForwardTransformImageCommand::Execute (int narg, const char* arg[])
+  int BackwardTransformImageCommand::Execute (int narg, const char* arg[])
   {
     
     GetPot cl(narg, const_cast<char**>(arg)); // argument parser
@@ -49,12 +46,9 @@ namespace itk
     
     const char* inputfile                    = cl.follow("input.mha",2,"-i","-I");
     const char* prolatefile                  = cl.follow("prolate.lms",2,"-pr","-PR");
-    const char* displacementfieldfile        = cl.follow("forward.mha",2,"-f","-F");
+    const char* displacementfieldfile        = cl.follow("backward.mha",2,"-f","-F");
     const char* outputfile                   = cl.follow("output.csv",2,"-o","-O");
-    const double thickness                   = cl.follow(12.0,2,"-w","-W");
-    const double maxangle                    = cl.follow(95.0,2,"-a","-A");  
-    const bool spacingoverride               = cl.follow(false,2,"-so","-SO");  
-   
+    
     // typedefs
     typedef double                                                         ScalarType;
     typedef itk::Image<ScalarType,3>                                       ImageType;
@@ -67,6 +61,7 @@ namespace itk
     typedef TransformType::InputPointType                                  PointType;
     typedef VectorLinearInterpolateImageFunction<DisplacementFieldType,ScalarType> DisplacementInterpolatorType;
     typedef itk::LinearInterpolateImageFunction<ImageType, ScalarType>  InterpolatorType;
+    typedef itk::MinimumMaximumImageCalculator<ImageType> CalculatorType;
     
     std::cout<<"reading input : "<<inputfile<<std::endl;
     ImageReaderType::Pointer reader = ImageReaderType::New();
@@ -74,13 +69,13 @@ namespace itk
     reader->Update();  
     ImageType::Pointer inputimage = reader->GetOutput();
     std::cout<<" Done."<<std::endl;
-
+    
     // instantiation
     DisplacementFileReaderType::Pointer    displacementreader1    = DisplacementFileReaderType::New();
     // read the displacement field images
     DisplacementFieldType::Pointer displacementfield = NULL;
 
-    std::cout << "Reading forward field: " << displacementfieldfile << std::flush;
+    std::cout << "Reading backward field: " << displacementfieldfile << std::flush;
     displacementreader1->SetFileName(displacementfieldfile);
     try
     {
@@ -106,49 +101,18 @@ namespace itk
     transform->GetInverse(transform_inverse);
     std::cout << " Done." << std::endl;
 
-    
-    // define the future box boundaries :
-
-    double mu1 = asinh ((transform->GetLambda2() - thickness/2.0) / transform->GetSemiFociDistance());
-    double mu2 = asinh ((transform->GetLambda2() + thickness/2.0) / transform->GetSemiFociDistance());
-    double nu1 = 0.0;
-    double nu2 = maxangle * vnl_math::pi / 180.0;
-    
-    double PSS_box_bounds[3][2];
-    PSS_box_bounds[0][0] = mu1 - 0.1; // the +- 0.1 are to allow a bit of room to "visualize" the epicardial-endocardial walls
-    PSS_box_bounds[0][1] = mu2 + 0.1; // the +- 0.1 are to allow a bit of room to "visualize" the epicardial-endocardial walls
-    
-    PSS_box_bounds[1][0] = nu1;
-    PSS_box_bounds[1][1] = nu2;
-    
-    PSS_box_bounds[2][0] = 0.0;
-    PSS_box_bounds[2][1] = 2.0 * vnl_math::pi;
-
-    // define the future box size :
-
-    unsigned int PSS_box_size[3];
-    
-    PSS_box_size[0] = 75;
-    PSS_box_size[1] = 150;
-    PSS_box_size[2] = 150;
-    
-    
     // create the output image geometry -> outputimage
-    
+    // we take the bounds of the displacement field,
+    // they should englobe the LV.
     ImageType::DirectionType direction;
-    direction.SetIdentity();
     ImageType::PointType origin;
     ImageType::SpacingType spacing;
     ImageType::RegionType region;
     ImageType::SizeType size;
-    origin[0] = PSS_box_bounds[0][0];
-    origin[1] = PSS_box_bounds[1][0];
-    origin[2] = PSS_box_bounds[2][0];
-    size[0] = PSS_box_size[0];
-    size[1] = PSS_box_size[1];
-    size[2] = PSS_box_size[2];
-    for (unsigned int i=0; i<3; i++)
-      spacing[i] = (double)(PSS_box_bounds[i][1] - PSS_box_bounds[i][0])/(double)(PSS_box_size[i] - 1);
+    direction = displacementfield->GetDirection();
+    origin = displacementfield->GetOrigin();
+    spacing = displacementfield->GetSpacing();
+    size = displacementfield->GetLargestPossibleRegion().GetSize();
     region.SetSize (size);
     ImageType::Pointer outputimage = ImageType::New();
     outputimage->SetRegions (region);
@@ -160,10 +124,10 @@ namespace itk
 
     // iterate and fill the image
     
-    // for each point in the prolate spheroidal output image xi, do
-    // p = phi-1 * psi-1 (xi)
-    // ask input image the scalar value at p
-    // put the value in output prolate spheroidal image at xi
+    // for each point in the cartesian output image p, do
+    // xi = psi * phi (p)
+    // ask input image the scalar value at xi
+    // put the value in output cartesian image at p
     
     itk::ImageRegionIterator<ImageType> itOut (outputimage, outputimage->GetLargestPossibleRegion());
     itk::ImageRegionIterator<ImageType> itIn  (inputimage,  inputimage->GetLargestPossibleRegion());
@@ -179,26 +143,17 @@ namespace itk
     {
       ImageType::PixelType value = static_cast<ImageType::PixelType>(0.0);
       
-      outputimage->TransformIndexToPhysicalPoint (itOut.GetIndex(), xi);
-      p1 = transform_inverse->TransformPoint (xi); // psi-1 operator
+      outputimage->TransformIndexToPhysicalPoint (itOut.GetIndex(), p1);
       if (displacementinterpolator->IsInsideBuffer (p1))
       {
-	p2 = p1 + displacementinterpolator->Evaluate (p1); // phi-1 operator
-	
-	if (interpolator->IsInsideBuffer (p2))
-	  value = interpolator->Evaluate (p2); // ask the input image its value at p2 and put it in the box
+	p2 = p1 + displacementinterpolator->Evaluate (p1); // phi operator	
       }
+      xi = transform->TransformPoint (p2); // psi operator
+      if (interpolator->IsInsideBuffer (xi))
+	value = interpolator->Evaluate (xi); // ask the input image its value at p2 and put it in the box
+      
       itOut.Set (value);
       ++itOut;
-    }
-    
-    // to trick the spacing so that the image is more viewable...
-    if (spacingoverride)
-    {
-      spacing[0] *= 200;
-      spacing[1] *= 90;
-      spacing[2] *= 30;
-      outputimage->SetSpacing (spacing);
     }
     
     std::cout<<"Writing..."<<std::endl;
