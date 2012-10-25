@@ -128,10 +128,9 @@ namespace itk
 
     unsigned int PSS_box_size[3];
     
-    PSS_box_size[0] = 75;
+    PSS_box_size[0] = 50;
     PSS_box_size[1] = 150;
-    PSS_box_size[2] = 150;
-    
+    PSS_box_size[2] = 250;
     
     // create the output image geometry -> outputimage
     
