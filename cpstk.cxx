@@ -45,6 +45,7 @@
 #include "itkBackwardTransformImageCommandFactory.h"
 #include "itkReorderDWIsCommandFactory.h"
 #include "itkCropImageCommandFactory.h"
+#include "itkPaintTensorImageWithAngleCommandFactory.h"
 
 #include "itkCommandObjectFactory.h"
 #include "cpstkConfigure.h"
@@ -83,6 +84,7 @@ int main (int narg, char *args[])
   itk::CreateProlateCoordinateImageCommandFactory::RegisterOneFactory();
   itk::ReorderDWIsCommandFactory::RegisterOneFactory();
   itk::CropImageCommandFactory::RegisterOneFactory();
+  itk::PaintTensorImageWithAngleCommandFactory::RegisterOneFactory();
 
   GetPot cl(narg, const_cast<char**>(args)); // argument parser
   if( cl.size() == 1 || cl.search(2, "--help", "-h") )

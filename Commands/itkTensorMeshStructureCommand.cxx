@@ -349,12 +349,13 @@ namespace itk
       if (zone->GetNumberOfPoints())
       {
 	t /= static_cast<ScalarType> (zone->GetNumberOfPoints());
-	t = t.Exp();	
+	t = t.Exp();
+	// This sqrt is definitely artificial... it's for visual purposes...
+	t = t.Sqrt();
 	// The norm of the inertia tensors is very small, artificially increase
 	// it by a ad hoc factor 
 	// not allowed
 	ScalarType adhocfactor = 70.0;  
-	t = t.Sqrt();
 	t *= adhocfactor;
       }
 

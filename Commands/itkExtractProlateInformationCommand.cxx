@@ -393,7 +393,7 @@ namespace itk
 	  case 0:
 	  default:
 	    helix = mainvectorprolate[1];
-	    if (mainvectorprolate[2] < 0) helix = -helix;
+	    if (mainvectorprolate[2] > 0) helix = -helix;
 	    helix = std::asin(helix) * 180.0 / vnl_math::pi;
 	    os << helix;
 	    break;

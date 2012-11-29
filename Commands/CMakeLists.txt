@@ -116,6 +116,9 @@ CreateCpstkCommand(ReorderDWIs
 CreateCpstkCommand(CropImage
   "crop" "crop a 3D or 4D image to a certain diameter around the central long axis"
   )
+CreateCpstkCommand(PaintTensorImageWithAngle
+  "paint" "paint"
+  )
 
 add_library(CPSTKCommands ${CPSTK_BUILD_TYPE}
   ${CPSTK_COMMAND_SRCS}
