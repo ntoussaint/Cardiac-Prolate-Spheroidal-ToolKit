@@ -76,7 +76,6 @@ namespace itk
       std::cout  << std::endl << this->GetLongDescription() << std::endl;
       return -1;
     }
-
     
     const char* inputfile                    = cl.follow("input.vtk",2,"-i","-I");
     const char* prolatefile                  = cl.follow("prolate.lms",2,"-pr","-PR");
@@ -101,7 +100,6 @@ namespace itk
     else if (std::strcmp (typestring,"h3") == 0 )         type = 10;
     else if (std::strcmp (typestring,"l2") == 0 )         type = 11;
     else if (std::strcmp (typestring,"ta") == 0 )         type = 12;
-
     
     std::cout<<"computing the extraction of ";
     switch(type)
@@ -294,7 +292,7 @@ namespace itk
     zonelimiter->SetAHASegmentationType (AHALimiterType::AHA_17_ZONES);
     zonelimiter->SetTransform (transform);
     zonelimiter->SetInverseDisplacementField (inversedisplacementfield);
-    zonelimiter->CanineDivisionsOff();
+    zonelimiter->CanineDivisionsOn();
     
     if (tensorimage)
     {

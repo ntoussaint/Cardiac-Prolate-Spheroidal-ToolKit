@@ -177,7 +177,7 @@ namespace itk
        Set the center point of the ellipsoid separately. Of course it has to be in Cartesian
        coordinates - as the center point has [0,0,0] as Prolate Spheroidal coordinates by definition.
     */
-    void SetCenter (PointType point)
+    virtual void SetCenter (PointType point)
     {
       m_Center = point;
       this->ComputeTransformation();
@@ -186,7 +186,7 @@ namespace itk
        Set the long axis point of the ellipsoid separately. Of course it has to be in Cartesian
        coordinates - as the center point has [0,0,0] as Prolate Spheroidal coordinates by definition.
     */
-    void SetLongAxisPoint (PointType point)
+    virtual void SetLongAxisPoint (PointType point)
     {
       m_LongAxisPoint = point;
       this->ComputeTransformation();
@@ -195,7 +195,7 @@ namespace itk
        Set the short axis point of the ellipsoid separately. Of course it has to be in Cartesian
        coordinates.
     */
-    void SetShortAxisPoint (PointType point)
+    virtual void SetShortAxisPoint (PointType point)
     {
       m_ShortAxisPoint = point;
       this->ComputeTransformation();
@@ -220,7 +220,7 @@ namespace itk
        \arg The semi-foci distance \f$f_{1/2}\f$, half of distance between the 2 foci, is also the linear eccentricity \f$l = \sqrt{a^2 - b^2}}\f$.
        \arg The eccentricity : \f$ e = \frac{\sqrt{a^2 - b^2}}{a} = l / a\f$.
     */
-    void DefineEllipsoid (PointType center,
+    virtual void DefineEllipsoid (PointType center,
 			  PointType longaxispoint,
 			  PointType shortaxispoint)
     {
@@ -231,13 +231,13 @@ namespace itk
     }
     
     /**  Method to transform a point. */
-    OutputPointType     TransformPoint(const InputPointType  & ) const;
+    virtual OutputPointType     TransformPoint(const InputPointType  & ) const;
     /**  Method to transform a vector. */
-    OutputVectorType    TransformVector(const InputVectorType &, const InputPointType &) const;
+    virtual OutputVectorType    TransformVector(const InputVectorType &, const InputPointType &) const;
     /**  Method to transform a vnl_vector. */
-    OutputVnlVectorType TransformVector(const InputVnlVectorType &, const InputPointType &) const;
+    virtual OutputVnlVectorType TransformVector(const InputVnlVectorType &, const InputPointType &) const;
     /**  Method to transform a CovariantVector. */
-    OutputCovariantVectorType TransformCovariantVector(const InputCovariantVectorType &, const InputPointType &) const;    
+    virtual OutputCovariantVectorType TransformCovariantVector(const InputCovariantVectorType &, const InputPointType &) const;    
     /**
      * Set the transformation parameters and update internal transformation.
      * SetParameters gives the transform the option to set it's
@@ -251,7 +251,7 @@ namespace itk
      * \sa SetParametersByValue
      * 
     */
-    void SetParameters( const ParametersType & );
+    virtual void SetParameters( const ParametersType & );
     
     /**
      * Set the transformation parameters and update internal transformation. 
@@ -266,27 +266,27 @@ namespace itk
      * \sa SetParameters
      *
     */
-    void SetParametersByValue ( const ParametersType & p );
+    virtual void SetParametersByValue ( const ParametersType & p );
 
     /**
      * Get the Transformation Parameters.
      * In our case the parameters correspond to the cartesian coordinates of succesively
      * the center, the long axis and the long axis points of the ellipsoid.
      */
-    const ParametersType& GetParameters(void) const
+    virtual const ParametersType& GetParameters(void) const
     { 
       return this->m_Parameters; 
     }
     
     /** Set the fixed parameters and update internal transformation. */
-    void SetFixedParameters( const ParametersType &t ) 
+    virtual void SetFixedParameters( const ParametersType &t ) 
     {
       if (t.GetSize())
 	itkWarningMacro( << "There is no fixed parameters in a ProlateSpheroidalTransform" );
     }
 
     /** Get the Fixed Parameters. */
-    const ParametersType& GetFixedParameters(void) const
+    virtual const ParametersType& GetFixedParameters(void) const
     {
       return this->m_FixedParameters;
     }
@@ -319,27 +319,23 @@ namespace itk
        *
        * \f]
        */
-    JacobianType & GetJacobian(const InputPointType  &) const;
+    virtual JacobianType & GetJacobian(const InputPointType  &) const;
     /**
        Get the jacobian of the transformation with respect to the coordinates at a specific point
        
        It can also be seen in our case as a local contravariant basis, 
     */
-    vnl_matrix_fixed<TPixelType,3,3> GetJacobianWithRespectToCoordinates(const InputPointType  &) const;
-    /**
-       Get the jacobian determinant of transformation with respect to the coordinates at a specific point
-    */
-    ScalarType GetJacobianDeterminantWithRespectToCoordinates(const InputPointType  &) const;
+    virtual vnl_matrix_fixed<TPixelType,3,3> GetJacobianWithRespectToCoordinates(const InputPointType  &) const;
     /**
        Get the inverse of this transform
     */
-    bool GetInverse( Self* inverse) const;
+    virtual bool GetInverse( Self* inverse) const;
     
     /**
        Set the transform to identity. Basically remove (and unregister)
        the displacement field from the transform
     */
-    void SetIdentity(void);
+    virtual void SetIdentity(void);
     
     
     /**
@@ -348,7 +344,7 @@ namespace itk
        
        T( a*P + b*Q ) = a * T(P) + b * T(Q)
     */
-    bool IsLinear() const { return true; }
+    virtual bool IsLinear() const { return true; }
     
     /**
        from an input point \arg x (in Cartesian if Forward / in Prolate if !forward),
@@ -375,7 +371,7 @@ namespace itk
        calculation, resulting in a possible numerical error, and inducing the non-orthogonality of the
        basis.       
     */
-    void EvaluateLocalBasis(InputPointType x,
+    virtual void EvaluateLocalBasis(InputPointType x,
 			    VectorType &n,
 			    VectorType &a,
 			    VectorType &d) const;
@@ -394,7 +390,7 @@ namespace itk
        and then the transformation InternalTransform iis used to go from zero-centered ellipsoid
        to the true point in space.
     */
-    PointType ToCartesian(PointType xsi) const;
+    virtual PointType ToCartesian(PointType xsi) const;
     /**
        Not as easy as it seems...
 
@@ -413,10 +409,10 @@ namespace itk
 
        \f$\xi^3\f$ is simply derived from the projection of the cartesian point onto the plane \f$(x(1), x(2))\f$, i.e. \f$\xi^3 = \arccos \left( \frac{x(1)}{\|x\|} \right) \f$.
     */
-    PointType ToProlate(PointType x) const;
+    virtual PointType ToProlate(PointType x) const;
 
-    VectorType ToCartesian (VectorType v, PointType p) const;
-    VectorType ToProlate (VectorType v, PointType p) const;
+    virtual VectorType ToCartesian (VectorType v, PointType p) const;
+    virtual VectorType ToProlate (VectorType v, PointType p) const;
     
     /// Recover the spheroid first eigenvalue
     itkGetMacro (Lambda1, double);
@@ -451,7 +447,7 @@ namespace itk
        \right) 
        \f$
     */
-    void EvaluateScaleFactors (double xsi[3], double h[3]) const;
+    virtual void EvaluateScaleFactors (double xsi[3], double h[3]) const;
 
     /**
        Evaluate ellipsoid equation. The implicit function that is evaluated here is :
@@ -460,7 +456,7 @@ namespace itk
        \f$
        The argument is a Point in Cartesian coordinates
     */
-    double EvaluateFunction(PointType x) const;
+    virtual double EvaluateFunction(PointType x) const;
     /**
        Evaluate ellipsoid equation. The implicit function that is evaluated here is :
        \f$
@@ -468,7 +464,7 @@ namespace itk
        \f$
        The argument is a Point in Cartesian coordinates
     */
-    double EvaluateFunction(double x[3]) const;
+    virtual double EvaluateFunction(double x[3]) const;
     /**
        Evaluate ellipsoid implicit function gradient. It is estimated in the centered ellipsoid
        coordinate system (point is transformed using InternalTransformInverse), with the coefficients
@@ -500,42 +496,10 @@ namespace itk
 
        \f]
     */
-    void EvaluateGradient(PointType x, VectorType &n) const;
-    /**
-       Evaluate ellipsoid implicit function gradient. It is estimated in the centered ellipsoid
-       coordinate system (point is transformed using InternalTransformInverse), with the coefficients
-       of the ellipsoid. The argument is a Point in Cartesian coordinates \f$x\f$.
-       \f[
-       g_1 = 
-       2 
-       \left(
-       \begin{array}{ccc}
-       a^{-2} x(0) \\
-       b^{-2} x(1) \\
-       c^{-2} x(2)
-       \end{array}
-       \right)
-       \f]
+    virtual void EvaluateGradient(PointType x, VectorType &n) const;
 
-       It also corresponds to the first contravariant vector.
-
-       \f[
-
-       g_1 =
-       \left(
-       \begin{array}{ccc}
-       cosh({\xi}^1) sin({\xi}^2) cos({\xi}^3) \\
-       cosh({\xi}^1) sin({\xi}^2) sin({\xi}^3) \\
-       sinh({\xi}^1) cos({\xi}^2)
-       \end{array}
-       \right) 
-
-       \f]
-    */
-    void EvaluateGradient(double x[3], double n[3]) const;
-
-    double EstimateGeodesicLength1(PointType xi, VectorType dxi, unsigned int divisions) const;
-    double EstimateGeodesicLength2(PointType xi, VectorType dxi, unsigned int divisions) const;
+    virtual double EstimateGeodesicLength1(PointType xi, VectorType dxi, unsigned int divisions) const;
+    virtual double EstimateGeodesicLength2(PointType xi, VectorType dxi, unsigned int divisions) const;
     
   protected:
 
@@ -544,7 +508,7 @@ namespace itk
     
     void PrintSelf(std::ostream& os, Indent indent) const;
 
-    void ComputeTransformation (void);
+    virtual void ComputeTransformation (void);
     
     PointType m_Center;
     PointType m_LongAxisPoint;
