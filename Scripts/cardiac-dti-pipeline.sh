@@ -1,6 +1,6 @@
 #/usr/bin/bash
 
-crop-preparation.sh 85 prolatetransform.tr
+crop-preparation.sh 100 prolatetransform.tr
 reorder-register-estimate.sh 3 0.3 domain.mha
 
 for file in *-tensors-tr.mha
