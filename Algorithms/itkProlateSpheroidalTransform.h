@@ -506,7 +506,7 @@ namespace itk
     ProlateSpheroidalTransform();
     ~ProlateSpheroidalTransform();
     
-    void PrintSelf(std::ostream& os, Indent indent) const;
+    virtual void PrintSelf(std::ostream& os, Indent indent) const;
 
     virtual void ComputeTransformation (void);
     

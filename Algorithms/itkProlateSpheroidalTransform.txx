@@ -421,7 +421,7 @@ namespace itk
     xsi[2] = std::acos (axis[1]);
     // cos ambiguity removed by checking the z sign
     if (axis[2] < 0)
-      xsi[2] = 2*vnl_math::pi - xsi[2];
+      xsi[2] = 2.0 * vnl_math::pi - xsi[2];
     
     // the real xsi[1] is here,
     xsi[1] = std::asin (std::sqrt (gamma1));

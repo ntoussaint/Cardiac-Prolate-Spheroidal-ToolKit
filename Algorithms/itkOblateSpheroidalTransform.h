@@ -121,7 +121,7 @@ namespace itk
 			       PointType longaxispoint,
 			       PointType shortaxispoint)
     {
-      this->DefineEllipsoid (center, shortaxispoint, longaxispoint );
+      this->DefineEllipsoid (center, longaxispoint, shortaxispoint );
     }
   
     /**
@@ -185,8 +185,6 @@ namespace itk
     OblateSpheroidalTransform();
     ~OblateSpheroidalTransform();
     
-    void PrintSelf(std::ostream& os, Indent indent) const;
-
     void ComputeTransformation (void);
 
   private :

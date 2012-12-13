@@ -55,12 +55,11 @@ namespace itk
     this->m_InternalTransform.SetIdentity();
     this->m_InternalTransformInverse.SetIdentity ();
 
-    this->m_LongAxisPoint[0] = std::cosh (1.0);
-    this->m_ShortAxisPoint[1] = std::sinh (1.0);
+    this->m_LongAxisPoint[1] = std::cosh (1.0);
+    this->m_ShortAxisPoint[0] = std::sinh (1.0);
 
     this->ComputeTransformation();
   }
-
 
   /*
    * Destructor. 
@@ -72,67 +71,27 @@ namespace itk
   }
   
   template <class TPixelType>
-  void OblateSpheroidalTransform<TPixelType>::PrintSelf(std::ostream& os, Indent indent) const
-  {
-    this->Superclass::PrintSelf(os,indent);
-
-    os << indent << "Excentricity : "<<this->m_Eccentricity << "\n";
-    os << indent << "Semi Foci Distance : "<<this->m_SemiFociDistance << "\n";
-    
-    os << indent << "Coefficients: " 
-       << "\n\ta: " << this->m_Coefficients[0]
-       << "\n\tb: " << this->m_Coefficients[1]
-       << "\n\tc: " << this->m_Coefficients[2] << "\n";
-    os << indent << "Lambdas: " 
-       << "\n\tl1: " << this->m_Lambda1
-       << "\n\tl2: " << this->m_Lambda2
-       << "\n\tl3: " << this->m_Lambda3 << "\n";
-    os << indent << "Center: " 
-       << "\n\tO1: " << this->m_Center[0]
-       << "\n\tO2: " << this->m_Center[1]
-       << "\n\tO3: " << this->m_Center[2] << "\n";
-    os << indent << "v1: " 
-       << "\n\tv11: " << this->m_Axis1[0]
-       << "\n\tv12: " << this->m_Axis1[1]
-       << "\n\tv13: " << this->m_Axis1[2] << "\n";
-    os << indent << "v2: " 
-       << "\n\tv21: " << this->m_Axis2[0]
-       << "\n\tv22: " << this->m_Axis2[1]
-       << "\n\tv23: " << this->m_Axis2[2] << "\n";
-    os << indent << "v3: " 
-       << "\n\tv31: " << this->m_Axis3[0]
-       << "\n\tv32: " << this->m_Axis3[1]
-       << "\n\tv33: " << this->m_Axis3[2] << "\n";
-  }
-
-
-
-
-  template <class TPixelType>
   void OblateSpheroidalTransform<TPixelType>::ComputeTransformation (void)
   {
-    /// \todo REDO THE COMPUTATION FOR OBLATE
-    itkWarningMacro (<< "OblateSpheroidalTransform::ComputeTransformation: CAUTION : This method has to change for the oblate case");
-    
     unsigned int count = 0;
     for (unsigned int i=0; i<3; i++) this->m_Parameters[count++] = this->m_Center[i];
     for (unsigned int i=0; i<3; i++) this->m_Parameters[count++] = this->m_LongAxisPoint[i];
     for (unsigned int i=0; i<3; i++) this->m_Parameters[count++] = this->m_ShortAxisPoint[i];
-
-    this->m_Axis1 = this->m_LongAxisPoint  - this->m_Center;
-    this->m_Axis2 = this->m_ShortAxisPoint - this->m_Center;
+    
+    this->m_Axis1 = this->m_ShortAxisPoint  - this->m_Center;
+    this->m_Axis2 = this->m_LongAxisPoint - this->m_Center;
 
     this->m_Lambda1 = this->m_Axis1.GetNorm();
     this->m_Lambda2 = this->m_Axis2.GetNorm();
     this->m_Lambda3 = this->m_Lambda2;
-
+    
     this->m_Axis1.Normalize ();
     this->m_Axis2.Normalize ();
     this->m_Axis3 = CrossProduct (this->m_Axis1, this->m_Axis2);
     // We absolutely need the axes of the spheroid to be orthogonal !
     // By trusting Axis1, we can re-compute axis2 by cross-product
     this->m_Axis2 = CrossProduct (this->m_Axis3, this->m_Axis1);
-
+    
     // A is the rigid transformation matrix from R1 to R0
     for (unsigned int i=0; i<3; i++)
     {
@@ -144,23 +103,154 @@ namespace itk
     
     // A-1 is then the transformation matrix from R0 to R1
     this->m_InternalTransformInverse = this->m_InternalTransform.GetInverse();
-
+    
     // The coefficients a b and c correspond to the coefficients of the
     // ellipsoid equation : x2/a2 + y2/b2 + z2/c2 = 1, defined in R1
     this->m_Coefficients[0] =  this->m_Lambda1;
     this->m_Coefficients[1] =  this->m_Lambda2;
     this->m_Coefficients[2] =  this->m_Lambda3;
-    // so we have a > b = c ==> prolate spheroid, centered in R1 origin, aligned at x axis, in R1;
-    double Eccentricity = std::sqrt (this->m_Lambda1 * this->m_Lambda1 - this->m_Lambda2 * this->m_Lambda2) / this->m_Lambda1;
+    // so we have a < b = c ==> oblate spheroid, centered in R1 origin, aligned at x axis, in R1;
+    double Eccentricity = std::sqrt (this->m_Lambda2 * this->m_Lambda2 - this->m_Lambda1 * this->m_Lambda1) / this->m_Lambda2;
     this->m_Eccentricity = Eccentricity;
-
-    this->m_Focus1 = this->m_Center + Eccentricity * this->m_Lambda1 * this->m_Axis1;
-    this->m_Focus2 = this->m_Center - Eccentricity * this->m_Lambda1 * this->m_Axis1;
+    
+    this->m_Focus1 = this->m_Center + Eccentricity * this->m_Lambda2 * this->m_Axis2;
+    this->m_Focus2 = this->m_Center - Eccentricity * this->m_Lambda2 * this->m_Axis2;
     
     // The semi foci distance (d in Costa paper 1996)
     this->m_SemiFociDistance = this->m_Focus1.EuclideanDistanceTo (this->m_Focus2) / 2.0;
-    
   }  
+
+  template <class TPixelType>
+  typename OblateSpheroidalTransform<TPixelType>::PointType OblateSpheroidalTransform<TPixelType>::ToCartesian(PointType xsi) const
+  {
+
+    // xsi has constrains and bounds, lets check them;
+    if ( ( (xsi[0] < 0.0) ) ||
+	 ( (xsi[1] < - vnl_math::pi / 2.0 ) || (xsi[1] > vnl_math::pi / 2.0) ) ||
+	 ( (xsi[2] < 0.0) || (xsi[2] > 2 * vnl_math::pi) ) )
+    {
+      itkDebugMacro (<<"inconsistent Oblate Coordinate : "<<xsi);
+    }
+    
+    // put the point back into the x-aligned aligned spheroid
+    UniformVectorType xs;
+
+    xs[0] = this->m_SemiFociDistance * std::sinh(xsi[0]) * std::sin ( xsi [1]);
+    xs[1] = this->m_SemiFociDistance * std::cosh(xsi[0]) * std::cos ( xsi [1]) * std::cos (xsi[2]);
+    xs[2] = this->m_SemiFociDistance * std::cosh(xsi[0]) * std::cos ( xsi [1]) * std::sin (xsi[2]);
+    xs[3] = 1;
+    
+    xs = this->m_InternalTransform* xs;
+
+    PointType x;
+    for (unsigned int i=0; i<3; i++)
+      x[i] = xs[i];
+    return x;
+  }
+  
+  template <class TPixelType>
+  typename OblateSpheroidalTransform<TPixelType>::PointType OblateSpheroidalTransform<TPixelType>::ToProlate(PointType x) const
+  {
+    PointType xsi;
+
+    // numerical precision for null tests
+    const double epsilon = vcl_numeric_limits<double>::epsilon();
+
+    // put the point back into the x-aligned aligned spheroid,
+    // i.e. in referential R1
+    UniformVectorType xs;
+    for (unsigned int i=0; i<3; i++)
+    {
+      xs[i]=x[i];
+    }
+    
+    xs[3] = 1;
+    xs = this->m_InternalTransformInverse* xs;
+
+    // define a few variables for the polynomial in alpha = cos^2(\xsi_2)
+    double A = this->m_SemiFociDistance*this->m_SemiFociDistance;
+    double B = xs[1]*xs[1] + xs[2]*xs[2];
+    double C = xs[0]*xs[0];
+    double gamma1 = (A + B + C - std::sqrt((A+B+C)*(A+B+C) - 4*A*B) ) / (2.0*A);
+    
+    // by definition gamma1 is positive and should be lower than 1
+    // as we'll compute acos(sqrt(gamma1)) below.
+    // make sure of this. there could be numerical errors.
+    if (gamma1 > (1.0 - epsilon))
+      gamma1 = 1.0 - epsilon;
+    
+    VectorType axis;
+    
+    // axis2 is the y axis, origin of xsi[2] angle.
+    VectorType axis2(0.0);
+    axis2[1] = 1;
+    
+    for (unsigned int i=0; i<3; i++)
+      axis[i] = xs[i];
+    
+    // we project our point to the yz plane by nulling the x component.
+    axis[0] = 0;
+    // then we normalize it --> we are in the xy unit circle
+    // if axis.GetNorm() is null then it means we are directly along the
+    // axis of revolution, where xsi[2] is undefined.
+    // then we impose xsi[2] = 0 by using axis = axis2.
+    if (axis.GetNorm() > epsilon)
+      axis.Normalize();
+    else
+      axis = axis2;
+    // then xsi[2] is well defined, apart from cos ambiguity.
+    xsi[2] = std::acos (axis[1]);
+    // cos ambiguity removed by checking the z sign
+    if (axis[2] < 0)
+      xsi[2] = 2.0 * vnl_math::pi - xsi[2];
+    
+    // the real xsi[1] is here,
+    xsi[1] = std::acos (std::sqrt (gamma1));
+    // cos ambiguity removed by checking the x sign
+    if (xs[0] < 0)
+      xsi[1] = - xsi[1];
+    // the real xsi[0] is here,
+    double j1;
+    if (gamma1 > epsilon)
+    {
+      j1 = std::sqrt (B / (A * gamma1));
+    }
+    else
+    {
+      // if gamma1 is null, it means we are the axis of revolution,
+      // then we have :
+      // j1 = std::sqrt (C/A + 1);
+      // this equation holds everywhere along the axis BUT between focii,
+      // where this train terminates. i.e. prolates coord. are not defined...
+      if (std::abs (xs[0]) > this->m_SemiFociDistance)
+      {
+	j1 = std::sqrt (C/A + 1);
+      }
+      else
+      {
+	// we reached the singularity axis between focii, impose xsi[0] = 0
+	// by using j1 = 0:
+	j1 = 0;
+	itkWarningMacro (<<"reach singularity axis between foci\n");
+      }
+    }
+
+    // the function arccosh is taken as sqrt and logs
+    xsi[0] = std::log (j1 + std::sqrt (j1 + 1.0) * std::sqrt (j1 - 1.0));
+    
+    // xsi has constrains and bounds, let's check them;
+    if ( ( (xsi[0] < 0.0) ) ||
+    	 ( (xsi[1] < - vnl_math::pi / 2.0) || (xsi[1] > vnl_math::pi / 2.0) ) ||
+    	 ( (xsi[2] < 0.0) || (xsi[2] > 2 * vnl_math::pi) ) )
+    {
+      itkWarningMacro (<<"inconsistent Oblate Coordinate : "<<xsi);
+    }
+    
+    // all singularity situations have been handled, even between focii,
+    // no need to test for null xsi[0] now.
+    return xsi;
+  }
+
 
   template <class TPixelType>
   vnl_matrix_fixed<TPixelType,3,3> OblateSpheroidalTransform<TPixelType>::GetJacobianWithRespectToCoordinates(const InputPointType  &x) const
@@ -241,7 +331,7 @@ namespace itk
     // and should be orthogonal and normal basis, let's check that:
     if ( std::abs ( vnl_determinant (jacobian) - 1.0 ) > epsilon_orthogonality ) 
     {
-      itkWarningMacro (<<"CAUTION !!! prolate local basis vectors are not orthogonal..."<<std::endl
+      itkWarningMacro (<<"CAUTION !!! oblate local basis vectors are not orthogonal..."<<std::endl
       		       <<"determinant : "<<vnl_determinant (jacobian)<<std::endl);
     }
     
@@ -261,139 +351,7 @@ namespace itk
     return jacobian;
     
   }
-
-  template <class TPixelType>
-  typename OblateSpheroidalTransform<TPixelType>::PointType OblateSpheroidalTransform<TPixelType>::ToCartesian(PointType xsi) const
-  {
-
-    // xsi has constrains and bounds, lets check them;
-    if ( ( (xsi[0] < 0.0) ) ||
-	 ( (xsi[1] < 0 ) || (xsi[1] > vnl_math::pi) ) ||
-	 ( (xsi[2] < 0.0) || (xsi[2] > 2 * vnl_math::pi) ) )
-    {
-      itkDebugMacro (<<"inconsistent Oblate Coordinate : "<<xsi);
-    }
-    
-    // put the point back into the x-aligned aligned spheroid
-    UniformVectorType xs;
-
-    xs[0] = this->m_SemiFociDistance * std::sinh(xsi[0]) * std::sin ( xsi [1]);
-    xs[1] = this->m_SemiFociDistance * std::cosh(xsi[0]) * std::cos ( xsi [1]) * std::cos (xsi[2]);
-    xs[2] = this->m_SemiFociDistance * std::cosh(xsi[0]) * std::cos ( xsi [1]) * std::sin (xsi[2]);    
-    xs[3] = 1;
-    
-    xs = this->m_InternalTransform* xs;
-
-    PointType x;
-    for (unsigned int i=0; i<3; i++)
-      x[i] = xs[i];
-    return x;
-  }
   
-  template <class TPixelType>
-  typename OblateSpheroidalTransform<TPixelType>::PointType OblateSpheroidalTransform<TPixelType>::ToProlate(PointType x) const
-  {
-
-    PointType xsi;
-
-    // numerical precision for null tests
-    const double epsilon = vcl_numeric_limits<double>::epsilon();
-
-    // put the point back into the x-aligned aligned spheroid,
-    // i.e. in referential R1
-    UniformVectorType xs;
-    for (unsigned int i=0; i<3; i++)
-    {
-      xs[i]=x[i];
-    }
-    
-    xs[3] = 1;
-    xs = this->m_InternalTransformInverse* xs;
-
-    // define a few variables for the polynomial in alpha = sin^2(\xsi_2)
-    double A = this->m_SemiFociDistance*this->m_SemiFociDistance;
-    double B = xs[1]*xs[1] + xs[2]*xs[2];
-    double C = xs[0]*xs[0];
-    double gamma1 = (A + B + C + std::sqrt((A+B+C)*(A+B+C) - 4*A*B) ) / (2.0*A);
-    // by definition gamma1 is positive and should be lower than 1
-    // as we'll compute asin(sqrt(gamma1)) below.
-    // make sure of this. there could be numerical errors.
-    if (gamma1 > (1.0 - epsilon))
-      gamma1 = 1.0 - epsilon;
-    
-    VectorType axis;
-    
-    // axis2 is the y axis, origin of xsi[2] angle.
-    VectorType axis2(0.0);
-    axis2[1] = 1;
-    
-    for (unsigned int i=0; i<3; i++)
-      axis[i] = xs[i];
-    
-    // we project our point to the yz plane by nulling the x component.
-    axis[0] = 0;
-    // then we normalize it --> we are in the xy unit circle
-    // if axis.GetNorm() is null then it means we are directly along the
-    // axis of revolution, where xsi[2] is undefined.
-    // then we impose xsi[2] = 0 by using axis = axis2.
-    if (axis.GetNorm() > epsilon)
-      axis.Normalize();
-    else
-      axis = axis2;
-    // then xsi[2] is well defined, apart from cos ambiguity.
-    xsi[2] = std::acos (axis[1]);
-    // cos ambiguity removed by checking the z sign
-    if (axis[2] < 0)
-      xsi[2] = 2*vnl_math::pi - xsi[2];
-    
-    // the real xsi[1] is here,
-    xsi[1] = std::asin (std::sqrt (gamma1));
-    // sin ambiguity removed by checking the x sign
-    if (xs[0] < 0)
-      xsi[1] = vnl_math::pi - xsi[1];
-    // the real xsi[0] is here,
-    double j1;
-    if (gamma1 > epsilon)
-    {
-      j1 = std::sqrt (B / (A * gamma1));
-    }
-    else
-    {
-      // if gamma1 is null, it means we are the axis of revolution,
-      // then we have :
-      // j1 = std::sqrt (C/A - 1);
-      // this equation holds everywhere along the axis BUT between focii,
-      // where this train terminates. i.e. prolates coord. are not defined...
-      if (std::abs (xs[0]) > this->m_SemiFociDistance)
-      {
-	j1 = std::sqrt (C/A - 1);
-      }
-      else
-      {
-	// we reached the singularity axis between focii, impose xsi[0] = 0
-	// by using j1 = 0:
-	j1 = 0;
-	itkWarningMacro (<<"reach singularity axis between foci\n");
-      }
-    }
-
-    // the function arcsinh is taken as sqrt and logs
-    xsi[0] = std::log (j1 + std::sqrt (j1 * j1 + 1.0));
-
-    // xsi has constrains and bounds, let's check them;
-    if ( ( (xsi[0] < 0.0) ) ||
-	 ( (xsi[1] < 0.0) || (xsi[1] >     vnl_math::pi) ) ||
-	 ( (xsi[2] < 0.0) || (xsi[2] > 2 * vnl_math::pi) ) )
-    {
-      itkWarningMacro (<<"inconsistent Prolate Coordinate : "<<xsi);
-    }
-
-    // all singularity situations have been handled, even between focii,
-    // no need to test for null xsi[0] now.
-
-    return xsi;
-    
-  }
 
   template <class TPixelType>
   void OblateSpheroidalTransform<TPixelType>::EvaluateScaleFactors (double xsi[3], double h[3]) const
