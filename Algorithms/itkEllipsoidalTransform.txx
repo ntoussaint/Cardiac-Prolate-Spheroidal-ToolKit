@@ -214,54 +214,67 @@ namespace itk
   template <class TPixelType>
   vnl_matrix_fixed<TPixelType,3,3> EllipsoidalTransform<TPixelType>::GetJacobianWithRespectToCoordinates(const InputPointType  &x) const
   {
-
-    /// \todo REDO THE COMPUTATION FOR ELLIPSOID
-    itkWarningMacro (<< "EllipsoidalTransform::GetJacobianWithRespectToCoordinates: CAUTION : This method has to change for the oblate case");
-    
-
     vnl_matrix_fixed<TPixelType,3,3> jacobian(0.0);
     jacobian[0][0] = jacobian[1][1] = jacobian[2][2] = 1.0;
     
     // error overwhich we consider the system to be inconsistent (non- orthogonal)
     const double epsilon_orthogonality = 0.001;
-
-    // recover the Prolate coordinates point
+    
+    // recover the Ellipsoidal coordinates point
     PointType xsi = m_Forward ? this->TransformPoint (x) : x;
-
+    
+    const double epsilon_singularity = 0.0001;
     // error underwhich we display a warning because we reached the singularity
-    const double epsilon_singularity = 0.001;
-        
-    if ( (xsi[0] <= epsilon_singularity) || (xsi[1] <= epsilon_singularity) )
+    if ( ( std::abs (xsi[0] - xsi[1]) < epsilon_singularity ) ||
+	 ( std::abs (xsi[1] - xsi[2]) < epsilon_singularity ) ||
+	 ( std::abs (xsi[2] - xsi[0]) < epsilon_singularity ) )
     {
       itkWarningMacro (<<"singularity point : "<<xsi<<"\n"
-		       <<"jacobian matrix undefined --> set to identity");
-      return jacobian;
+		       <<"jacobian undefined --> set to Id");
     }
+
+    double a2 = m_Lambda1*m_Lambda1;
+    double b2 = m_Lambda2*m_Lambda2;
+    double c2 = m_Lambda3*m_Lambda3;
+
+    double A = (a2 - b2)*(a2 - c2);
+    double B = (b2 - c2)*(b2 - a2);
+    double C = (c2 - a2)*(c2 - b2);
+
+    double B11 = ( (a2 - xsi[1]) * (a2 - xsi[2]) ) / A;
+    double B12 = ( (a2 - xsi[2]) * (a2 - xsi[0]) ) / A;
+    double B13 = ( (a2 - xsi[0]) * (a2 - xsi[1]) ) / A;
+
+    double B21 = ( (b2 - xsi[1]) * (b2 - xsi[2]) ) / B;
+    double B22 = ( (b2 - xsi[2]) * (b2 - xsi[0]) ) / B;
+    double B23 = ( (b2 - xsi[0]) * (b2 - xsi[1]) ) / B;
+    
+    double B31 = ( (c2 - xsi[1]) * (c2 - xsi[2]) ) / C;
+    double B32 = ( (c2 - xsi[2]) * (c2 - xsi[0]) ) / C;
+    double B33 = ( (c2 - xsi[0]) * (c2 - xsi[1]) ) / C;
     
     UniformVectorType ns, as, ds;
     VectorType n, a, d;
-    ns[0] = sinh(xsi[0]) * std::cos(xsi[1]);
-    ns[1] = cosh(xsi[0]) * std::sin(xsi[1]) * std::cos(xsi[2]);
-    ns[2] = cosh(xsi[0]) * std::sin(xsi[1]) * std::sin(xsi[2]);
+    ns[0] = std::sqrt( B11 / (4.0 * (a2 - xsi[0])) );
+    ns[0] = std::sqrt( B12 / (4.0 * (b2 - xsi[1])) );
+    ns[0] = std::sqrt( B13 / (4.0 * (c2 - xsi[2])) );
     ns[3] = 0;
     
-    as[0] = - cosh(xsi[0]) * std::sin(xsi[1]);
-    as[1] =   sinh(xsi[0]) * std::cos(xsi[1]) * std::cos(xsi[2]);
-    as[2] =   sinh(xsi[0]) * std::cos(xsi[1]) * std::sin(xsi[2]);
+    as[0] = std::sqrt( B21 / (4.0 * (a2 - xsi[0])) );
+    as[0] = std::sqrt( B22 / (4.0 * (b2 - xsi[1])) );
+    as[0] = std::sqrt( B23 / (4.0 * (c2 - xsi[2])) );
     as[3] = 0;
     
-    ds[0] = 0;
-    ds[1] = - sinh(xsi[0]) * std::sin(xsi[1]) * std::sin(xsi[2]);
-    ds[2] = sinh(xsi[0]) * std::sin(xsi[1]) * std::cos(xsi[2]);
+    ds[0] = std::sqrt( B31 / (4.0 * (a2 - xsi[0])) );
+    ds[0] = std::sqrt( B32 / (4.0 * (b2 - xsi[1])) );
+    ds[0] = std::sqrt( B33 / (4.0 * (c2 - xsi[2])) );
     ds[3] = 0;
     
     // the contra-variant basis vectors are in R1 referential
     // they have to be transformed to R0 with m_InternalTransform
-    // Also, they have to be scaled by the
-    // constant \f$ f_{1/2} \f$ (m_SemiFociDistance).
-    ns = m_InternalTransform * (m_SemiFociDistance * ns);
-    as = m_InternalTransform * (m_SemiFociDistance * as);
-    ds = m_InternalTransform * (m_SemiFociDistance * ds);
+    ns = m_InternalTransform * ns;
+    as = m_InternalTransform * as;
+    ds = m_InternalTransform * ds;
     
     // As we are looking for only re-orientation component of
     // the Jacobian Matrix, we simply multiply the columns by
@@ -286,7 +299,7 @@ namespace itk
       jacobian[i][1] = a[i];
       jacobian[i][2] = d[i];
     }
-
+    
     // a warning is shown is the basis is inconsistent (non-orthogonality) 
     // [jacobian] is a local orthonormal prolate spheroid basis at x;
     // and should be orthogonal and normal basis, let's check that:
@@ -299,7 +312,7 @@ namespace itk
     // transpose the matrix if we are looking for the inverse transformation
     if (!m_Forward)
       jacobian.inplace_transpose();
-
+    
     // NB : the jacobian matrix is orthonormal but is NOT a rotation matrix.
     // Its determinant is always negative egual to -1 (roto-inversion).
     // This is due to the fact that by construction the basis (g1,g2,g3)
@@ -376,7 +389,7 @@ namespace itk
     xs[3] = 1;
     
     xs = m_InternalTransform* xs;
-
+    
     PointType x;
     for (unsigned int i=0; i<3; i++)
       x[i] = xs[i];
@@ -439,7 +452,6 @@ namespace itk
       xsi[i] = sorter[i];
     
     return xsi;
-    
   }
 
   
@@ -499,7 +511,6 @@ namespace itk
     h[0] = std::sqrt( ( 4.0 * (a2 - xsi[0]) * (b2 - xsi[0]) * (c2 - xsi[0]) ) / ( (xsi[1] - xsi[0]) * (xsi[2] - xsi[0]) ) );
     h[1] = std::sqrt( ( 4.0 * (a2 - xsi[1]) * (b2 - xsi[1]) * (c2 - xsi[1]) ) / ( (xsi[2] - xsi[1]) * (xsi[0] - xsi[1]) ) );
     h[2] = std::sqrt( ( 4.0 * (a2 - xsi[2]) * (b2 - xsi[2]) * (c2 - xsi[2]) ) / ( (xsi[0] - xsi[2]) * (xsi[1] - xsi[2]) ) );
-    
   }
 
   template <class TPixelType>
