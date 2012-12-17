@@ -353,13 +353,16 @@ namespace itk
 
   template <class TPixelType>
   typename EllipsoidalTransform<TPixelType>::PointType EllipsoidalTransform<TPixelType>::ToCartesian(PointType xsi) const
-  {    
-    // xsi has constrains and bounds, lets check them;
-    if ( ( (xsi[0] < 0.0) ) ||
-	 ( (xsi[1] < 0.0) || (xsi[1] >     vnl_math::pi) ) ||
-	 ( (xsi[2] < 0.0) || (xsi[2] > 2 * vnl_math::pi) ) )
+  {
+    double a2 = m_Lambda1*m_Lambda1;
+    double b2 = m_Lambda2*m_Lambda2;
+    double c2 = m_Lambda3*m_Lambda3;
+    // xsi has bounds, lets check them;
+    if ( ( (xsi[0] > c2) ) ||
+	 ( (xsi[1] < c2) || (xsi[1] > b2) ) ||
+	 ( (xsi[2] < b2) || (xsi[2] > a2) ) )
     {
-      itkDebugMacro (<<"inconsistent Prolate Coordinate : "<<xsi);
+      itkWarningMacro (<<"inconsistent Ellipsoidal Coordinate : "<<xsi);
     }
     
     // put the point back into the x-aligned aligned spheroid
@@ -369,7 +372,7 @@ namespace itk
     xs[0] = std::sqrt ( ( (a*a - xsi[0]) * (a*a - xsi[1]) * (a*a - xsi[2]) ) / ( (a*a - b*b) * (a*a - c*c) ) );
     xs[1] = std::sqrt ( ( (b*b - xsi[0]) * (b*b - xsi[1]) * (b*b - xsi[2]) ) / ( (b*b - a*a) * (b*b - c*c) ) );
     xs[2] = std::sqrt ( ( (c*c - xsi[0]) * (c*c - xsi[1]) * (c*c - xsi[2]) ) / ( (c*c - a*a) * (c*c - b*b) ) );
-
+    
     xs[3] = 1;
     
     xs = m_InternalTransform* xs;
@@ -379,14 +382,14 @@ namespace itk
       x[i] = xs[i];
     return x;
   }
-
   
   template <class TPixelType>
   typename EllipsoidalTransform<TPixelType>::PointType EllipsoidalTransform<TPixelType>::ToEllipsoidal(PointType x) const
   {
+    const double epsilon = 0.01;
     
-    PointType xsi;
-
+    PointType xsi; xsi[0] = xsi[1] = xsi[2] = 0.0;
+    
     // put the point back into the x-aligned aligned spheroid,
     // i.e. in referential R1
     UniformVectorType xs;
@@ -395,8 +398,13 @@ namespace itk
     xs[3] = 1;
     xs = m_InternalTransformInverse* xs;
     
-    // define a few variables for the polynomial in \xsi
+    // define variables for the polynomial in \xsi
     double a=m_Lambda1, b=m_Lambda2, c=m_Lambda3;
+    if (std::abs (b - a) < epsilon)
+      b = a - epsilon;
+    if (std::abs (c - b) < epsilon)
+      c = b - epsilon;
+    
     double a2 = a*a, b2=b*b, c2=c*c;
     double x2 = xs[0]*xs[0], y2 = xs[1]*xs[1], z2 = xs[2]*xs[2];
     double A = a2 + b2 + c2;
@@ -406,34 +414,29 @@ namespace itk
     double E = x2 * (b2 + c2) + y2 * (a2 + c2) + z2 * (a2 + b2);
     double F = x2 *  b2 * c2  + y2 *  a2 * c2  + z2 *  a2 * b2 ;
     
-    vnl_vector<ScalarType> f1 (4);
-    f1[0] = 1.0;
-    f1[1] = D - A;
-    f1[2] = B - E;
-    f1[3] = F - C;
-    vnl_matrix<unsigned int> p1(4,1, 0);
-    p1(0,0) = 3; p1(1,0) = 2; p1(2,0) = 1; p1(3,0) = 0;
-    vnl_real_npolynomial polynome(f1,p1);
+    double s2 = D-A;
+    double s1 = B-E;
+    double s0 = F-C;
+    double Q = (3.0*s1 - s2*s2) / 9.0;
+    double R = (9.0*s2*s1 - 27.0*s0 - 2.0*s2*s2*s2) / 54.0;
+    double delta = Q*Q*Q + R*R;
     
-    vcl_vector<vnl_real_npolynomial*> polynomes;
-    polynomes.push_back (&polynome);
-    
-    vnl_rnpoly_solve solver(polynomes);
-    vcl_vector<vnl_vector<ScalarType>*> roots = solver.realroots();
+    if (delta > 0)
+    {
+      itkWarningMacro (<<"found non-real roots at  xs = "<<xs<<" with Delta = "<<delta);
+      return xsi;
+    }
+
+    double theta = std::acos( R / std::sqrt (-Q*Q*Q) );
     
     std::vector<ScalarType> sorter;
-    for (unsigned int i=0; i<roots.size(); i++)
-    {
-      vnl_vector<double>& root = *(roots[i]);
-      sorter.push_back (root[0]);
-    }
+    sorter.push_back (2.0 * std::sqrt (-Q) * std::cos( (theta + 0.0 * vnl_math::pi) / 3.0 ) - s2 / 3.0);
+    sorter.push_back (2.0 * std::sqrt (-Q) * std::cos( (theta + 2.0 * vnl_math::pi) / 3.0 ) - s2 / 3.0);
+    sorter.push_back (2.0 * std::sqrt (-Q) * std::cos( (theta + 4.0 * vnl_math::pi) / 3.0 ) - s2 / 3.0);
     
     std::sort (sorter.begin(), sorter.end());
     for (unsigned int i=0; i<sorter.size(); i++)
       xsi[i] = sorter[i];
-    
-    std::cout<<xs<<" ==> "<<xsi<<std::endl;
-    
     
     return xsi;
     
@@ -443,14 +446,19 @@ namespace itk
   template <class TPixelType>
   typename EllipsoidalTransform<TPixelType>::VectorType EllipsoidalTransform<TPixelType>::ToCartesian(VectorType v, PointType p) const
   {
+
     
-    // xsi has constrains and bounds, lets check them;
-    if ( ( (p[0] < 0.0) ) ||
-	 ( (p[1] < 0.0) || (p[1] >     vnl_math::pi) ) ||
-	 ( (p[2] < 0.0) || (p[2] > 2 * vnl_math::pi) ) )
+    double a2 = m_Lambda1*m_Lambda1;
+    double b2 = m_Lambda2*m_Lambda2;
+    double c2 = m_Lambda3*m_Lambda3;
+    
+    // xsi has bounds, lets check them;
+    if ( ( (p[0] > c2) ) ||
+	 ( (p[1] < c2) || (p[1] > b2) ) ||
+	 ( (p[2] < b2) || (p[2] > a2) ) )
     {
-      itkWarningMacro (<<"inconsistent Prolate Coordinate : "<<p);
-    }    
+      itkWarningMacro (<<"inconsistent Ellipsoidal Coordinate : "<<p);
+    }
     
     MatrixType matrix; matrix = this->GetJacobianWithRespectToCoordinates(p);
     VectorType ret = matrix * v;
@@ -472,24 +480,26 @@ namespace itk
   void EllipsoidalTransform<TPixelType>::EvaluateScaleFactors (double xsi[3], double h[3]) const
   {
     
-    /// \todo REDO THE COMPUTATION FOR ELLIPSOID
-    itkWarningMacro (<< "EllipsoidalTransform::EvaluateScaleFactors: CAUTION : This method has to change for the oblate case");
-    
+    const double epsilon_singularity = 0.0001;
     // error underwhich we display a warning because we reached the singularity
-    const double epsilon_singularity = 0.001;
-    if ( (xsi[0] <= epsilon_singularity) || (xsi[1] <= epsilon_singularity) )
+    if ( ( std::abs (xsi[0] - xsi[1]) < epsilon_singularity ) ||
+	 ( std::abs (xsi[1] - xsi[2]) < epsilon_singularity ) ||
+	 ( std::abs (xsi[2] - xsi[0]) < epsilon_singularity ) )
     {
       itkWarningMacro (<<"singularity point : "<<xsi<<"\n"
 		       <<"scale factors undefined --> set to null");
       h[0] = h[1] = h[2] = 0.0;
       return;
     }
+
+    double a2 = m_Lambda1*m_Lambda1;
+    double b2 = m_Lambda2*m_Lambda2;
+    double c2 = m_Lambda3*m_Lambda3;
     
-    double d = m_SemiFociDistance;
+    h[0] = std::sqrt( ( 4.0 * (a2 - xsi[0]) * (b2 - xsi[0]) * (c2 - xsi[0]) ) / ( (xsi[1] - xsi[0]) * (xsi[2] - xsi[0]) ) );
+    h[1] = std::sqrt( ( 4.0 * (a2 - xsi[1]) * (b2 - xsi[1]) * (c2 - xsi[1]) ) / ( (xsi[2] - xsi[1]) * (xsi[0] - xsi[1]) ) );
+    h[2] = std::sqrt( ( 4.0 * (a2 - xsi[2]) * (b2 - xsi[2]) * (c2 - xsi[2]) ) / ( (xsi[0] - xsi[2]) * (xsi[1] - xsi[2]) ) );
     
-    h[0] = 1.0 / ( d * std::sqrt( std::sinh (xsi[0]) * std::sinh (xsi[0]) + std::sin (xsi[1]) * std::sin (xsi[1]) ) );
-    h[1] = 1.0 / ( d * std::sqrt( std::sinh (xsi[0]) * std::sinh (xsi[0]) + std::sin (xsi[1]) * std::sin (xsi[1]) ) );
-    h[2] = 1.0 / ( d * std::sinh (xsi[0]) * std::sin (xsi[1]) );
   }
 
   template <class TPixelType>
@@ -631,13 +641,8 @@ namespace itk
       ds = std::sqrt ( ds );
       length += ds;
       pt += step;
-      if (pt[2] > (2 * vnl_math::pi))
-        pt[2] -= 2 * vnl_math::pi;
-      if (pt[2] < 0)
-        pt[2] += 2 * vnl_math::pi;
-
     }
-
+    
     return length;
   }
 
