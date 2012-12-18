@@ -41,7 +41,7 @@ namespace itk
   {
     this->m_Parameters.SetSize (ParametersDimension);
     this->m_Parameters.Fill (0.0);
-
+    
     this->m_FixedParameters.SetSize (0);
     
     this->m_Jacobian.SetSize (OutputSpaceDimension,InputSpaceDimension);
@@ -75,7 +75,6 @@ namespace itk
   {
     
   }
-
 
   template <class TPixelType>
   void EllipsoidalTransform<TPixelType>::ComputeTransformation (void)
@@ -142,35 +141,13 @@ namespace itk
   }
 
   template <class TPixelType>
-  typename EllipsoidalTransform<TPixelType>::OutputVectorType EllipsoidalTransform<TPixelType>::TransformVector(const InputVectorType &v, const InputPointType &p) const
+  typename EllipsoidalTransform<TPixelType>::VectorType EllipsoidalTransform<TPixelType>::TransformVector(const VectorType &v, const InputPointType &p) const
   {
-    OutputVectorType ret;
+    VectorType ret;
     if (m_Forward)
       ret = this->ToEllipsoidal (v, p);
     else
       ret = this->ToCartesian (v, p);
-    return ret;
-  }
-
-  template <class TPixelType>
-  typename EllipsoidalTransform<TPixelType>::OutputVnlVectorType EllipsoidalTransform<TPixelType>::TransformVector(const InputVnlVectorType &v, const InputPointType &p) const
-  {
-    VectorType mv, mret;
-    OutputVnlVectorType ret;
-    for (unsigned int i=0; i<3; i++) mv[i] = v[i];
-    mret = this->TransformVector (mv, p);
-    for (unsigned int i=0; i<3; i++) ret[i] = mret[i];
-    return ret;
-  }
-
-  template <class TPixelType>
-  typename EllipsoidalTransform<TPixelType>::OutputCovariantVectorType EllipsoidalTransform<TPixelType>::TransformCovariantVector(const InputCovariantVectorType &v, const InputPointType &p) const
-  {
-    VectorType mv, mret;
-    OutputCovariantVectorType ret;
-    for (unsigned int i=0; i<3; i++) mv[i] = v[i];
-    mret = this->TransformVector (mv, p);
-    for (unsigned int i=0; i<3; i++) ret[i] = mret[i];
     return ret;
   }
 
@@ -221,7 +198,7 @@ namespace itk
     const double epsilon_orthogonality = 0.001;
     
     // recover the Ellipsoidal coordinates point
-    PointType xsi = m_Forward ? this->TransformPoint (x) : x;
+    OutputPointType xsi = m_Forward ? this->TransformPoint (x) : x;
     
     const double epsilon_singularity = 0.0001;
     // error underwhich we display a warning because we reached the singularity
@@ -232,7 +209,7 @@ namespace itk
       itkWarningMacro (<<"singularity point : "<<xsi<<"\n"
 		       <<"jacobian undefined --> set to Id");
     }
-
+    
     double a2 = m_Lambda1*m_Lambda1;
     double b2 = m_Lambda2*m_Lambda2;
     double c2 = m_Lambda3*m_Lambda3;
@@ -255,6 +232,9 @@ namespace itk
     
     UniformVectorType ns, as, ds;
     VectorType n, a, d;
+
+    // need to choose the signs with xsi[3]...
+    
     ns[0] = std::sqrt( B11 / (4.0 * (a2 - xsi[0])) );
     ns[0] = std::sqrt( B12 / (4.0 * (b2 - xsi[1])) );
     ns[0] = std::sqrt( B13 / (4.0 * (c2 - xsi[2])) );
@@ -323,14 +303,13 @@ namespace itk
     // A sign error was introduced to $ g_3 $ making the basis indirect,
     // this has been corrected, Note that it did not affect any further results.
     return jacobian;
-    
   }
   
   template <class TPixelType>
   void EllipsoidalTransform<TPixelType>::EvaluateLocalBasis(InputPointType x,
-						      VectorType &n,
-						      VectorType &a,
-						      VectorType &d) const
+							    VectorType &n,
+							    VectorType &a,
+							    VectorType &d) const
   {
     vnl_matrix_fixed<double,3,3> jacobian = this->GetJacobianWithRespectToCoordinates (x);
     // The basis vectors correspond to each column of the jacobian matrix
@@ -365,7 +344,7 @@ namespace itk
   }
 
   template <class TPixelType>
-  typename EllipsoidalTransform<TPixelType>::PointType EllipsoidalTransform<TPixelType>::ToCartesian(PointType xsi) const
+  typename EllipsoidalTransform<TPixelType>::OutputPointType EllipsoidalTransform<TPixelType>::ToCartesian(InputPointType xsi) const
   {
     double a2 = m_Lambda1*m_Lambda1;
     double b2 = m_Lambda2*m_Lambda2;
@@ -380,28 +359,39 @@ namespace itk
     
     // put the point back into the x-aligned aligned spheroid
     UniformVectorType xs;
-    ScalarType a = m_Lambda1, b = m_Lambda2, c = m_Lambda3;
+    ScalarType a = m_Lambda1, b = m_Lambda2, c = m_Lambda3;    
     
-    xs[0] = std::sqrt ( ( (a*a - xsi[0]) * (a*a - xsi[1]) * (a*a - xsi[2]) ) / ( (a*a - b*b) * (a*a - c*c) ) );
-    xs[1] = std::sqrt ( ( (b*b - xsi[0]) * (b*b - xsi[1]) * (b*b - xsi[2]) ) / ( (b*b - a*a) * (b*b - c*c) ) );
-    xs[2] = std::sqrt ( ( (c*c - xsi[0]) * (c*c - xsi[1]) * (c*c - xsi[2]) ) / ( (c*c - a*a) * (c*c - b*b) ) );
+    int sign = (int)xsi[3];
+    
+    double e2 = (sign >= 4) ? 1 : -1;
+    if (e2>0) sign -= 4;
+    double e1 = (sign >= 2) ? 1 : -1;
+    double e0 = ( ((int)sign % 2) != 0 ) ? 1 : -1;
+    
+    // need to choose the sign with xsi[3]
+    xs[0] = e0 * std::sqrt ( ( (a*a - xsi[0]) * (a*a - xsi[1]) * (a*a - xsi[2]) ) / ( (a*a - b*b) * (a*a - c*c) ) );
+    xs[1] = e1 * std::sqrt ( ( (b*b - xsi[0]) * (b*b - xsi[1]) * (b*b - xsi[2]) ) / ( (b*b - a*a) * (b*b - c*c) ) );
+    xs[2] = e2 * std::sqrt ( ( (c*c - xsi[0]) * (c*c - xsi[1]) * (c*c - xsi[2]) ) / ( (c*c - a*a) * (c*c - b*b) ) );
     
     xs[3] = 1;
     
     xs = m_InternalTransform* xs;
     
-    PointType x;
+    OutputPointType x;
     for (unsigned int i=0; i<3; i++)
       x[i] = xs[i];
+
+    x[3] = xsi[3];
+    
     return x;
   }
   
   template <class TPixelType>
-  typename EllipsoidalTransform<TPixelType>::PointType EllipsoidalTransform<TPixelType>::ToEllipsoidal(PointType x) const
+  typename EllipsoidalTransform<TPixelType>::OutputPointType EllipsoidalTransform<TPixelType>::ToEllipsoidal(InputPointType x) const
   {
     const double epsilon = 0.01;
     
-    PointType xsi; xsi[0] = xsi[1] = xsi[2] = 0.0;
+    OutputPointType xsi; xsi[0] = xsi[1] = xsi[2] = 0.0; xsi[3] = 0.0;
     
     // put the point back into the x-aligned aligned spheroid,
     // i.e. in referential R1
@@ -450,16 +440,20 @@ namespace itk
     std::sort (sorter.begin(), sorter.end());
     for (unsigned int i=0; i<sorter.size(); i++)
       xsi[i] = sorter[i];
+
+    // put xsi[3] according to the signs of xs[0], xs[1], xs[2]
+    xsi[3] =
+      (double)(xs[0] >= 0) * std::pow (2,0) +
+      (double)(xs[1] >= 0) * std::pow (2,1) +
+      (double)(xs[2] >= 0) * std::pow (2,2);
     
     return xsi;
   }
 
   
   template <class TPixelType>
-  typename EllipsoidalTransform<TPixelType>::VectorType EllipsoidalTransform<TPixelType>::ToCartesian(VectorType v, PointType p) const
-  {
-
-    
+  typename EllipsoidalTransform<TPixelType>::VectorType EllipsoidalTransform<TPixelType>::ToCartesian(VectorType v, InputPointType p) const
+  { 
     double a2 = m_Lambda1*m_Lambda1;
     double b2 = m_Lambda2*m_Lambda2;
     double c2 = m_Lambda3*m_Lambda3;
@@ -474,12 +468,12 @@ namespace itk
     
     MatrixType matrix; matrix = this->GetJacobianWithRespectToCoordinates(p);
     VectorType ret = matrix * v;
-
+    
     return ret;
   }
 
   template <class TPixelType>
-  typename EllipsoidalTransform<TPixelType>::VectorType EllipsoidalTransform<TPixelType>::ToEllipsoidal(VectorType v, PointType p) const
+  typename EllipsoidalTransform<TPixelType>::VectorType EllipsoidalTransform<TPixelType>::ToEllipsoidal(VectorType v, InputPointType p) const
   {
     MatrixType matrix; matrix = this->GetJacobianWithRespectToCoordinates(p);
     MatrixType transpose; transpose = matrix.GetTranspose ();
@@ -615,13 +609,13 @@ namespace itk
 
 
   template <class TPixelType>
-  double EllipsoidalTransform<TPixelType>::EstimateGeodesicLength1(PointType xi, VectorType dxi, unsigned int divisions) const
+  double EllipsoidalTransform<TPixelType>::EstimateGeodesicLength1(InputPointType xi, InputVectorType dxi, unsigned int divisions) const
   {
-    VectorType step = dxi / (double)(divisions);
+    InputVectorType step = dxi / (double)(divisions);
     double length = 0.0;
-    PointType point1 = xi, point2 = xi;
-    PointType cart1, cart2;
-    VectorType dL;
+    InputPointType point1 = xi, point2 = xi;
+    InputPointType cart1, cart2;
+    InputVectorType dL;
     
     for (unsigned int i=0; i<divisions; i++)
     {
@@ -637,10 +631,10 @@ namespace itk
   }
 
   template <class TPixelType>
-  double EllipsoidalTransform<TPixelType>::EstimateGeodesicLength2(PointType xi, VectorType dxi, unsigned int divisions) const
+  double EllipsoidalTransform<TPixelType>::EstimateGeodesicLength2(InputPointType xi, InputVectorType dxi, unsigned int divisions) const
   {
-    VectorType step = dxi / (double)(divisions);
-    PointType pt = xi;
+    InputVectorType step = dxi / (double)(divisions);
+    InputPointType pt = xi;
     double h[3];
     
     double length = 0.0;

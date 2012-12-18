@@ -1,20 +1,20 @@
 /*=========================================================================
 
-Program:   ImagingSciences
-Module:    $Id: itkEllipsoidalTransform.h 1 2010-05-21 14:00:33Z nt08 $
-Language:  C++
-Author:    $Author: nt08 $
-Date:      $Date: 2010-05-21 14:00:33 +0000 (Fri, 21 May 2010) $
-Version:   $Revision: 1 $
+  Program:   ImagingSciences
+  Module:    $Id: itkEllipsoidalTransform.h 1 2010-05-21 14:00:33Z nt08 $
+  Language:  C++
+  Author:    $Author: nt08 $
+  Date:      $Date: 2010-05-21 14:00:33 +0000 (Fri, 21 May 2010) $
+  Version:   $Revision: 1 $
 
-Copyright (c) 2010 King's College London - Division of Imaging Sciences. All rights reserved.
-See Copyright.txt for details.
+  Copyright (c) 2010 King's College London - Division of Imaging Sciences. All rights reserved.
+  See Copyright.txt for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+  This software is distributed WITHOUT ANY WARRANTY; without even
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the above copyright notices for more information.
 
-=========================================================================*/
+  =========================================================================*/
 #ifndef _itk_EllipsoidalTransform_h_
 #define _itk_EllipsoidalTransform_h_
 
@@ -29,10 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace itk
 {
-  
-
-
-
 
   /**
      \class EllipsoidalTransform (itk)
@@ -105,11 +101,11 @@ namespace itk
   */
   
   template <class TPixelType=double>
-  class ITK_EXPORT EllipsoidalTransform : public Transform<TPixelType, 3, 3>
-  {
-  public:
+    class ITK_EXPORT EllipsoidalTransform : public Transform<TPixelType, 4, 4>
+    {
+    public:
     typedef EllipsoidalTransform Self;
-    typedef Transform<double, 3, 3>  Superclass;
+    typedef Transform<double, 4, 4>  Superclass;
     typedef SmartPointer<Self>       Pointer;
     typedef SmartPointer<const Self> ConstPointer;
 
@@ -117,8 +113,8 @@ namespace itk
     typedef TPixelType ScalarType;
     
     /** Dimension of the domain space. */
-    itkStaticConstMacro(InputSpaceDimension, unsigned int,  3);
-    itkStaticConstMacro(OutputSpaceDimension, unsigned int, 3);
+    itkStaticConstMacro(InputSpaceDimension, unsigned int,  4);
+    itkStaticConstMacro(OutputSpaceDimension, unsigned int, 4);
     itkStaticConstMacro(ParametersDimension, unsigned int,  12);
   
     /** Type of the input parameters. */
@@ -242,13 +238,9 @@ namespace itk
     }
     
     /**  Method to transform a point. */
-    virtual OutputPointType     TransformPoint(const InputPointType  & ) const;
+    virtual OutputPointType TransformPoint(const InputPointType  & ) const;
     /**  Method to transform a vector. */
-    virtual OutputVectorType    TransformVector(const InputVectorType &, const InputPointType &) const;
-    /**  Method to transform a vnl_vector. */
-    virtual OutputVnlVectorType TransformVector(const InputVnlVectorType &, const InputPointType &) const;
-    /**  Method to transform a CovariantVector. */
-    virtual OutputCovariantVectorType TransformCovariantVector(const InputCovariantVectorType &, const InputPointType &) const;    
+    virtual VectorType TransformVector(const VectorType &, const InputPointType &) const;
     /**
      * Set the transformation parameters and update internal transformation.
      * SetParameters gives the transform the option to set it's
@@ -261,7 +253,7 @@ namespace itk
      *
      * \sa SetParametersByValue
      * 
-    */
+     */
     virtual void SetParameters( const ParametersType & );
     
     /**
@@ -276,7 +268,7 @@ namespace itk
      * 
      * \sa SetParameters
      *
-    */
+     */
     virtual void SetParametersByValue ( const ParametersType & p );
 
     /**
@@ -341,14 +333,11 @@ namespace itk
        Get the inverse of this transform
     */
     virtual bool GetInverse( Self* inverse) const;
-    
     /**
        Set the transform to identity. Basically remove (and unregister)
        the displacement field from the transform
     */
     virtual void SetIdentity(void);
-    
-    
     /**
        Indicates that this transform is linear. That is, given two
        points P and Q, and scalar coefficients a and b, then
@@ -356,7 +345,6 @@ namespace itk
        T( a*P + b*Q ) = a * T(P) + b * T(Q)
     */
     virtual bool IsLinear() const { return true; }
-    
     /**
        from an input point \arg x (in Cartesian if Forward / in Prolate if !forward),
        
@@ -380,12 +368,12 @@ namespace itk
 
        \warning The contravariant basis is subject to a lot of sinus, cosinus, and hyperbolic function
        calculation, resulting in a possible numerical error, and inducing the non-orthogonality of the
-       basis.       
+       basis.
     */
     virtual void EvaluateLocalBasis(InputPointType x,
-			    VectorType &n,
-			    VectorType &a,
-			    VectorType &d) const;
+				    VectorType &n,
+				    VectorType &a,
+				    VectorType &d) const;
     /**
        Transforms a point between prolate spheroidal coordinates towards Cartesian coordinates.
        \f[
@@ -401,7 +389,7 @@ namespace itk
        and then the transformation InternalTransform iis used to go from zero-centered ellipsoid
        to the true point in space.
     */
-    virtual PointType ToCartesian(PointType xsi) const;
+    virtual OutputPointType ToCartesian(InputPointType xsi) const;
     /**
        Not as easy as it seems...
 
@@ -420,10 +408,10 @@ namespace itk
 
        \f$\xi^3\f$ is simply derived from the projection of the cartesian point onto the plane \f$(x(1), x(2))\f$, i.e. \f$\xi^3 = \arccos \left( \frac{x(1)}{\|x\|} \right) \f$.
     */
-    virtual PointType ToEllipsoidal(PointType x) const;
-
-    virtual VectorType ToCartesian (VectorType v, PointType p) const;
-    virtual VectorType ToEllipsoidal (VectorType v, PointType p) const;
+    virtual OutputPointType ToEllipsoidal(InputPointType x) const;
+  
+    virtual VectorType ToCartesian (VectorType v, InputPointType p) const;
+    virtual VectorType ToEllipsoidal (VectorType v, InputPointType p) const;
     
     /// Recover the spheroid first eigenvalue
     itkGetMacro (Lambda1, double);
@@ -508,11 +496,11 @@ namespace itk
        \f]
     */
     virtual void EvaluateGradient(PointType x, VectorType &n) const;
-
-    virtual double EstimateGeodesicLength1(PointType xi, VectorType dxi, unsigned int divisions) const;
-    virtual double EstimateGeodesicLength2(PointType xi, VectorType dxi, unsigned int divisions) const;
+  
+    virtual double EstimateGeodesicLength1(InputPointType xi, InputVectorType dxi, unsigned int divisions) const;
+    virtual double EstimateGeodesicLength2(InputPointType xi, InputVectorType dxi, unsigned int divisions) const;
     
-  protected:
+    protected:
 
     EllipsoidalTransform();
     ~EllipsoidalTransform();
@@ -541,17 +529,15 @@ namespace itk
   
     UniformMatrixType m_InternalTransform;
     UniformMatrixType m_InternalTransformInverse;
-
+  
     CrossHelperType m_Cross;
     unsigned int m_Forward;
     
-  private :
+    private :
     EllipsoidalTransform(const Self&);
     void operator=(const Self&);
-
-
     
-  };
+    };
   
 }// end of namespace itk
 
