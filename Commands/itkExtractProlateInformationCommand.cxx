@@ -62,6 +62,7 @@ namespace itk
     m_LongDescription +="\t h3 [scale factor in xi3 direction] \n";
     m_LongDescription +="\t l2 [L2 norm of the tensors] \n";
     m_LongDescription +="\t ta [transverse anisotropy] \n";
+    m_LongDescription +="\t truehelix [corrected helix angle] \n";
   }
 
   ExtractProlateInformationCommand::~ExtractProlateInformationCommand()
@@ -100,6 +101,7 @@ namespace itk
     else if (std::strcmp (typestring,"h3") == 0 )         type = 10;
     else if (std::strcmp (typestring,"l2") == 0 )         type = 11;
     else if (std::strcmp (typestring,"ta") == 0 )         type = 12;
+    else if (std::strcmp (typestring,"truehelix") == 0 )  type = 13;
     
     std::cout<<"computing the extraction of ";
     switch(type)
@@ -143,6 +145,9 @@ namespace itk
 	  break;
 	case 12:
 	  std::cout<<"transverse anisotropy";
+	  break;
+	case 13:
+	  std::cout<<"true helix angle";
 	  break;
     }
 
@@ -441,6 +446,14 @@ namespace itk
 	    break;
 	  case 12:
 	    os << prolatetensor.GetEigenvalue(0) / prolatetensor.GetEigenvalue(1);
+	    break;
+	  case 13:
+	    mainvectorprolate[0] = 0;
+	    mainvectorprolate.Normalize();
+	    helix = mainvectorprolate[1];
+	    if (mainvectorprolate[2] > 0) helix = -helix;
+	    helix = std::asin(helix) * 180.0 / vnl_math::pi;
+	    os << helix;
 	    break;
       }
       
