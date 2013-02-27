@@ -107,6 +107,9 @@ CreateCpstkCommand(BackwardTransformMesh
 CreateCpstkCommand(TensorsToVTK
   "itk2vtk" "Convert a tensor image or a list of tensor images into a vtkUnstructuredGrid structure"
   )
+CreateCpstkCommand(TensorsToVTK2
+  "itk2vtk2" "Convert a list of tensor images into a list vtkUnstructuredGrid structures"
+  )
 CreateCpstkCommand(CreateProlateCoordinateImage
   "coordinates" "Extract Prolate Coordinates from input and output it in an 3-compartment image"
   )
