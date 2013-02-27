@@ -1,7 +1,7 @@
 #/usr/bin/bash
 
-crop-preparation.sh 100 prolatetransform.tr
-reorder-register-estimate.sh 3 0.3 domain.mha
+crop-preparation.sh 90 prolatetransform.tr
+reorder-register-estimate.sh 3 0.0 domain.mha
 
 for file in *-tensors-tr.mha
 do
@@ -20,7 +20,7 @@ echo -e $n $inputs > tensors.list
 
 cpstk itk2vtk -i tensors.list -o tensors.vtk
 
-non-linear-registration.sh
+#non-linear-registration.sh
 
 # ln -s ~/shells/optimal-kernels.csv kernels.csv
 

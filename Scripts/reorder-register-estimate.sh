@@ -27,11 +27,13 @@ do
     cp -f $name $name_without_ext-before.mha
     # Actually reconstruct the tensors.
     ttk estimate -i temp.mha -g temp.grad -b 0 -o $name_without_ext-tensors-initial.mha
-    
+    cp -f $name_without_ext-tensors-initial.mha $name_without_ext-tensors.mha
     # Unstack this 4D image to recover the mean-diffusivity image 
     # and store the DWIs as 'original'
     unstackimage -i $name -o original-dwi-
-
+    
+    # first iteration : put the arithmetic mean of all DWIs 
+    # in front, it will be the reference for 1-to-1 registration
     cpstk reorder -i $name -g $gradname -o temp -t 1 -a 1.0
     
     # Multi-Level registration Process
@@ -48,10 +50,10 @@ do
 	    if [ "$level" -eq 1 ]
 	    then
 	        # Register each of the 'original' DWI to the j-est reference
-		slicetosliceregistration -f reference.mha -m $dwi -o temp-$j
+		slicetosliceregistration -f reference.mha -m $dwi -o temp-$j -mt 0 -d 0
 	    else
 	        # Register each of the 'original' DWI to the j-est reference, using the previous translation as initialization
-		slicetosliceregistration -f reference.mha -m $dwi -o temp-$j -t temp-$j.mat 
+		slicetosliceregistration -f reference.mha -m $dwi -o temp-$j -t temp-$j.mat -mt 0 -d 0
 	    fi
 	    export inputs=${inputs}"\n"temp-$j.mha
 	    let j=$j+1
@@ -63,20 +65,22 @@ do
 	stackimage -i input.blist -o temp.mha
 	# This is now the 4D image to use for tensor estimation
 	cp temp.mha $name_without_ext-after.mha
+
 	# Put the new j-est mean-diffusivity in front of the stack
 	cpstk reorder -i temp.mha -g temp.grad -o geom -t 2 -f $factor
 	# Actually reconstruct the tensors.
-        ttk estimate -i geom.mha -g geom.grad -b 0 -o $name_without_ext-tensors.mha
+	ttk estimate -i geom.mha -g geom.grad -b 0 -o $name_without_ext-tensors.mha
+
 	# Put the new j-est mean-diffusivity in front of the stack
-	cpstk reorder -i temp.mha -g temp.grad -o temp -t 1 -f 1.0
+	cpstk reorder -i temp.mha -g temp.grad -o temp -t 1 -a 1.0
 	# remove temporary files
 	rm -rf t-* geom* temp-increased.mha input.blist
 	
     done
 
     cpstk res-image -i $anatomy -r original-dwi-*00.mha -o reference.mha
-    slicetosliceregistration -f reference.mha -m original-dwi-*00.mha -o $name_without_ext-transformed -d 1
+    slicetosliceregistration -f reference.mha -m original-dwi-*00.mha -o $name_without_ext-transformed -mt 1 -d 1
     cpstk apply-tensors -i $name_without_ext-tensors.mha -t $name_without_ext-transformed.mat -o $name_without_ext-tensors-tr.mha
-
+    #cp -f $name_without_ext-tensors.mha $name_without_ext-tensors-tr.mha
     rm -rf temp* original-dwi* input.blist reference.mha
 done
