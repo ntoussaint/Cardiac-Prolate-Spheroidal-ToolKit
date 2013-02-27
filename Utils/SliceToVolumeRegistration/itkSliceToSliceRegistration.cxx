@@ -64,7 +64,7 @@ int main( int argc, char *argv[] )
   const char* transformfile  = cl.follow("NoFile",2,"-t","-T");
   const bool  smoothing      = cl.follow(1, 2,"-s","-s");
   const bool  threedimension = cl.follow(0, 2,"-d","-d");
-  const unsigned int metrictype = cl.follow(1, 2,"-m","-M");
+  const unsigned int metrictype = cl.follow(1, 2,"-mt","-MT");
   
   double translationthreshold = 20; 
   double smoothingsigma = 2;
@@ -236,12 +236,27 @@ int main( int argc, char *argv[] )
   optimizer->SetRelaxationFactor( 0.8 );
   optimizer->SetMaximumStepLength( initialStepLength ); 
   optimizer->SetMinimumStepLength( 0.01 );
-  optimizer->SetNumberOfIterations( 400 );
-  optimizer->MaximizeOn();
+  optimizer->SetNumberOfIterations( 100 );
+  
+  switch(metrictype)
+  {
+      case 0:
+	optimizer->MaximizeOff();
+	break;
+      case 1:
+	optimizer->MaximizeOn();
+	break;
+      case 2:
+	optimizer->MaximizeOn();
+	break;
+      default:
+	optimizer->MaximizeOff();
+	break;
+  }  
   
   try 
   { 
-    registration->StartRegistration(); 
+    registration->StartRegistration();
   } 
   catch( itk::ExceptionObject & err ) 
   { 
