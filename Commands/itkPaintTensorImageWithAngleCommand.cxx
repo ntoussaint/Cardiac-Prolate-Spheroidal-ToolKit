@@ -300,7 +300,7 @@ namespace itk
     
     VectorType mainvectorprolate;
     TensorType prolatetensor (0.0);
-    double helix=0;
+    double helix=0, transverse=0;
     unsigned int point_id = 0;
     itk::ImageRegionIterator<ImageType> itOut (outputimage, outputimage->GetLargestPossibleRegion());
     itk::ImageRegionIterator<TensorImageType> itIn  (tensorimage,  tensorimage->GetLargestPossibleRegion());
@@ -314,15 +314,22 @@ namespace itk
 	mainvectorprolate.Normalize();
 	switch (type)
 	{
+	    case 1:
+	      transverse = mainvectorprolate[0];
+	      if (mainvectorprolate[2] < 0) transverse = -transverse;
+	      transverse = std::asin(transverse) * 180.0 / vnl_math::pi;
+	      itOut.Set (transverse);
+	      break;
 	    case 0:
 	    default:
 	      helix = mainvectorprolate[1];
 	      if (mainvectorprolate[2] > 0) helix = -helix;
 	      helix = std::asin(helix) * 180.0 / vnl_math::pi;
+	      itOut.Set (helix);
 	      break;
 	}
 	
-	itOut.Set (helix);
+	
 	point_id++;
       }
       

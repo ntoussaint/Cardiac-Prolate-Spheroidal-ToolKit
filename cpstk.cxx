@@ -16,6 +16,7 @@
 =========================================================================*/
 #include "itkRotateProlateSpheroidCommandFactory.h"
 #include "itkTensorsToVTKCommandFactory.h"
+#include "itkTensorsToVTK2CommandFactory.h"
 #include "itkCreateProlateCoordinateImageCommandFactory.h"
 #include "itkExtractProlateInformationCommandFactory.h"
 #include "itkTensorImageToMeshCommandFactory.h"
@@ -55,6 +56,7 @@ int main (int narg, char *args[])
 {
   itk::RotateProlateSpheroidCommandFactory::RegisterOneFactory();
   itk::TensorsToVTKCommandFactory::RegisterOneFactory();
+  itk::TensorsToVTK2CommandFactory::RegisterOneFactory();
   itk::ExtractProlateInformationCommandFactory::RegisterOneFactory();
   itk::TensorImageToMeshCommandFactory::RegisterOneFactory();
   itk::TensorMeshToImageCommandFactory::RegisterOneFactory();
