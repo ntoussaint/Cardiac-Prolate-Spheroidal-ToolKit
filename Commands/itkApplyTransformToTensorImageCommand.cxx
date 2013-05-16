@@ -49,6 +49,7 @@
 #include <itkRigid3DTransform.h>
 #include <itkTransformFactory.h>
 #include "itkTranslationTransform.h"
+#include "itkVersorRigid3DTransform.h"
 
 #include "GetPot.h"
 
@@ -101,6 +102,7 @@ namespace itk
     typedef TensorImageType::DirectionType DirectionType;
   
     typedef itk::MatrixOffsetTransformBase<double, 3, 3> LinearTransformType;
+    typedef itk::VersorRigid3DTransform<double> RigidTransformType;
     typedef itk::TranslationTransform<double, 3> TranslationTransformType;
     typedef itk::Rigid3DTransform<double> Rigid3DTransformType;
     typedef itk::Transform<double, 3, 3> TransformType;
@@ -108,6 +110,7 @@ namespace itk
     typedef TensorImageType::PointType PointType;
   
     itk::TransformFactory< LinearTransformType >::RegisterTransform ();
+    itk::TransformFactory< RigidTransformType >::RegisterTransform ();
     itk::TransformFactory< TranslationTransformType >::RegisterTransform ();
     itk::TransformFactory< Rigid3DTransformType >::RegisterTransform ();
   

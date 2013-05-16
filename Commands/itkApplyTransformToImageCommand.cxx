@@ -50,6 +50,7 @@
 #include <itkResampleImageFilter.h>
 #include <itkTransformFactory.h>
 #include "itkTranslationTransform.h"
+#include "itkVersorRigid3DTransform.h"
 
 #include "GetPot.h"
 
@@ -123,6 +124,7 @@ namespace itk
     typedef ImageType::DirectionType                     DirectionType;
 
     typedef itk::MatrixOffsetTransformBase<double, Dimension, Dimension> LinearTransformType;
+    typedef itk::VersorRigid3DTransform<double> RigidTransformType;
     typedef itk::TranslationTransform<double, UnderDimension>         UnderTranslationTransformType;
     typedef itk::TranslationTransform<double, Dimension>         TranslationTransformType;
     typedef itk::Transform<double, Dimension, Dimension>                 TransformType;
@@ -136,7 +138,8 @@ namespace itk
     typedef UnderImageType::PixelContainer PixelContainerType;
 
     itk::TransformFactory< LinearTransformType >::RegisterTransform ();
-    itk::TransformFactory< UnderTranslationTransformType >::RegisterTransform ();
+     itk::TransformFactory< RigidTransformType >::RegisterTransform ();
+   itk::TransformFactory< UnderTranslationTransformType >::RegisterTransform ();
     itk::TransformFactory< TranslationTransformType >::RegisterTransform ();
   
     std::cout<<"reading input file "<<fileIn<<std::endl;  
