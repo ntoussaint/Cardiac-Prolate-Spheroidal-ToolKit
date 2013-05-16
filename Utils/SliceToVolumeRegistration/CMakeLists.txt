@@ -12,3 +12,12 @@ target_link_libraries(slicetosliceregistration
   ITKNumerics
   ITKStatistics 
 )
+add_executable(volumetovolumeregistration
+  itkVolumeToVolumeRegistration.cxx 
+)
+target_link_libraries(volumetovolumeregistration
+  ITKCommon 
+  ITKIO
+  ITKNumerics
+  ITKStatistics 
+)
