@@ -443,9 +443,9 @@ namespace itk
 
     // put xsi[3] according to the signs of xs[0], xs[1], xs[2]
     xsi[3] =
-      (double)(xs[0] >= 0) * std::pow (2,0) +
-      (double)(xs[1] >= 0) * std::pow (2,1) +
-      (double)(xs[2] >= 0) * std::pow (2,2);
+      (double)(xs[0] >= 0) * std::pow (2.0,0.0) +
+      (double)(xs[1] >= 0) * std::pow (2.0,1.0) +
+      (double)(xs[2] >= 0) * std::pow (2.0,2.0);
     
     return xsi;
   }
