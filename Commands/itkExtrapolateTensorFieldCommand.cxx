@@ -72,7 +72,7 @@ namespace itk
   int ExtrapolateTensorFieldCommand::Execute (int narg, const char* arg[])
   {
     
-    bool force_reading_all = 1;
+    bool force_reading_all = 0;
     
     GetPot   cl(narg, const_cast<char**>(arg)); // argument parser
     if( cl.size() == 1 || cl.search(2, "--help", "-h") ) 
