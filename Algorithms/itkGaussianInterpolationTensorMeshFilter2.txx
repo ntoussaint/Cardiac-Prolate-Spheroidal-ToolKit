@@ -326,12 +326,12 @@ namespace itk
     {
       itkExceptionMacro(<<"Missing Alphas");
     }
-      
+    
     unsigned int N = limiter->GetNumberOfAHAZones();
-
+    
     m_BandwidthMatrices.clear();
     m_SqInverseBandwidthMatrices.clear();
-
+    
     unsigned int counter = 0;
     
     for (unsigned int i=0; i<N; i++)

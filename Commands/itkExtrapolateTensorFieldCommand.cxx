@@ -87,14 +87,14 @@ namespace itk
     inputfile = cl.follow("input.vtk",2,"-i","-I");
     
     const char* domainfile = cl.follow("domain.mha",2,"-d","-D");
-
+    
     const char* prolatefile         = cl.follow("prolate.lms",2,"-pr","-PR");
     const char* displacementfieldfile = cl.follow("forward.mha",2,"-f1","-F1");
     const char* inversedisplacementfieldfile = cl.follow("backward.mha",2,"-f2","-F2");
     const char* gaussiantensorfile = cl.follow("output.mha",2,"-o","-O");
     const unsigned int kerneltouse   = cl.follow(0, 2,"-k","-K");
     const char* kernelfile    = cl.follow("nofile", 2,"-u","-U");
-  
+    
     std::cout << "Processing tensor extrapolation with following arguments: " << std::endl;
     std::cout << "useprolatesystem: \t\t" << useprolatesystem << std::endl;
     std::cout << "prolatefile: \t\t\t" << prolatefile << std::endl;
@@ -105,7 +105,6 @@ namespace itk
     std::cout << "outputfile: \t\t\t" <<gaussiantensorfile << std::endl;
     std::cout << "kerneltouse: \t\t" <<kerneltouse << std::endl;
     std::cout << std::flush;
-
   
     // typedefs
     typedef double ScalarType;
@@ -242,12 +241,15 @@ namespace itk
     ExtrapolateTensorFieldType::Pointer extrapolator = ExtrapolateTensorFieldType::New();
     extrapolator->SetInput (data);
     extrapolator->SetDomain (domain);
-    extrapolator->SetDisplacementField (displacementfield);
-    extrapolator->SetInverseDisplacementField (inversedisplacementfield);
-    extrapolator->SetTransform (transform);
-    extrapolator->SetUseProlateCoordinates (useprolatesystem);
     extrapolator->SetAlpha (alphas);
-  
+    extrapolator->SetUseProlateCoordinates (useprolatesystem);
+    if (useprolatesystem)
+    {
+      extrapolator->SetDisplacementField (displacementfield);
+      extrapolator->SetInverseDisplacementField (inversedisplacementfield);
+      extrapolator->SetTransform (transform);
+    }
+    
     KaiserBesselKernelType::Pointer kaiserkernel = KaiserBesselKernelType::New();
     kaiserkernel->SetWindowSize (6.3);
     kaiserkernel->SetBeta (22.0);
@@ -266,14 +268,30 @@ namespace itk
 	  break;
     }
 
-    ExtrapolateTensorFieldType::InterpolatorType::LimiterType::Pointer limiter = extrapolator->GetInterpolator()->GetLimiter();
-    limiter->CanineDivisionsOff();
-    limiter->SetTransform (transform);
-    limiter->SetDisplacementField (displacementfield);
-    limiter->SetInverseDisplacementField (inversedisplacementfield);
-    limiter->SetAHASegmentationType (ExtrapolateTensorFieldType::InterpolatorType::LimiterType::AHA_1_ZONE);
-    limiter->CalculateZones();
-  
+    if (useprolatesystem)
+    {
+      ExtrapolateTensorFieldType::InterpolatorType::LimiterType::Pointer limiter = extrapolator->GetInterpolator()->GetLimiter();
+      limiter->CanineDivisionsOff();
+      limiter->SetTransform (transform);
+      limiter->SetDisplacementField (displacementfield);
+      limiter->SetInverseDisplacementField (inversedisplacementfield);
+      limiter->SetAHASegmentationType (ExtrapolateTensorFieldType::InterpolatorType::LimiterType::AHA_17_ZONES);
+      try
+      {
+	limiter->CalculateZones();
+      }
+      catch (itk::ExceptionObject& e)
+      {
+	std::cerr<<e<<std::endl;
+	return EXIT_FAILURE;
+      }	
+    }
+    else
+    {
+      ExtrapolateTensorFieldType::InterpolatorType::LimiterType::Pointer limiter = extrapolator->GetInterpolator()->GetLimiter();
+      limiter->SetAHASegmentationType (ExtrapolateTensorFieldType::InterpolatorType::LimiterType::AHA_1_ZONE);
+    }
+    
     try
     {
       extrapolator->Update();
@@ -283,6 +301,7 @@ namespace itk
       std::cerr << e << std::endl;
       return EXIT_FAILURE;
     }
+
     std::cout << " done." << std::endl;
     ExtrapolateTensorFieldType::MeshType::Pointer output = extrapolator->GetOutput();
     output->DisconnectPipeline();

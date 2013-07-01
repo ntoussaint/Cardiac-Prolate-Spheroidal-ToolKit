@@ -127,6 +127,8 @@ namespace itk
   LimitToAHAZoneImageFilter<TImage>
   ::CalculateZones (void)
   {
+    std::cout<<"AHA type entered : "<<m_AHASegmentationType<<std::endl;
+    
     switch (m_AHASegmentationType)
     {
 	case AHA_13_ZONES:
