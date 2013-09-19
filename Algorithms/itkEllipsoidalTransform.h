@@ -322,12 +322,6 @@ namespace itk
        *
        * \f]
        */
-    virtual JacobianType & GetJacobian(const InputPointType  &) const;
-    /**
-       Get the jacobian of the transformation with respect to the coordinates at a specific point
-       
-       It can also be seen in our case as a local contravariant basis, 
-    */
     virtual vnl_matrix_fixed<TPixelType,3,3> GetJacobianWithRespectToCoordinates(const InputPointType  &) const;
     /**
        Get the inverse of this transform

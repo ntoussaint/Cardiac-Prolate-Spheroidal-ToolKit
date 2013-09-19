@@ -37,15 +37,12 @@ namespace itk
    */
   template <class TPixelType>
   EllipsoidalTransform<TPixelType>::EllipsoidalTransform() :
-    Superclass (OutputSpaceDimension, ParametersDimension)
+    Superclass (OutputSpaceDimension)
   {
     this->m_Parameters.SetSize (ParametersDimension);
     this->m_Parameters.Fill (0.0);
     
     this->m_FixedParameters.SetSize (0);
-    
-    this->m_Jacobian.SetSize (OutputSpaceDimension,InputSpaceDimension);
-    this->m_Jacobian.Fill (0.0);
     
     m_Forward = 1;
     
@@ -178,16 +175,7 @@ namespace itk
 
     this->ComputeTransformation();
   }
-
-  template <class TPixelType>
-  typename EllipsoidalTransform<TPixelType>::JacobianType & EllipsoidalTransform<TPixelType>::GetJacobian(const InputPointType  &x) const
-  {
-    // jacobian according to the "parameters" is definitely NOT defined...
-    itkWarningMacro (<<"jacobian according to the \"parameters\" is definitely NOT defined..."<<"\n");
-    
-    return this->m_Jacobian;
-  }
-
+  
   template <class TPixelType>
   vnl_matrix_fixed<TPixelType,3,3> EllipsoidalTransform<TPixelType>::GetJacobianWithRespectToCoordinates(const InputPointType  &x) const
   {

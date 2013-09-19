@@ -41,9 +41,6 @@ namespace itk
 
     this->m_FixedParameters.SetSize (0);
     
-    this->m_Jacobian.SetSize (OutputSpaceDimension,InputSpaceDimension);
-    this->m_Jacobian.Fill (0.0);
-    
     this->m_Forward = 1;
     
     this->m_Center.Fill (0);
