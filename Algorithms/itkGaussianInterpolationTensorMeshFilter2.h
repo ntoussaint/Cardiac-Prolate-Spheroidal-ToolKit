@@ -85,9 +85,9 @@ namespace itk
     typedef typename PixelType::ValueType ScalarType;
     typedef typename MeshType::PointType   PointType;
     typedef Vector <ScalarType, 3>   VectorType;
-    typedef KernelFunction KernelFunctionType;
+    typedef KernelFunctionBase<ScalarType> KernelFunctionType;
     typedef typename KernelFunctionType::Pointer KernelFunctionPointerType;
-    typedef GaussianKernelFunction GaussianKernelFunctionType;
+    typedef GaussianKernelFunction<ScalarType> GaussianKernelFunctionType;
     typedef CovariantVector<double, 3> CovariantVectorType;
     typedef Matrix<double, 3, 3> BandwidthMatrixType;
 

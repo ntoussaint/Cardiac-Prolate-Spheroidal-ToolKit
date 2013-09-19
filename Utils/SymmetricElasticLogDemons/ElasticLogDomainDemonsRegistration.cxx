@@ -1091,7 +1091,7 @@ void LogDomainDemonsRegistrationFunction( arguments args )
   warper->SetOutputSpacing( fixedImage->GetSpacing() );
   warper->SetOutputOrigin( fixedImage->GetOrigin() );
   warper->SetOutputDirection( fixedImage->GetDirection() );
-  warper->SetDeformationField( defField );
+  warper->SetDisplacementField( defField );
 
    
   // Write warped image out to file

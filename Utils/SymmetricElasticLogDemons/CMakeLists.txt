@@ -11,4 +11,4 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 add_executable(elasticlogdomaindemonsregistration ElasticLogDomainDemonsRegistration.cxx )
-target_link_libraries(elasticlogdomaindemonsregistration ITKCommon ITKIO ITKStatistics )
+target_link_libraries(elasticlogdomaindemonsregistration ${ITK_LIBRARIES} )

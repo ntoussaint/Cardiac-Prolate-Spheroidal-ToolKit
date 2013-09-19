@@ -7,17 +7,11 @@ add_executable(slicetosliceregistration
   itkSliceToSliceRegistration.cxx 
 )
 target_link_libraries(slicetosliceregistration
-  ITKCommon 
-  ITKIO
-  ITKNumerics
-  ITKStatistics 
+  ${ITK_LIBRARIES}
 )
 add_executable(volumetovolumeregistration
   itkVolumeToVolumeRegistration.cxx 
 )
 target_link_libraries(volumetovolumeregistration
-  ITKCommon 
-  ITKIO
-  ITKNumerics
-  ITKStatistics 
+  ${ITK_LIBRARIES}
 )

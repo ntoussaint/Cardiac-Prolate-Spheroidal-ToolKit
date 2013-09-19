@@ -516,20 +516,20 @@ namespace itk
     VectorType m_Axis1;
     VectorType m_Axis2;
     VectorType m_Axis3;
-
+    
     double m_Coefficients[3];
     double m_Lambda1;
     double m_Lambda2;
     double m_Lambda3;
-
+    
     PointType m_Focus1;
     PointType m_Focus2;
     double m_Eccentricity;
     double m_SemiFociDistance;
-  
+    
     UniformMatrixType m_InternalTransform;
     UniformMatrixType m_InternalTransformInverse;
-  
+    
     CrossHelperType m_Cross;
     unsigned int m_Forward;
     

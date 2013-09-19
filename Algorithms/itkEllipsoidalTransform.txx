@@ -429,13 +429,14 @@ namespace itk
       itkWarningMacro (<<"found non-real roots at  xs = "<<xs<<" with Delta = "<<delta);
       return xsi;
     }
-
+    
     double theta = std::acos( R / std::sqrt (-Q*Q*Q) );
+    double sqrQ  = std::sqrt (-Q);
     
     std::vector<ScalarType> sorter;
-    sorter.push_back (2.0 * std::sqrt (-Q) * std::cos( (theta + 0.0 * vnl_math::pi) / 3.0 ) - s2 / 3.0);
-    sorter.push_back (2.0 * std::sqrt (-Q) * std::cos( (theta + 2.0 * vnl_math::pi) / 3.0 ) - s2 / 3.0);
-    sorter.push_back (2.0 * std::sqrt (-Q) * std::cos( (theta + 4.0 * vnl_math::pi) / 3.0 ) - s2 / 3.0);
+    sorter.push_back (2.0 * sqrQ * std::cos( (theta + 0.0 * vnl_math::pi) / 3.0 ) - s2 / 3.0);
+    sorter.push_back (2.0 * sqrQ * std::cos( (theta + 2.0 * vnl_math::pi) / 3.0 ) - s2 / 3.0);
+    sorter.push_back (2.0 * sqrQ * std::cos( (theta + 4.0 * vnl_math::pi) / 3.0 ) - s2 / 3.0);
     
     std::sort (sorter.begin(), sorter.end());
     for (unsigned int i=0; i<sorter.size(); i++)
@@ -478,7 +479,6 @@ namespace itk
     MatrixType matrix; matrix = this->GetJacobianWithRespectToCoordinates(p);
     MatrixType transpose; transpose = matrix.GetTranspose ();
     VectorType ret = transpose * v;
-    
     return ret;
   }
 
@@ -539,6 +539,13 @@ namespace itk
        << "\n\tv31: " << m_Axis3[0]
        << "\n\tv32: " << m_Axis3[1]
        << "\n\tv33: " << m_Axis3[2] << "\n";
+    os << indent << "type as string: "
+       << this->GetTransformTypeAsString() << "\n";
+    os << indent << "parameters: "
+       << this->GetParameters() << "\n";
+    os << indent << "fixed parameters: "
+       << this->GetFixedParameters() << "\n";
+    
   }
 
   /*

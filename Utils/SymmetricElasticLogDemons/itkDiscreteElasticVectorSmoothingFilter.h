@@ -12,10 +12,10 @@
 #include "itkImageToImageFilter.h"
 
 #include "itkAddImageFilter.h"
-#include "itkCompose3DVectorImageFilter.h"
-#include "itkDivideByConstantImageFilter.h"
+#include "itkComposeImageFilter.h"
+#include "itkDivideImageFilter.h"
 #include "itkMaskImageFilter.h"
-#include "itkMultiplyByConstantImageFilter.h"
+#include "itkMultiplyImageFilter.h"
 #include "itkDiscreteGaussianDerivativeImageFilter.h"
 #ifdef ITK_USE_CONCEPT_CHECKING
   #define CONCEPT_CHECKING_IS_USED
@@ -91,10 +91,10 @@ protected:
   typedef  DiscreteGaussianImageFilter< ComponentImageType, ComponentImageType >            SmootherType;
   typedef  AddImageFilter< ComponentImageType, ComponentImageType, ComponentImageType >     AdderType;
   typedef  DiscreteGaussianDerivativeImageFilter< ComponentImageType, ComponentImageType >  DerivativeFilterType;
-  typedef  DivideByConstantImageFilter< ComponentImageType, float, ComponentImageType >     DividerType;
-  typedef  MultiplyByConstantImageFilter< ComponentImageType, float, ComponentImageType >   MultiplierType;
+  typedef  DivideImageFilter< ComponentImageType, ComponentImageType, ComponentImageType >     DividerType;
+  typedef  MultiplyImageFilter< ComponentImageType, ComponentImageType, ComponentImageType >   MultiplierType;
   typedef  MaskImageFilter< ComponentImageType, TMaskImageType, ComponentImageType >        MaskerType;
-  typedef  Compose3DVectorImageFilter< ComponentImageType >                                 VectorComposerType;
+  typedef  ComposeImageFilter< ComponentImageType >                                 VectorComposerType;
 
   /// Default constructor
   DiscreteElasticVectorSmoothingFilter();

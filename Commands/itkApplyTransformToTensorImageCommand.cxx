@@ -112,7 +112,7 @@ namespace itk
     itk::TransformFactory< LinearTransformType >::RegisterTransform ();
     itk::TransformFactory< RigidTransformType >::RegisterTransform ();
     itk::TransformFactory< TranslationTransformType >::RegisterTransform ();
-    itk::TransformFactory< Rigid3DTransformType >::RegisterTransform ();
+    //itk::TransformFactory< Rigid3DTransformType >::RegisterTransform ();
   
     std::cout<<"reading input file "<<fileIn<<std::endl;  
     IOType::Pointer myReader = IOType::New();

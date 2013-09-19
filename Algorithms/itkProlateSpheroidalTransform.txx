@@ -35,15 +35,12 @@ namespace itk
    */
   template <class TPixelType>
   ProlateSpheroidalTransform<TPixelType>::ProlateSpheroidalTransform() :
-    Superclass (OutputSpaceDimension, ParametersDimension)
+    Superclass (OutputSpaceDimension)
   {
     this->m_Parameters.SetSize (ParametersDimension);
     this->m_Parameters.Fill (0.0);
 
     this->m_FixedParameters.SetSize (0);
-    
-    this->m_Jacobian.SetSize (OutputSpaceDimension,InputSpaceDimension);
-    this->m_Jacobian.Fill (0.0);
     
     m_Forward = 1;
     
@@ -192,15 +189,6 @@ namespace itk
     for (unsigned int i=0; i<3; i++) m_ShortAxisPoint[i] = this->m_Parameters[count++];
 
     this->ComputeTransformation();
-  }
-
-  template <class TPixelType>
-  typename ProlateSpheroidalTransform<TPixelType>::JacobianType & ProlateSpheroidalTransform<TPixelType>::GetJacobian(const InputPointType  &x) const
-  {
-    // jacobian according to the "parameters" is definitely NOT defined...
-    itkWarningMacro (<<"jacobian according to the \"parameters\" is definitely NOT defined..."<<"\n");
-    
-    return this->m_Jacobian;
   }
 
   template <class TPixelType>

@@ -5,10 +5,7 @@
 
 #include "itkAddImageFilter.h"
 #include "itkImageDuplicator.h"
-#include "itkCompose3DVectorImageFilter.h"
-#include "itkDivideByConstantImageFilter.h"
 #include "itkMaskImageFilter.h"
-#include "itkMultiplyByConstantImageFilter.h"
 #include "itkDiscreteGaussianImageFilter.h"
 #include "itkDiscreteGaussianDerivativeImageFilter.h"
 #include "itkVectorIndexSelectionCastImageFilter.h"

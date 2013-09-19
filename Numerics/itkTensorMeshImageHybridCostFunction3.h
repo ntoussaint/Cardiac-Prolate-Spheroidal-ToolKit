@@ -70,7 +70,7 @@ public:
   typedef ProlateSpheroidalTransformTensorMeshFilter<MeshType>  TransformerType;
   typedef GaussianInterpolationTensorMeshFilter2<MeshType>      Interpolator2Type;
 
-  typedef GaussianKernelFunction                                GaussianKernelFunctionType;
+  typedef GaussianKernelFunction<ScalarType>                    GaussianKernelFunctionType;
   typedef BSplineKernelFunction<3>                              BSplineKernelFunctionType;
   typedef KaiserBesselKernelFunction                            KaiserBesselKernelType;
   

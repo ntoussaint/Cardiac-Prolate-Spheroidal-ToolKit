@@ -180,7 +180,7 @@ ExponentialDeformationFieldImageFilter<TInputImage,TOutputImage>
   for( unsigned int i=0; i<numiter; i++ )
     {
     m_Warper->SetInput(this->GetOutput());
-    m_Warper->SetDeformationField(this->GetOutput());
+    m_Warper->SetDisplacementField(this->GetOutput());
 
     m_Warper->GetOutput()->SetRequestedRegion(
        this->GetOutput()->GetRequestedRegion() );

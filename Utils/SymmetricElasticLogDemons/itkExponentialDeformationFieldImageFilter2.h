@@ -2,7 +2,7 @@
 #define __itkExponentialDeformationFieldImageFilter2_h
 
 #include "itkImageToImageFilter.h"
-#include "itkDivideByConstantImageFilter.h"
+#include "itkDivideImageFilter.h"
 #include "itkCastImageFilter.h"
 #include "itkOppositeImageFilter.h"
 #include "itkWarpVectorImageFilter.h"
@@ -72,6 +72,8 @@ public:
   typedef TOutputImage                                 OutputImageType;
   typedef typename OutputImageType::Pointer            OutputImagePointer;
   typedef typename OutputImageType::PixelType          OutputPixelType;
+  typedef Image<InputPixelRealValueType, TInputImage::ImageDimension> RealImageType;
+  
 
   /** Specify the maximum number of iteration. */
   itkSetMacro(MaximumNumberOfIterations, unsigned int);
@@ -129,9 +131,9 @@ protected:
 
   typedef typename InputImageType::RegionType          RegionType;
 
-  typedef DivideByConstantImageFilter<
+  typedef DivideImageFilter<
     InputImageType,
-    InputPixelRealValueType, OutputImageType >         DivideByConstantType;
+    RealImageType, OutputImageType >         DivideByConstantType;
 
   typedef CastImageFilter<
     InputImageType, OutputImageType>                   CasterType;

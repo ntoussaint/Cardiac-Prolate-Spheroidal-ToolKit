@@ -116,7 +116,7 @@ namespace itk
     typedef TransformType::InputPointType                                  PointType;
     typedef itk::ResampleImageFilter<ImageType,ImageType>                  ResampleImageFilterType;
 
-    typedef itk::GaussianKernelFunction GaussianKernelFunctionType;
+    typedef itk::GaussianKernelFunction<ScalarType> GaussianKernelFunctionType;
 
     std::cout<<"reading kernel list : "<<kernelfile<<std::endl;
     std::ifstream inputliststream (kernelfile);

@@ -259,7 +259,7 @@ int main( int argc, char *argv[] )
   
   try 
   { 
-    registration->StartRegistration();
+    registration->Update();
   } 
   catch( itk::ExceptionObject & err ) 
   { 
@@ -274,7 +274,7 @@ int main( int argc, char *argv[] )
   finaltransform->SetFixedParameters( transform->GetFixedParameters() );
 
   TransformType::OutputVectorType offset = finaltransform->GetOffset();
-  TransformType::MatrixType     rotation = finaltransform->GetRotationMatrix();
+  TransformType::MatrixType     rotation = finaltransform->GetMatrix();
   TransformType::Pointer inversetransform = TransformType::New();
   finaltransform->GetInverse(inversetransform);
       
@@ -313,7 +313,7 @@ int main( int argc, char *argv[] )
         for (unsigned int j=0; j<3; j++)
 	{
 	  matrix[i][j] = direction[i][j];
-          transformmatrix[i][j] = transformtouse->GetRotationMatrix()[i][j];
+          transformmatrix[i][j] = transformtouse->GetMatrix()[i][j];
 	}
         matrix[i][3] = movingimage->GetOrigin()[i];
         transformmatrix[i][3] = transformtouse->GetOffset()[i];

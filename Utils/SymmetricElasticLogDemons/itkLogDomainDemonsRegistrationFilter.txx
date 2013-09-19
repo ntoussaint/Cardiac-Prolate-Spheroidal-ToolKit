@@ -73,7 +73,7 @@ LogDomainDemonsRegistrationFilter<TFixedImage,TMovingImage,TField>
   //std::cout<<"LogDomainDemonsRegistrationFilter::InitializeIteration"<<std::endl;
   // update variables in the equation object
   DemonsRegistrationFunctionType *f = this->DownCastDifferenceFunctionType();
-  f->SetDeformationField( this->GetDeformationField() );
+  f->SetDisplacementField( this->GetDeformationField() );
   
   // call the superclass  implementation ( initializes f )
   Superclass::InitializeIteration();

@@ -111,7 +111,7 @@ namespace itk
     typedef itk::TensorImageIO<ScalarType, 3, 3> TensorImageIOType;
     typedef itk::TensorMeshIO<ScalarType, 3, 3> TensorMeshIOType;
 
-    typedef itk::GaussianKernelFunction GaussianKernelFunctionType;
+    typedef itk::GaussianKernelFunction<ScalarType> GaussianKernelFunctionType;
     typedef itk::BSplineKernelFunction<3> BSplineKernelFunctionType;
     typedef itk::KaiserBesselKernelFunction KaiserBesselKernelType;
 

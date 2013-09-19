@@ -17,7 +17,7 @@
 #ifndef __itkKaiserBesselKernelFunction_h
 #define __itkKaiserBesselKernelFunction_h
 
-#include "itkKernelFunction.h"
+#include "itkKernelFunctionBase.h"
 #include <cmath>
 
 namespace itk
@@ -55,13 +55,13 @@ namespace itk
  *
  * \ingroup Functions
  */
-class ITK_EXPORT KaiserBesselKernelFunction : public KernelFunction
+  class ITK_EXPORT KaiserBesselKernelFunction : public KernelFunctionBase<double>
 {
 public:
   /** Standard class typedefs. */
   typedef KaiserBesselKernelFunction      Self;
-  typedef KernelFunction              Superclass;
-  typedef SmartPointer<Self>          Pointer;
+  typedef KernelFunctionBase<double>      Superclass;
+  typedef SmartPointer<Self>              Pointer;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self); 
