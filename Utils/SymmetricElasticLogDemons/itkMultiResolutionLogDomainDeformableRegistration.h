@@ -71,12 +71,12 @@ namespace itk
  */
 template <class TFixedImage, class TMovingImage, class TField, class  TRealType = float>
 class ITK_EXPORT MultiResolutionLogDomainDeformableRegistration :
-    public ImageToImageFilter <TField, TField>
+    public ImageToImageFilter <TFixedImage, TField>
 {
 public:
   /** Standard class typedefs */
   typedef MultiResolutionLogDomainDeformableRegistration Self;
-  typedef ImageToImageFilter<TField, TField>
+  typedef ImageToImageFilter<TFixedImage, TField>
                                                    Superclass;
   typedef SmartPointer<Self>                       Pointer;
   typedef SmartPointer<const Self>                 ConstPointer;
@@ -159,10 +159,8 @@ public:
   /** Set initial velocity field. No assumption is made on the
    *  input. It will therefore be smoothed and resampled to match the
    *  images characteristics at the coarsest level of the pyramid. */
-  virtual void SetArbitraryInitialVelocityField( VelocityFieldType * ptr )
-    {
-    this->SetInput( ptr ); 
-    }
+  virtual void SetArbitraryInitialVelocityField( const VelocityFieldType * ptr );
+  const VelocityFieldType* GetArbitraryInitialVelocityField( void ) const;
 
   /** Get output velocity field. */
   VelocityFieldType * GetVelocityField() { return this->GetOutput(); }

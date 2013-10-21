@@ -64,13 +64,13 @@ namespace itk {
  */
 template<class TFixedImage, class TMovingImage, class TField>
 class ITK_EXPORT LogDomainDeformableRegistrationFilter : 
-    public DenseFiniteDifferenceImageFilter<TField,TField>
+    public DenseFiniteDifferenceImageFilter<TFixedImage,TField>
 {
 public:
   /** Standard class typedefs. */
   typedef LogDomainDeformableRegistrationFilter    Self;
   typedef DenseFiniteDifferenceImageFilter<
-    TField,TField>                                 Superclass;
+    TFixedImage,TField>                            Superclass;
   typedef SmartPointer<Self>                       Pointer;
   typedef SmartPointer<const Self>                 ConstPointer;
 
@@ -127,9 +127,11 @@ public:
   const MovingImageType * GetMovingImage(void) const;
 
   /** Set initial velocity field. */
-  void SetInitialVelocityField( VelocityFieldType * ptr )
-  { this->SetInput( ptr ); }
-
+  void SetInitialVelocityField( const VelocityFieldType * ptr );
+  
+  /** Get initial velocity field. */
+  const VelocityFieldType * GetInitialVelocityField(void) const;
+    
   /** Get output velocity field. */
   VelocityFieldType * GetVelocityField() { return this->GetOutput(); }
 
