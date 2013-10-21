@@ -169,6 +169,7 @@ namespace itk
     typename Image4DType::IndexType  bufferstart;  bufferstart.Fill (0);
     typename Image4DType::RegionType bufferregion; bufferregion.SetSize (buffersize); bufferregion.SetIndex (bufferstart);
     extractor->SetInput (input);
+    extractor->SetDirectionCollapseToSubmatrix();
     
     unsigned counter = 0;
     for (unsigned int i = 0; i < gradientlist.size(); i++)
@@ -214,7 +215,8 @@ namespace itk
     typename Image4DType::IndexType  bufferstart;  bufferstart.Fill (0);
     typename Image4DType::RegionType bufferregion; bufferregion.SetSize (buffersize); bufferregion.SetIndex (bufferstart);
     extractor->SetInput (input);
-
+    extractor->SetDirectionCollapseToSubmatrix();
+    
     unsigned int numberofdwis = 0;
 
     // 1) ACCUMULATE DWI SIGNAL FOR ARITHMETIC MEAN CALCULATION
@@ -289,7 +291,8 @@ namespace itk
     typename Image4DType::IndexType  bufferstart;  bufferstart.Fill (0);
     typename Image4DType::RegionType bufferregion; bufferregion.SetSize (buffersize); bufferregion.SetIndex (bufferstart);
     extractor->SetInput (input);
-
+    extractor->SetDirectionCollapseToSubmatrix();
+    
     unsigned int numberofdwis = 0;
 
     // 1) ACCUMULATE DWI SIGNAL FOR GEOMETRIC MEAN CALCULATION AND GEOMETRIC COEFFICIENT CALCULATION
@@ -407,6 +410,7 @@ namespace itk
     typename Image4DType::IndexType  bufferstart;  bufferstart.Fill (0);
     typename Image4DType::RegionType bufferregion; bufferregion.SetSize (buffersize); bufferregion.SetIndex (bufferstart);
     extractor->SetInput (input);
+    extractor->SetDirectionCollapseToSubmatrix();
 
     std::cout << "Filling output with extracted DWI..."<< std::endl;
     typename itk::ImageRegionIterator<Image4DType> itOut(output, output->GetLargestPossibleRegion());
@@ -540,32 +544,65 @@ namespace itk
     ImageType::Pointer arithmeticmeanimage = ImageType::New();    
     ImageType::Pointer geometricmeanimage  = ImageType::New();
     
+    try
+    {
+      
+      // ESTIMATE THE OUTPUT GRADIENT LIST
+      EstimateOutputGradientList<itk::GradientFileReader::VectorListType> (inputgradients, replacementtype, outputgradients, ids);
+    }
+    catch(itk::ExceptionObject &e)
+    {
+      std::cerr << e;
+      exit(EXIT_FAILURE);
+    }
 
-    // ESTIMATE THE OUTPUT GRADIENT LIST
-    EstimateOutputGradientList<itk::GradientFileReader::VectorListType> (inputgradients, replacementtype, outputgradients, ids);
-
-    // EXTRACT THE B0 IMAGE
-    ExtractB0Image<Image4DType,ImageType,itk::GradientFileReader::VectorListType> (inputimage, inputgradients, b0image);  
+    try
+    {
+      // EXTRACT THE B0 IMAGE
+      ExtractB0Image<Image4DType,ImageType,itk::GradientFileReader::VectorListType> (inputimage, inputgradients, b0image);  
+    }
+    catch(itk::ExceptionObject &e)
+    {
+      std::cerr << e;
+      exit(EXIT_FAILURE);
+    }
 
     ImageType::Pointer firstimage;
     switch (replacementtype)
     {
 	case 1:
-	  // CALCULATE THE ARITHMETIC MEAN OF THE DIFFUSION MIMAGES
-	  EstimateArithmeticcMean<Image4DType,ImageType,itk::GradientFileReader::VectorListType>(inputimage, b0image, inputgradients, afactor, arithmeticmeanimage);
+	  try
+	  {
+	    // CALCULATE THE ARITHMETIC MEAN OF THE DIFFUSION MIMAGES
+	    EstimateArithmeticcMean<Image4DType,ImageType,itk::GradientFileReader::VectorListType>(inputimage, b0image, inputgradients, afactor, arithmeticmeanimage);
+	  }
+	  catch(itk::ExceptionObject &e)
+	  {
+	    std::cerr << e;
+	    exit(EXIT_FAILURE);
+	  }
+
     	  firstimage = arithmeticmeanimage;
 	  break;
 	case 2:
-	  // CALCULATE THE GEOMETRIC MEAN OF THE DIFFUSION MIMAGES
-	  EstimateGeometricMean<Image4DType,ImageType,itk::GradientFileReader::VectorListType>(inputimage, b0image, inputgradients, gfactor, geometricmeanimage);
+	  try
+	  { 
+	    // CALCULATE THE GEOMETRIC MEAN OF THE DIFFUSION MIMAGES
+	    EstimateGeometricMean<Image4DType,ImageType,itk::GradientFileReader::VectorListType>(inputimage, b0image, inputgradients, gfactor, geometricmeanimage);
+	  }
+	  catch(itk::ExceptionObject &e)
+	  {
+	    std::cerr << e;
+	    exit(EXIT_FAILURE);
+	  }
+	  
 	  firstimage = geometricmeanimage;
 	  break;
 	case 0:
 	default:
 	  firstimage = b0image;
 	  break;
-    }
-    
+    }    
 
     // FILL OUTPUT WITH THE RIGHT IMAGES
     Image4DType::Pointer output = Image4DType::New();
