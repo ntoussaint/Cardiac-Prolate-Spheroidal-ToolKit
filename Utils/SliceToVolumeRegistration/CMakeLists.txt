@@ -15,3 +15,9 @@ add_executable(volumetovolumeregistration
 target_link_libraries(volumetovolumeregistration
   ${ITK_LIBRARIES}
 )
+add_executable(slicetovolumeregistration
+  itkSliceToVolumeRegistration.cxx 
+)
+target_link_libraries(slicetovolumeregistration
+  ${ITK_LIBRARIES}
+)

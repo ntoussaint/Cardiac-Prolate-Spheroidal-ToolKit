@@ -68,7 +68,7 @@ void PrintHelp(const char* exec)
   std::cout << "-t  [optional initial 3D transform file]" << std::endl;
   std::cout << "-o  [output file base]" << std::endl;
   std::cout << "-k  [keep image container and only modify header (0/1, default: 1)]" << std::endl;
-  std::cout << "-m  [metric-type (0 : cross-correlation / 1 : mutual information / 2 : derivative-based )]" << std::endl << std::endl;
+  std::cout << "-mt  [metric-type (0 : cross-correlation / 1 : mutual information / 2 : derivative-based )]" << std::endl << std::endl;
   
   std::exit(EXIT_SUCCESS);
 }
@@ -101,15 +101,15 @@ int main( int argc, char *argv[] )
   
   const    unsigned int    Dimension = 3;
   typedef  short   PixelType;
-
+  
   typedef itk::Image< PixelType, Dimension >  FixedImageType;
   typedef itk::Image< PixelType, Dimension >  MovingImageType;
   typedef itk::Image< PixelType, Dimension > ImageType;
   
   typedef itk::VersorRigid3DTransform< double> TransformType;
   itk::TransformFactory<TransformType>::RegisterTransform ();
-
-  typedef itk::VersorRigid3DTransformOptimizer       OptimizerType;
+  
+  typedef itk::VersorRigid3DTransformOptimizer                                  OptimizerType;
   typedef itk::MeanSquaresImageToImageMetric< FixedImageType, MovingImageType > MetricType;
   typedef itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType >    MIMetricType;
   typedef itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType >    CCMetricType;
@@ -120,23 +120,23 @@ int main( int argc, char *argv[] )
   typedef itk::ResampleImageFilter< MovingImageType, FixedImageType > ResampleFilterType;
   typedef itk::ImageFileReader< FixedImageType  > FixedImageReaderType;
   typedef itk::ImageFileReader< MovingImageType > MovingImageReaderType;
-
+  
   typedef FixedImageType::SpacingType    SpacingType;
   typedef FixedImageType::PointType      OriginType;
   typedef FixedImageType::RegionType     RegionType;
   typedef FixedImageType::SizeType       SizeType;
   typedef FixedImageType::PixelContainer PixelContainerType;
-
-  MetricType::Pointer         metric        = MetricType::New();
-  MIMetricType::Pointer     mimetric        = MIMetricType::New();
-  MattesMetricType::Pointer mattesmetric    = MattesMetricType::New();
-  CCMetricType::Pointer         ccmetric    = CCMetricType::New();
-  OptimizerType::Pointer      optimizer     = OptimizerType::New();
-  InterpolatorType::Pointer   interpolator  = InterpolatorType::New();
-  RegistrationType::Pointer   registration  = RegistrationType::New();
+  
+  MetricType::Pointer                metric = MetricType::New();
+  MIMetricType::Pointer            mimetric = MIMetricType::New();
+  MattesMetricType::Pointer    mattesmetric = MattesMetricType::New();
+  CCMetricType::Pointer            ccmetric = CCMetricType::New();
+  OptimizerType::Pointer          optimizer = OptimizerType::New();
+  InterpolatorType::Pointer    interpolator = InterpolatorType::New();
+  RegistrationType::Pointer    registration = RegistrationType::New();
   GaussianFilterType::Pointer      smoother = GaussianFilterType::New();
   ResampleFilterType::Pointer      resample = ResampleFilterType::New();
-  TransformType::Pointer              transform = TransformType::New();
+  TransformType::Pointer          transform = TransformType::New();
 
   FixedImageReaderType::Pointer  fixedImageReader  = FixedImageReaderType::New();
   MovingImageReaderType::Pointer movingImageReader = MovingImageReaderType::New();
@@ -166,11 +166,9 @@ int main( int argc, char *argv[] )
     startingpoint = startingtransform->GetParameters();
   }
   
-  unsigned int numberOfHistogramBins = 1;
+  unsigned int numberOfHistogramBins = 20;
   MIMetricType::HistogramType::SizeType histogramSize;
-#ifdef ITK_USE_REVIEW_STATISTICS
   histogramSize.SetSize(3);
-#endif
   histogramSize[0] = numberOfHistogramBins;
   histogramSize[1] = numberOfHistogramBins;
   histogramSize[2] = numberOfHistogramBins;

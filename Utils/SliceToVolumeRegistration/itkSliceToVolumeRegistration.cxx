@@ -39,11 +39,11 @@ int main( int argc, char *argv[] )
   if( argc < 5 )
     {
       std::cerr << "Parameters: " << argv[0] << std::endl;
-    std::cerr << " fixedImageFile\n movingImageFile\n";
-    std::cerr << " center-initialization (0/1)\n";
-    std::cerr << " constrain-type (0: no constrain; 1: slice-plane constraiin; 2: respiratory-plane constrain)\n";
-    std::cerr << " outputTransformfile\n [outputtranslatedimage]\n" <<std::endl;
-    return EXIT_FAILURE;
+      std::cerr << " fixedImageFile\n movingImageFile\n";
+      std::cerr << " center-initialization (0/1)\n";
+      std::cerr << " constrain-type (0: no constrain; 1: slice-plane constraiin; 2: respiratory-plane constrain)\n";
+      std::cerr << " outputTransformfile\n [outputtranslatedimage]\n" <<std::endl;
+      return EXIT_FAILURE;
     }
   
   const unsigned int Dimension3 = 3;
