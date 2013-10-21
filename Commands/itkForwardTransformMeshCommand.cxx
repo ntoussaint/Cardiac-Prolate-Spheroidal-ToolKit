@@ -1,6 +1,7 @@
 #include "itkForwardTransformMeshCommand.h"
 
 #include "itkProlateSpheroidalTransformTensorMeshFilter.h"
+#include "itkCylindricalTransformTensorMeshFilter.h"
 
 #include "itkTensorImageIO.h"
 #include "itkTensorMeshIO.h"
@@ -30,10 +31,11 @@ namespace itk
     m_LongDescription = m_ShortDescription;
     m_LongDescription += "\n\nUsage:\n";
     m_LongDescription +="-i    [input tensor image/mesh (default : input.vtk)]\n";    
-    m_LongDescription +="-pr   [prolate transform used]\n";
+    m_LongDescription +="-pr   [prolate/cylindrical transform used]\n";
     m_LongDescription +="-f1   [forward displacement field (default : forward.mha)]\n";
     m_LongDescription +="-f2   [backward displacement field (default : backward.mha)]\n";
     m_LongDescription +="-o    [output vtk unstructured tensor mesh]\n";    
+    m_LongDescription +="-t    [transformation type (0: prolate / 1: cylindrical)]\n";    
   }
 
   ForwardTransformMeshCommand::~ForwardTransformMeshCommand()
@@ -54,6 +56,7 @@ namespace itk
     const char* displacementfieldfile        = cl.follow("forward.mha",2,"-f1","-F1");
     const char* inversedisplacementfieldfile = cl.follow("backward.mha",2,"-f2","-F2");
     const char* outputfile                   = cl.follow("output.csv",2,"-o","-O");
+    unsigned int transformationtype          = cl.follow(0, 2,"-t","-T");
 
     // typedefs
     typedef double                                                         ScalarType;
@@ -74,12 +77,16 @@ namespace itk
     typedef itk::ProlateSpheroidalTransformTensorMeshFilter<MeshType>      TransformerType;
     typedef TransformerType::TransformType                                 TransformType;
     typedef TransformType::InputPointType                                  PointType;
+    typedef itk::CylindricalTransformTensorMeshFilter<MeshType>            CylindricalTransformerType;
+    typedef CylindricalTransformerType::TransformType                      CylindricalTransformType;
 
     // instantiation
     DisplacementFileReaderType::Pointer    displacementreader1    = DisplacementFileReaderType::New();
     DisplacementFileReaderType::Pointer    displacementreader2    = DisplacementFileReaderType::New();
     TransformType::Pointer                 transform              = TransformType::New();
+    CylindricalTransformType::Pointer      cylindricaltransform   = CylindricalTransformType::New();
     TransformerType::Pointer               transformer            = TransformerType::New();
+    CylindricalTransformerType::Pointer    cylindricaltransformer = CylindricalTransformerType::New();
     WarperType::Pointer                    warper                 = WarperType::New();
     
     // read the input tensors and put tham into a vtkUnstructuredGrid
@@ -143,27 +150,60 @@ namespace itk
   
     std::cout<<"reading transform "<<prolatefile<<"..."<<std::endl;
     itk::TransformFactory<TransformType>::RegisterTransform ();
+    itk::TransformFactory<CylindricalTransformType>::RegisterTransform ();
     itk::TransformFileReader::Pointer transformreader = itk::TransformFileReader::New();
     transformreader->SetFileName( prolatefile );
-    transformreader->Update();
+    try
+    {
+      transformreader->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+      std::cerr << e << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
   
     transform = dynamic_cast<TransformType*>( transformreader->GetTransformList()->front().GetPointer() );
+    cylindricaltransform = dynamic_cast<CylindricalTransformType*>( transformreader->GetTransformList()->front().GetPointer() );
     TransformType::Pointer transform_inverse = TransformType::New();
-    transform->GetInverse(transform_inverse);
+    CylindricalTransformType::Pointer cylindricaltransform_inverse = CylindricalTransformType::New();
+    if (transformationtype == 0)
+      transform->GetInverse(transform_inverse);
+    else
+      cylindricaltransform->GetInverse(cylindricaltransform_inverse);
     std::cout << " Done." << std::endl;
     
     std::cout<<"Warping..."<<std::endl;
     warper->SetInput (data);
     warper->SetDisplacementField (displacementfield);
     warper->SetInverseDisplacementField (inversedisplacementfield);
-    warper->Update();
+    try
+    {
+      warper->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+      std::cerr << e << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
     
     std::cout<<"Transforming..."<<std::endl;
-    transformer->SetInput (warper->GetOutput());
-    transformer->SetTransform (transform);
-    transformer->Update();
-    
-    MeshType::Pointer output = transformer->GetOutput();
+    MeshType::Pointer output;
+
+    if (transformationtype == 0)
+    {
+      transformer->SetInput (warper->GetOutput());
+      transformer->SetTransform (transform);
+      transformer->Update();
+      output = transformer->GetOutput();
+    }
+    else
+    {
+      cylindricaltransformer->SetInput (warper->GetOutput());
+      cylindricaltransformer->SetTransform (cylindricaltransform);
+      cylindricaltransformer->Update();
+      output = cylindricaltransformer->GetOutput();
+    }
 
     output->DisconnectPipeline();
 
