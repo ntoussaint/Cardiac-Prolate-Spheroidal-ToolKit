@@ -43,6 +43,22 @@ void EvaluateXi1Range(typename MeshType::Pointer mesh, double* range)
   range[1] = max;
   
 }
+template<typename MeshType>
+void EvaluateXi2Range(typename MeshType::Pointer mesh, double* range)
+{
+  double min = range[0];
+  double max = range[1];
+  typename MeshType::PointType p;
+  for (unsigned int i=0; i<mesh->GetNumberOfPoints(); i++)
+  {
+    mesh->GetPoint (i, &p);
+    min = std::min (p[1], min);
+    max = std::max (p[1], max);    
+  }
+  range[0] = min;
+  range[1] = max;
+  
+}
 
 
 template<typename MeshType>
@@ -65,6 +81,31 @@ void NormalizeXi1(typename MeshType::Pointer mesh, double* outrange)
   {
     mesh->GetPoint (i, &p);
     p[0] = outmin + ( (outmax - outmin) / (inmax - inmin) ) * (p[0] - inmin);
+    mesh->SetPoint (i, p);
+  }
+}
+
+
+template<typename MeshType>
+void NormalizeXi2(typename MeshType::Pointer mesh, double* outrange)
+{
+  double inrange[2] = {+100, -100};
+  EvaluateXi2Range<MeshType> (mesh, inrange);
+  
+  double inmin = inrange[0];
+  double inmax = inrange[1];
+  double outmin = outrange[0];
+  double outmax = outrange[1];
+  typename MeshType::PointType p;
+  
+  std::cout<<"2nd component normalization:"<<std::endl
+	   <<"from : "<<inmin<<" and "<<inmax<<std::endl
+	   <<"  to : "<<outmin<<" and "<<outmax<<std::endl;
+  
+  for (unsigned int i=0; i<mesh->GetNumberOfPoints(); i++)
+  {
+    mesh->GetPoint (i, &p);
+    p[1] = outmin + ( (outmax - outmin) / (inmax - inmin) ) * (p[1] - inmin);
     mesh->SetPoint (i, p);
   }
 }
@@ -151,6 +192,7 @@ namespace itk
     data->SetPointData (tensors);
     
     double xi1range[2] = {+100, -100};
+    double xi2range[2] = {+100, -100};
     
     for (unsigned int i=0; i<filelist.size(); i++)
     {
@@ -160,9 +202,16 @@ namespace itk
       reader->Read();
       MeshType::Pointer mesh = reader->GetOutput();
       if (i == 0)
+      {
 	EvaluateXi1Range<MeshType> (mesh, xi1range);
+	EvaluateXi2Range<MeshType> (mesh, xi2range);
+      }
       else
+      {	
 	NormalizeXi1<MeshType> (mesh, xi1range);
+	// not necessary, it is an angle between -pi and pi and the full range is covered
+	// NormalizeXi2<MeshType> (mesh, xi2range);
+      }
       
       AppendMesh<MeshType> (mesh, data);
       std::cout<<" Done."<<std::endl;

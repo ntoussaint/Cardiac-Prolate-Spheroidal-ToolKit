@@ -96,7 +96,7 @@ namespace itk
     }
     // A-1 is then the transformation matrix from R0 to R1
     m_InternalTransformInverse = m_InternalTransform.GetInverse();
-
+    
     // R1 is a referential centered in m_Center and with an x-axis towards the short axis point,
     // the y-axis on the short axis plane, and the z-axis along the ventricle axis, towards the apex.    
 
@@ -184,6 +184,7 @@ namespace itk
 
     // recover the Cylindrical coordinates point
     PointType xsi = m_Forward ? this->TransformPoint (x) : x;
+    
 
     // error underwhich we display a warning because we reached the singularity
     const double epsilon_singularity = 0.001;
@@ -210,7 +211,7 @@ namespace itk
     // dy / dxsi[1]
     as[1] =   xsi[0] * cos (xsi[1]);
     // dz / dxsi[1]
-    as[2] =   0;
+    as[2] = 0;
     as[3] = 0;
     
     // dx / dxsi[2]
@@ -315,14 +316,12 @@ namespace itk
 
   template <class TPixelType>
   typename CylindricalTransform<TPixelType>::PointType CylindricalTransform<TPixelType>::ToCartesian(PointType xsi) const
-  {
-
-    
+  { 
     // xsi has constrains and bounds, lets check them;
     if ( ( (xsi[0] < 0.0) ) ||
-	 ( (xsi[1] < - vnl_math::pi / 2.0 ) || (xsi[1] > vnl_math::pi / 2.0) ) )
+	 ( (xsi[1] < - vnl_math::pi ) || (xsi[1] > vnl_math::pi ) ) )
     {
-      itkDebugMacro (<<"inconsistent Cylindrical Coordinate : "<<xsi);
+      itkWarningMacro (<<"inconsistent Cylindrical Coordinate : "<<xsi);
     }
     
     // put the point back into the x-aligned aligned spheroid
@@ -340,8 +339,6 @@ namespace itk
       x[i] = xs[i];
     return x;
   }
-
-
   
   template <class TPixelType>
   typename CylindricalTransform<TPixelType>::PointType CylindricalTransform<TPixelType>::ToCylindrical(PointType x) const
@@ -361,24 +358,25 @@ namespace itk
     
     xs[3] = 1;
     xs = m_InternalTransformInverse* xs;
-
+    
     xsi[0] = std::sqrt (xs[0]*xs[0] + xs[1]*xs[1]);
     if ( (std::abs (xs[0]) < epsilon) && (std::abs (xs[1]) < epsilon) )
       xsi[1] = 0;
     else
     {
-      if (xs[0] >= 0)
-	xsi[1] = asin (xs[1] / xsi[0]);
-      else
-	xsi[1] = - asin (xs[1] / xsi[0]) + vnl_math::pi / 2.0;
+      // if (xs[0] >= 0)
+      // 	xsi[1] = asin (xs[1] / xsi[0]);
+      // else
+      // 	xsi[1] = - asin (xs[1] / xsi[0]) + vnl_math::pi / 2.0;
+      xsi[1] = std::atan2 (xs[1],xs[0]);
     }
     xsi[2] = xs[2];
-
+    
     // xsi has constrains and bounds, lets check them;
     if ( ( (xsi[0] < 0.0) ) ||
-	 ( (xsi[1] < - vnl_math::pi / 2.0 ) || (xsi[1] > vnl_math::pi / 2.0) ) )
+	 ( (xsi[1] < - vnl_math::pi ) || (xsi[1] > vnl_math::pi ) ) )
     {
-      itkDebugMacro (<<"inconsistent Cylindrical Coordinate : "<<xsi);
+      itkWarningMacro (<<"inconsistent Cylindrical Coordinate : "<<xsi);
     }
 
     // all singularity situations have been handled
@@ -393,9 +391,9 @@ namespace itk
     
     // xsi has constrains and bounds, lets check them;
     if ( ( (p[0] < 0.0) ) ||
-	 ( (p[1] < - vnl_math::pi / 2.0 ) || (p[1] > vnl_math::pi / 2.0) ) )
+	 ( (p[1] < - vnl_math::pi ) || (p[1] > vnl_math::pi ) ) )
     {
-      itkDebugMacro (<<"inconsistent Cylindrical Coordinate : "<<xsi);
+      itkWarningMacro (<<"inconsistent Cylindrical Coordinate : "<<p);
     }
     
     MatrixType matrix; matrix = this->GetJacobianWithRespectToCoordinates(p);
