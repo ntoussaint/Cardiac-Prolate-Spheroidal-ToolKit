@@ -49,21 +49,7 @@
 #include "itkTransformFactory.h"
 #include <itkMultiplyImageFilter.h>
 
-
 #include "GetPot.h"
-
-double asinh(double value){
-   
- double returned;
-
- if(value>0)
-    returned = log(value + sqrt(value * value + 1));
- else
-    returned = -log(-value + sqrt(value * value + 1));
-
- return(returned);
-
-}
 
 typedef unsigned short BinaryScalarType;
 typedef itk::Image<BinaryScalarType, 3> BinaryImageType;
@@ -338,8 +324,8 @@ namespace itk
     transform = dynamic_cast<TransformType*>( transformreader->GetTransformList()->front().GetPointer() );
     std::cout<<"done."<<std::endl;
 
-    double mu1 = asinh ((transform->GetLambda2() - thickness/2.0) / transform->GetSemiFociDistance());
-    double mu2 = asinh ((transform->GetLambda2() + thickness/2.0) / transform->GetSemiFociDistance());
+    double mu1 = TransformType::asinh ((transform->GetLambda2() - thickness/2.0) / transform->GetSemiFociDistance());
+    double mu2 = TransformType::asinh ((transform->GetLambda2() + thickness/2.0) / transform->GetSemiFociDistance());
     double nu1 = 0.0;
     double nu2 = maxangle * vnl_math::pi / 180.0;
   

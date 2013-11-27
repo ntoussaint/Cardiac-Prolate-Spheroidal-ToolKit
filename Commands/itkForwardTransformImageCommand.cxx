@@ -17,6 +17,7 @@
 
 #include "GetPot.h"
 
+
 namespace itk
 {
 
@@ -105,12 +106,11 @@ namespace itk
     TransformType::Pointer transform_inverse = TransformType::New();
     transform->GetInverse(transform_inverse);
     std::cout << " Done." << std::endl;
-
     
     // define the future box boundaries :
 
-    double mu1 = asinh ((transform->GetLambda2() - thickness/2.0) / transform->GetSemiFociDistance());
-    double mu2 = asinh ((transform->GetLambda2() + thickness/2.0) / transform->GetSemiFociDistance());
+    double mu1 = TransformType::asinh ((transform->GetLambda2() - thickness/2.0) / transform->GetSemiFociDistance());
+    double mu2 = TransformType::asinh ((transform->GetLambda2() + thickness/2.0) / transform->GetSemiFociDistance());
     double nu1 = 0.0;
     double nu2 = maxangle * vnl_math::pi / 180.0;
     
