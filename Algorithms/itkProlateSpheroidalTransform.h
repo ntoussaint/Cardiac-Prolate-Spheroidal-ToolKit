@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkLinearInterpolateImageFunction.h>
 #include "itkCrossHelper.h"
 
+#include <cmath>
+
 
 namespace itk
 {
@@ -494,7 +496,19 @@ namespace itk
 
     virtual double EstimateGeodesicLength1(PointType xi, VectorType dxi, unsigned int divisions) const;
     virtual double EstimateGeodesicLength2(PointType xi, VectorType dxi, unsigned int divisions) const;
+
+  static double asinh(double value)
+  { 
+    double returned;
     
+    if(value>0)
+      returned = log(value + sqrt(value * value + 1));
+    else
+      returned = -log(-value + sqrt(value * value + 1));
+    
+    return(returned);
+  }
+  
   protected:
 
     ProlateSpheroidalTransform();
