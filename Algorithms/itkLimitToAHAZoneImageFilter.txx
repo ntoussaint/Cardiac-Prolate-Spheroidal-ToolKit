@@ -18,30 +18,13 @@
 #ifndef _itk_LimitToAHAZoneImageFilter_txx_
 #define _itk_LimitToAHAZoneImageFilter_txx_
 
+#include "itkLimitToAHAZoneImageFilter.txx"
+
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIterator.h>
-#include <cmath>
 
 namespace itk
 {
-
-
-  template<class TImage>
-  double
-  LimitToAHAZoneImageFilter<TImage>
-  ::asinh(double value)
-  {
-    
-    double returned;
-    
-    if(value>0)
-      returned = log(value + sqrt(value * value + 1));
-    else
-      returned = -log(-value + sqrt(value * value + 1));
-    
-    return(returned);
-    
-  }
   
   template<class TImage>
   LimitToAHAZoneImageFilter<TImage>
@@ -281,8 +264,8 @@ namespace itk
       itkExceptionMacro (<<"Missing inputs for calculating zones: Please provide transform and displacement field.");
     }
 
-    double mu1 = this->asinh ((m_Transform->GetLambda2() - m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
-    double mu2 = this->asinh ((m_Transform->GetLambda2() + m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
+    double mu1 = TransformType::asinh ((m_Transform->GetLambda2() - m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
+    double mu2 = TransformType::asinh ((m_Transform->GetLambda2() + m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
     
     Zone z;
     
@@ -356,8 +339,8 @@ namespace itk
       itkExceptionMacro (<<"Missing inputs for calculating zones: Please provide transform and displacement field.");
     }
 
-    double mu1 = this->asinh ((m_Transform->GetLambda2() - m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
-    double mu2 = this->asinh ((m_Transform->GetLambda2() + m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
+    double mu1 = TransformType::asinh ((m_Transform->GetLambda2() - m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
+    double mu2 = TransformType::asinh ((m_Transform->GetLambda2() + m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
     
     Zone z;
     
@@ -390,8 +373,8 @@ namespace itk
     }
 
 
-    double mu1 = this->asinh ((m_Transform->GetLambda2() - m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
-    double mu2 = this->asinh ((m_Transform->GetLambda2() + m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
+    double mu1 = TransformType::asinh ((m_Transform->GetLambda2() - m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
+    double mu2 = TransformType::asinh ((m_Transform->GetLambda2() + m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
     
     Zone z;
     
@@ -464,8 +447,8 @@ namespace itk
       itkExceptionMacro (<<"Missing inputs for calculating zones: Please provide transform and displacement field.");
     }
 
-    double mu1 = this->asinh ((m_Transform->GetLambda2() - m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
-    double mu2 = this->asinh ((m_Transform->GetLambda2() + m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
+    double mu1 = TransformType::asinh ((m_Transform->GetLambda2() - m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
+    double mu2 = TransformType::asinh ((m_Transform->GetLambda2() + m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
     
     Zone z;
     
@@ -540,8 +523,8 @@ namespace itk
       itkExceptionMacro (<<"Missing inputs for calculating zones: Please provide transform and displacement field.");
     }
 
-    double mu1 = this->asinh ((m_Transform->GetLambda2() - m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
-    double mu2 = this->asinh ((m_Transform->GetLambda2() + m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
+    double mu1 = TransformType::asinh ((m_Transform->GetLambda2() - m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
+    double mu2 = TransformType::asinh ((m_Transform->GetLambda2() + m_Thickness/2.0) / m_Transform->GetSemiFociDistance());;
     
     Zone z;
     

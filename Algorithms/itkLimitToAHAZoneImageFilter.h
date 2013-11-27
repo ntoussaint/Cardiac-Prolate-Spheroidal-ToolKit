@@ -235,8 +235,6 @@ namespace itk
     unsigned int InWhichZoneIsCartesianPoint (PointType pt);
     void CalculateZones (void);
 
-    double asinh(double value);
-    
   protected:
     LimitToAHAZoneImageFilter();
     ~LimitToAHAZoneImageFilter(){};
