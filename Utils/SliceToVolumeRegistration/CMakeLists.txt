@@ -16,8 +16,9 @@ target_link_libraries(volumetovolumeregistration
   ${ITK_LIBRARIES}
 )
 add_executable(slicetovolumeregistration
-  itkSliceToVolumeRegistration.cxx 
+  itkSliceToVolumeRegistration.cxx
 )
 target_link_libraries(slicetovolumeregistration
   ${ITK_LIBRARIES}
+  CPSTKNumerics
 )
