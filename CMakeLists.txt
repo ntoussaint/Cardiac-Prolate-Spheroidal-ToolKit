@@ -42,23 +42,23 @@ endif(WIN32)
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
-unset(CPSTK_THIRD_PARTY_PACKAGES)
-set(CPSTK_THIRD_PARTY_PACKAGES
+unset(${PROJECT_NAME}_THIRD_PARTY_PACKAGES)
+set(${PROJECT_NAME}_THIRD_PARTY_PACKAGES
   VTK
   TTK
 )
 
-set(CPSTK_PACKAGES_MISSING 0)
+set(${PROJECT_NAME}_PACKAGES_MISSING 0)
 
-foreach (package ${CPSTK_THIRD_PARTY_PACKAGES})
+foreach (package ${${PROJECT_NAME}_THIRD_PARTY_PACKAGES})
   find_package(${package} QUIET)
   if(${package}_FOUND)
     include(${${package}_USE_FILE})
   else(${package}_FOUND)
-    set(CPSTK_PACKAGES_MISSING 1)
-    set(CPSTK_MISSING_PACKAGES 
+    set(${PROJECT_NAME}_PACKAGES_MISSING 1)
+    set(${PROJECT_NAME}_MISSING_PACKAGES 
       ${package} 
-      ${CPSTK_MISSING_PACKAGES}
+      ${${PROJECT_NAME}_MISSING_PACKAGES}
       )
   endif(${package}_FOUND)
 endforeach (package) 
@@ -89,9 +89,9 @@ set(ARCHIVE_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_ARC
 set(RUNTIME_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
 set(EXECUTABLE_INSTALL_OUTPUT_PATH ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
 
-set(${PROJECT_NAME}_VERSION_MAJOR 1 CACHE STRING "CPSTK major version number.")
-set(${PROJECT_NAME}_VERSION_MINOR 1 CACHE STRING "CPSTK minor version number.")
-set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "CPSTK build version number.")
+set(${PROJECT_NAME}_VERSION_MAJOR 1 CACHE STRING "${PROJECT_NAME} major version number.")
+set(${PROJECT_NAME}_VERSION_MINOR 1 CACHE STRING "${PROJECT_NAME} minor version number.")
+set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "${PROJECT_NAME} build version number.")
 set(${PROJECT_NAME}_VERSION
   "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
 
@@ -117,21 +117,21 @@ configure_file(${PROJECT_SOURCE_DIR}/cpstkConfigure.h.in
                ${PROJECT_BINARY_DIR}/cpstkConfigure.h CONFIGURE IMMEDIATE)
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
-  install(FILES ${CPSTK_BINARY_DIR}/cpstkConfigure.h
+  install(FILES ${${PROJECT_NAME}_BINARY_DIR}/cpstkConfigure.h
       DESTINATION include)
 endif(NOT ${PROJECT_NAME}_INSTALL_NO_DEVELOPMENT)
 
-# To help using CPSTK with other projects
-configure_file(${CPSTK_SOURCE_DIR}/UseCPSTK.cmake.in
-               ${CPSTK_BINARY_DIR}/UseCPSTK.cmake COPYONLY IMMEDIATE)
+# To help using ${PROJECT_NAME} with other projects
+configure_file(${${PROJECT_NAME}_SOURCE_DIR}/Use${PROJECT_NAME}.cmake.in
+               ${${PROJECT_NAME}_BINARY_DIR}/Use${PROJECT_NAME}.cmake COPYONLY IMMEDIATE)
 
 #-----------------------------------------------------------------------------
-# Add compiler flags CPSTK needs to work on this platform.  This must be
+# Add compiler flags ${PROJECT_NAME} needs to work on this platform.  This must be
 # done AFTER the call to CMAKE_EXPORT_BUILD_SETTINGS.
-set(CPSTK_REQUIRED_C_FLAGS)
-set(CPSTK_REQUIRED_CXX_FLAGS)
-SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   ${CPSTK_REQUIRED_C_FLAGS}")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CPSTK_REQUIRED_CXX_FLAGS}")
+set(${PROJECT_NAME}_REQUIRED_C_FLAGS)
+set(${PROJECT_NAME}_REQUIRED_CXX_FLAGS)
+SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   ${${PROJECT_NAME}_REQUIRED_C_FLAGS}")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${${PROJECT_NAME}_REQUIRED_CXX_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # Set any extra compilation flags here
@@ -166,20 +166,20 @@ include_directories(
 
 #-----------------------------------------------------------------------------
 # Include the external configuration file
-include (${PROJECT_SOURCE_DIR}/CPSTKConfig.cmake)
+include (${PROJECT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake)
 
 
 ## #################################################################
 ## BUILD TYPE
 ## #################################################################
 
-set(CPSTK_BUILD_TYPE
+set(${PROJECT_NAME}_BUILD_TYPE
 STATIC
 )
 
 if (NOT WIN32)
   if (ITK_BUILD_SHARED)
-    set (CPSTK_BUILD_TYPE SHARED)
+    set (${PROJECT_NAME}_BUILD_TYPE SHARED)
   endif (ITK_BUILD_SHARED)
 endif (NOT WIN32)
 
@@ -188,7 +188,7 @@ endif (NOT WIN32)
 ## Actual CMakeLists code
 ## #################################################################
   
-if(NOT ${CPSTK_PACKAGES_MISSING})
+if(NOT ${${PROJECT_NAME}_PACKAGES_MISSING})
   add_subdirectory(IPF)
   add_subdirectory(Algorithms)
   add_subdirectory(Numerics)
@@ -198,20 +198,20 @@ if(NOT ${CPSTK_PACKAGES_MISSING})
     cpstk.cxx
     )
   target_link_libraries(cpstk
-    CPSTKCommands
-    CPSTKProgramFactory
+    ${PROJECT_NAME}Commands
+    ${PROJECT_NAME}ProgramFactory
     ${ITK_LIBRARIES}
     )
-else(NOT ${CPSTK_PACKAGES_MISSING})
-  message(WARNING "Some packages are missing to completely build ${PROJECT_NAME} : ${CPSTK_MISSING_PACKAGES}. ${PROJECT_NAME} won't be built")  
-endif(NOT ${CPSTK_PACKAGES_MISSING})
+else(NOT ${${PROJECT_NAME}_PACKAGES_MISSING})
+  message(WARNING "Some packages are missing to completely build ${PROJECT_NAME} : ${${PROJECT_NAME}_MISSING_PACKAGES}. ${PROJECT_NAME} won't be built")  
+endif(NOT ${${PROJECT_NAME}_PACKAGES_MISSING})
 
 ## #################################################################
 ## Installation
 ## #################################################################
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_RUNTIME)
-  if (NOT ${CPSTK_PACKAGES_MISSING})
+  if (NOT ${${PROJECT_NAME}_PACKAGES_MISSING})
     install(TARGETS cpstk
       BUNDLE DESTINATION bin
       RUNTIME DESTINATION bin
