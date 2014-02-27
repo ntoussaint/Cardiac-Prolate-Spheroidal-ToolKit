@@ -349,7 +349,7 @@ namespace itk
     		grid);
 
     vtkDataSetWriter* gridwriter = vtkDataSetWriter::New();
-    gridwriter->SetInput (grid);
+    gridwriter->SetInputData (grid);
     gridwriter->SetFileName ("grid.vtk");
     gridwriter->Update();
     grid->Delete();
@@ -364,7 +364,7 @@ namespace itk
     		circumdivisions,
     		grid2, 1);
 
-    gridwriter->SetInput (grid2);
+    gridwriter->SetInputData (grid2);
     gridwriter->SetFileName ("grid-prolate.vtk");
     gridwriter->Update();
   

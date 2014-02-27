@@ -486,7 +486,7 @@ namespace itk
     
     std::cout << "Writing the fibres to... "<<outputfile<< " " << std::endl;
     vtkDataSetWriter* writer = vtkDataSetWriter::New();
-    writer->SetInput (output);
+    writer->SetInputData (output);
     writer->SetFileName (outputfile);
     writer->SetFileTypeToBinary();
     writer->Update();

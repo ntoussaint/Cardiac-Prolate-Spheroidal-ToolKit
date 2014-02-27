@@ -131,8 +131,7 @@ target_link_libraries(CPSTKCommands
   ${ITK_LIBRARIES}
   CPSTKProgramFactory
   CPSTKNumerics
-  vtkCommon
-  vtkIO
+  ${VTK_LIBRARIES}
   ITKTensor
   )
 

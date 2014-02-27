@@ -280,7 +280,7 @@ namespace itk
     
     vtkDataSetWriter* writer = vtkDataSetWriter::New();
     writer->SetFileName (output);
-    writer->SetInput (crossvalidation);
+    writer->SetInputData (crossvalidation);
     writer->Update();
     
     writer->Delete();

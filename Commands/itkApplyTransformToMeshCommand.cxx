@@ -153,7 +153,7 @@ namespace itk
     vtkDataSetWriter* writer = vtkDataSetWriter::New();
     // writer->SetFileTypeToBinary();
     writer->SetFileName (fileOut);
-    writer->SetInput (pointset);
+    writer->SetInputData (pointset);
     writer->Update();
     reader->Delete();
     outputpoints->Delete();

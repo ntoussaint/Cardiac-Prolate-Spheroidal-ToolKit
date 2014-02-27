@@ -252,7 +252,7 @@ namespace itk
     vtkoutput->GetPointData()->SetTensors (data);
     vtkDataSetWriter* vtkwriter = vtkDataSetWriter::New();
     vtkwriter->SetFileName (filename);
-    vtkwriter->SetInput (vtkoutput);
+    vtkwriter->SetInputData (vtkoutput);
     vtkwriter->Update();
     
     vtkoutput->Delete();
