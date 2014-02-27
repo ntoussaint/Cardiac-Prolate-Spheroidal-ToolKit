@@ -114,7 +114,6 @@ namespace itk
     const char* fileOut  = cl.follow("NoFile",2,"-o","-O");
     const char* fileIn  = cl.follow("NoFile",2,"-i","-I");
     const char* fileTr  = cl.follow("NoFile",2,"-t","-T");
-
     
     static const unsigned int Dimension = 3;
     static const unsigned int UnderDimension = 2;
@@ -138,8 +137,8 @@ namespace itk
     typedef UnderImageType::PixelContainer PixelContainerType;
 
     itk::TransformFactory< LinearTransformType >::RegisterTransform ();
-     itk::TransformFactory< RigidTransformType >::RegisterTransform ();
-   itk::TransformFactory< UnderTranslationTransformType >::RegisterTransform ();
+    itk::TransformFactory< RigidTransformType >::RegisterTransform ();
+    itk::TransformFactory< UnderTranslationTransformType >::RegisterTransform ();
     itk::TransformFactory< TranslationTransformType >::RegisterTransform ();
   
     std::cout<<"reading input file "<<fileIn<<std::endl;  
@@ -148,15 +147,15 @@ namespace itk
     try
     {
       myReader->Update();
-    } catch (itk::ExceptionObject &e)
+    }
+    catch (itk::ExceptionObject &e)
     {
       std::cerr << e;
       return EXIT_FAILURE;
     }  
     ImageType::Pointer myImage = myReader->GetOutput();
     std::cout<<"done."<<std::endl;
-
-  
+    
     TransformReaderType::Pointer reader = TransformReaderType::New();
     reader->SetFileName ( fileTr );
     try
