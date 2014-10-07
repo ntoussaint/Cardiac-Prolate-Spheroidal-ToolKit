@@ -323,6 +323,20 @@ namespace itk
        * \f]
        */
     virtual vnl_matrix_fixed<TPixelType,3,3> GetJacobianWithRespectToCoordinates(const InputPointType  &) const;
+    /** Compute the Jacobian Matrix of the transformation at one point,
+     *  allowing for thread-safety. */
+    virtual void ComputeJacobianWithRespectToParameters( const InputPointType  & p, JacobianType & jacobian) const
+    {  
+      itkExceptionMacro( "ComputeJacobianWithRespectToPosition not yet implemented "
+                         "for " << this->GetNameOfClass() );
+    }
+  
+    virtual void ComputeJacobianWithRespectToPosition(const InputPointType &,
+                                                      JacobianType &) const
+    {  
+      itkExceptionMacro( "ComputeJacobianWithRespectToPosition not yet implemented "
+                         "for " << this->GetNameOfClass() );
+    }
     /**
        Get the inverse of this transform
     */
