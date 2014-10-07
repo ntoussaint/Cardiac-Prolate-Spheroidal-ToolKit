@@ -95,7 +95,7 @@ endif()
 ## #################################################################
 
 if(NOT ${PROJECT_NAME}_INSTALL_NO_RUNTIME)
-  foreach (exe ${REGISTRATION_EXECUTABLES})
+  foreach (exe ${PROLATE_EXECUTABLES})
     install(TARGETS ${exe}
       BUNDLE DESTINATION bin
       RUNTIME DESTINATION bin

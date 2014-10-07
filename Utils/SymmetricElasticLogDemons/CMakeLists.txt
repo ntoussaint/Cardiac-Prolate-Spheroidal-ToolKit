@@ -12,3 +12,13 @@ include_directories(
 )
 add_executable(elasticlogdomaindemonsregistration ElasticLogDomainDemonsRegistration.cxx )
 target_link_libraries(elasticlogdomaindemonsregistration ${ITK_LIBRARIES} )
+
+
+if(NOT ${PROJECT_NAME}_INSTALL_NO_RUNTIME)
+  install(TARGETS elasticlogdomaindemonsregistration
+    BUNDLE DESTINATION bin
+    RUNTIME DESTINATION bin
+    )
+  install_files(/include "(\\.h|\\.txx)$")
+endif()
+
