@@ -1,68 +1,14 @@
-cmake_minimum_required(VERSION 2.4)
-if(COMMAND cmake_policy)
-  cmake_policy(VERSION 2.4)
-  cmake_policy(SET CMP0005 OLD)
-  cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+cmake_minimum_required(VERSION 2.8)
 
+set(CMAKE_PROJECT_NAME ${PROJECT_NAME})
 
 project(CPSTK)
 
-
-# On Visual Studio 8 MS deprecated C. This removes all 1.276E1265 security
-# warnings
-if(WIN32)
-  if(NOT BORLAND)
-    if(NOT CYGWIN)
-      if(NOT MINGW)
-        if(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
-          add_definitions(
-            -D_CRT_FAR_MAPPINGS_NO_DEPRECATE
-            -D_CRT_IS_WCTYPE_NO_DEPRECATE
-            -D_CRT_MANAGED_FP_NO_DEPRECATE
-            -D_CRT_NONSTDC_NO_DEPRECATE
-            -D_CRT_SECURE_NO_DEPRECATE
-            -D_CRT_SECURE_NO_DEPRECATE_GLOBALS
-            -D_CRT_SETERRORMODE_BEEP_SLEEP_NO_DEPRECATE
-            -D_CRT_TIME_FUNCTIONS_NO_DEPRECATE
-            -D_CRT_VCCLRIT_NO_DEPRECATE
-            -D_SCL_SECURE_NO_DEPRECATE
-            )
-        endif(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
-      endif(NOT MINGW)
-    endif(NOT CYGWIN)
-  endif(NOT BORLAND)
-endif(WIN32)
-
-
-## #################################################################
-## Required dependencies
-## #################################################################
-
-find_package(ITK REQUIRED)
-include(${ITK_USE_FILE})
-
-unset(${PROJECT_NAME}_THIRD_PARTY_PACKAGES)
-set(${PROJECT_NAME}_THIRD_PARTY_PACKAGES
-  VTK
-  TTK
-)
-
-set(${PROJECT_NAME}_PACKAGES_MISSING 0)
-
-foreach (package ${${PROJECT_NAME}_THIRD_PARTY_PACKAGES})
-  find_package(${package} QUIET)
-  if(${package}_FOUND)
-    include(${${package}_USE_FILE})
-  else(${package}_FOUND)
-    set(${PROJECT_NAME}_PACKAGES_MISSING 1)
-    set(${PROJECT_NAME}_MISSING_PACKAGES 
-      ${package} 
-      ${${PROJECT_NAME}_MISSING_PACKAGES}
-      )
-  endif(${package}_FOUND)
-endforeach (package) 
-
+option(BUILD_GDCMIMPORT   "Build the GDCM DICOM Import tool"  OFF)
+option(BUILD_MEDVIEW "Build a simple visualisation tool"      OFF)
+option(BUILD_CPSTK "Build the CPSTK binaries"      OFF)
+option(BUILD_SEGMENTATION "Build the Segmentation tool"       OFF)
+option(BUILD_PROLATETOOLS "Build the Prolate Spheroidal Tools" OFF)
 
 ## #################################################################
 ## Configure path
@@ -99,16 +45,6 @@ mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_MINOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_BUILD)
 
-## ###################################################################
-## Some packages options are required for this project. Check them now
-## ###################################################################
-
-set(_ITKVersionString "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}.${ITK_VERSION_PATCH}" )
-math(EXPR _ITKVersionNum "${ITK_VERSION_MAJOR}*100*100 + ${ITK_VERSION_MINOR}*100 + ${ITK_VERSION_PATCH}")
-if( _ITKVersionNum LESS 30800 )
-  message(SEND_ERROR "The ITK version you want to use (${_ITKVersionString}) is not supported by this project. Please use a more recent version of ITK. The minimum required version is 3.8.0. The recommended version is 3.20.1.")
-endif( _ITKVersionNum LESS 30800 )
-
 # -----------------------------------------------------------------------------
 # Header file used to pass CMake settings to the source code
 # -----------------------------------------------------------------------------
@@ -144,6 +80,36 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 
+
+## #################################################################
+## Required dependencies
+## #################################################################
+
+find_package(ITK REQUIRED)
+include(${ITK_USE_FILE})
+
+unset(${PROJECT_NAME}_THIRD_PARTY_PACKAGES)
+set(${PROJECT_NAME}_THIRD_PARTY_PACKAGES
+  VTK
+  TTK
+)
+
+set(${PROJECT_NAME}_PACKAGES_MISSING 0)
+
+foreach (package ${${PROJECT_NAME}_THIRD_PARTY_PACKAGES})
+  find_package(${package} QUIET)
+  if(${package}_FOUND)
+    include(${${package}_USE_FILE})
+  else(${package}_FOUND)
+    set(${PROJECT_NAME}_PACKAGES_MISSING 1)
+    set(${PROJECT_NAME}_MISSING_PACKAGES 
+      ${package} 
+      ${${PROJECT_NAME}_MISSING_PACKAGES}
+      )
+  endif(${package}_FOUND)
+endforeach (package) 
+
+
 #-----------------------------------------------------------------------------
 # Set the include directories
 # also include the binary directories as some source files are built there
@@ -159,6 +125,11 @@ set(${PROJECT_NAME}_INCLUDE_DIRS
   ${PROJECT_BINARY_DIR}
   ${PROJECT_BINARY_DIR}/Commands
 )
+
+set(${CMAKE_PROJECT_NAME}_INCLUDE_DIRS
+  ${${CMAKE_PROJECT_NAME}_INCLUDE_DIRS}
+  ${PROJECT_NAME}_INCLUDE_DIRS
+  )
 
 include_directories(
   ${${PROJECT_NAME}_INCLUDE_DIRS}
@@ -205,6 +176,40 @@ if(NOT ${${PROJECT_NAME}_PACKAGES_MISSING})
 else(NOT ${${PROJECT_NAME}_PACKAGES_MISSING})
   message(WARNING "Some packages are missing to completely build ${PROJECT_NAME} : ${${PROJECT_NAME}_MISSING_PACKAGES}. ${PROJECT_NAME} won't be built")  
 endif(NOT ${${PROJECT_NAME}_PACKAGES_MISSING})
+
+
+
+if (BUILD_MEDVIEW)
+  add_subdirectory(vtkImageView)
+  add_subdirectory(vtkDataManagement)
+
+  set(${CMAKE_PROJECT_NAME}_INCLUDE_DIRS
+    ${${CMAKE_PROJECT_NAME}_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/vtkImageView
+    ${CMAKE_CURRENT_SOURCE_DIR}/vtkDataManagement
+    )
+
+  add_subdirectory(medview)
+endif()
+
+if (BUILD_GDCMIMPORT)
+  add_subdirectory(gdcmimport)
+endif()
+
+if (BUILD_SEGMENTATION)
+  set(${CMAKE_PROJECT_NAME}_INCLUDE_DIRS
+    ${${CMAKE_PROJECT_NAME}_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/segmentation/LandmarkVariationalSegmentation
+    )
+  add_subdirectory(segmentation)
+endif()
+
+if (BUILD_PROLATETOOLS)
+  add_subdirectory(prolatespheroidaltools)
+endif()
+
+
+
 
 ## #################################################################
 ## Installation

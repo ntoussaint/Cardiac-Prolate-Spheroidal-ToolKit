@@ -1,0 +1,56 @@
+project(vtkImageView)
+
+set(${PROJECT_NAME}_BUILD_TYPE SHARED)
+
+if(WIN32)
+  set(${PROJECT_NAME}_ARCHIVE_OUTPUT_DIRECTORY lib)
+  set(${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY bin)
+  set(${PROJECT_NAME}_LIBRARY_OUTPUT_DIRECTORY bin)
+else(WIN32)
+  set(${PROJECT_NAME}_ARCHIVE_OUTPUT_DIRECTORY lib)
+  set(${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY bin)
+  set(${PROJECT_NAME}_LIBRARY_OUTPUT_DIRECTORY lib)
+endif(WIN32)
+
+set(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_LIBRARY_OUTPUT_DIRECTORY})
+set(ARCHIVE_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_ARCHIVE_OUTPUT_DIRECTORY})
+set(RUNTIME_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
+
+set(LIBRARY_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_LIBRARY_OUTPUT_DIRECTORY})
+set(ARCHIVE_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_ARCHIVE_OUTPUT_DIRECTORY})
+set(RUNTIME_INSTALL_OUTPUT_PATH    ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
+set(EXECUTABLE_INSTALL_OUTPUT_PATH ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY})
+
+find_package(ITK REQUIRED)
+find_package(VTK REQUIRED)
+
+if(ITK_FOUND AND VTK_FOUND)
+
+  include(${ITK_USE_FILE})
+  include(${VTK_USE_FILE})
+
+  include_directories(
+    ${PROJECT_SOURCE_DIR}
+    )
+
+  add_library(vtkImageView ${${PROJECT_NAME}_BUILD_TYPE}
+    vtkImageView.cxx
+    vtkImageView2D.cxx
+    vtkImageView3D.cxx
+    vtkInteractorStyleImageView2D.cxx
+    vtkImageView2DCommand.cxx
+    vtkImageViewCornerAnnotation.cxx
+    vtkAxes2DWidget.cxx
+    vtkDataSet2DWidget.cxx
+    vtkImageViewCollection.cxx
+    vtkImageView3DCroppingBoxCallback.cxx
+    vtkOrientationAnnotation.cxx
+    vtkOrientedBoxWidget.cxx
+    )
+  
+  target_link_libraries(vtkImageView
+    ${VTK_LIBRARIES}
+    )
+  
+endif()
