@@ -23,6 +23,9 @@ function(CreateCpstkCommand command_name keyword description)
 
 endfunction()
 
+CreateCpstkCommand(ProlateSpheroidalStatistics
+  "stats" "Extract statistics from a Prolate Spheroid"
+  )
 CreateCpstkCommand(RotateProlateSpheroid
   "rotate" "Rotate a Prolate Spheroid according to a vtk file describing the antero-posterior line"
   )
@@ -122,6 +125,7 @@ CreateCpstkCommand(CropImage
 CreateCpstkCommand(PaintTensorImageWithAngle
   "paint" "paint"
   )
+
 
 add_library(CPSTKCommands ${CPSTK_BUILD_TYPE}
   ${CPSTK_COMMAND_SRCS}
