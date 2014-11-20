@@ -277,16 +277,7 @@ namespace itk
     std::string ellipsoiddomainfile = cl.follow("nofile",2,"-o","-O");
     const bool phase = cl.follow(0,2,"-p","-P");
     
-    double thickness = 0.0;
-    switch (phase)
-    {
-	case 1: // systole
-	  thickness = 17.0;
-	  break;
-	case 0: // diastole
-	default:
-	  thickness = 12.0;
-    }
+    double thickness = phase ? 17.0 : 12.0;
 
     if (cl.search(2,"-w","-W"))
       thickness = cl.follow(12.0,2,"-w","-W");
