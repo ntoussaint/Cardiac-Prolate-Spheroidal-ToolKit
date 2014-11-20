@@ -1,8 +1,6 @@
 
 project(vtkDataManagement)
 
-set(${PROJECT_NAME}_BUILD_TYPE SHARED)
-
 if(WIN32)
   set(${PROJECT_NAME}_ARCHIVE_OUTPUT_DIRECTORY lib)
   set(${PROJECT_NAME}_RUNTIME_OUTPUT_DIRECTORY bin)
