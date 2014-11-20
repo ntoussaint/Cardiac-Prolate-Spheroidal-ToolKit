@@ -14,6 +14,7 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
+#include "itkProlateSpheroidalStatisticsCommandFactory.h"
 #include "itkRotateProlateSpheroidCommandFactory.h"
 #include "itkTensorsToVTKCommandFactory.h"
 #include "itkTensorsToVTK2CommandFactory.h"
@@ -54,6 +55,7 @@
 
 int main (int narg, char *args[])
 {
+  itk::ProlateSpheroidalStatisticsCommandFactory::RegisterOneFactory();
   itk::RotateProlateSpheroidCommandFactory::RegisterOneFactory();
   itk::TensorsToVTKCommandFactory::RegisterOneFactory();
   itk::TensorsToVTK2CommandFactory::RegisterOneFactory();
