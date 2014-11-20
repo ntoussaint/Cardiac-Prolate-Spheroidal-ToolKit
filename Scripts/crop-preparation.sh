@@ -1,7 +1,7 @@
 #/usr/bin/bash
 
 diameter=$1 # use 85 if no idea
-prolatefile=$2 # use 'prolatetransform.tr' if no idea
+prolatefile=$2 # use 'prolatetransform.tfm' if no idea
 
 echo $diameter
 echo $prolatefile

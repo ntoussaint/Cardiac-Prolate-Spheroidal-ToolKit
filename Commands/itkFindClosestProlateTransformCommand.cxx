@@ -59,7 +59,7 @@ namespace itk
     
     m_LongDescription += "-i    [input midwall (or total LV) mesh file]\n";
     m_LongDescription += "-p    [percentage of basal ventricle above 90 deg. (default: 0.8)]\n";
-    m_LongDescription += "-o    [output prolate transform (default prolatetransform.tr)]\n";
+    m_LongDescription += "-o    [output prolate transform (default prolatetransform.tfm)]\n";
     m_LongDescription += "-v    [verbose]\n";
   }
 
@@ -77,7 +77,7 @@ namespace itk
     }
     
     const char*  inputfile  = cl.follow("nofile",2,"-i","-I");
-    const char*  outputfile = cl.follow("prolatetransform.tr",2,"-o","-O");
+    const char*  outputfile = cl.follow("prolatetransform.tfm",2,"-o","-O");
     const double percentile = cl.follow(0.8,2,"-p","-P");
     const bool   verbose    = cl.follow(false,2,"-v","-V");
   

@@ -91,7 +91,7 @@ public:
 	std::ostringstream transformfile;
 	if (this->FileOutSet)
 	  transformfile << this->FileOut;
-	transformfile << "ellipsoidaltransform.tr";
+	transformfile << "ellipsoidaltransform.tfm";
 	std::ostringstream imagefile2;
 	if (this->FileOutSet)
 	  imagefile2 << this->FileOut;

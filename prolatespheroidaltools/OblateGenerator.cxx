@@ -90,7 +90,7 @@ public:
 	std::ostringstream transformfile;
 	if (this->FileOutSet)
 	  transformfile << this->FileOut;
-	transformfile << "oblatetransform.tr";
+	transformfile << "oblatetransform.tfm";
 	std::ostringstream imagefile2;
 	if (this->FileOutSet)
 	  imagefile2 << this->FileOut;
