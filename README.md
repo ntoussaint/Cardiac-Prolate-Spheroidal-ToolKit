@@ -13,11 +13,13 @@
 
 <b> If you use this toolkit please reference this paper</b>
 
-<a href="http://www.springerlink.com/content/b5j04hn331668757/" target="_blank"> <b>
-    N. Toussaint, M. Sermesant, C. T. Stoeck, S. Kozerke and P. G. Batchelor. In-vivo
-    Human 3D Cardiac Fibre Architecture: Reconstruction Using Curvilinear Interpolation of
-    Diffusion Tensor Images. In Proc. Medical Image Computing and Computer Assisted
-    Intervention (MICCAI'10), Beijing, China, 2010. </b> </a>
+<a href="http://dx.doi.org/10.1016/j.media.2013.02.008" target="_blank">
+Nicolas Toussaint, Christian T. Stoeck, Tobias Schaeffter, Sebastian Kozerke, Maxime Sermesant, Philip G. Batchelor, 
+<b> 
+<i> In vivo human cardiac fibre architecture estimation using shape-based diffusion tensor processing </i> 
+</b> 
+Medical Image Analysis, Volume 17, Issue 8, Dec. 2013
+</a>
 <br>
 
 ### Gallery ###
