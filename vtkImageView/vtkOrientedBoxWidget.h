@@ -26,7 +26,7 @@ class VTK_EXPORT vtkOrientedBoxWidget : public vtkBoxWidget
  public:
   
   static vtkOrientedBoxWidget* New();
-  vtkTypeRevisionMacro(vtkOrientedBoxWidget, vtkBoxWidget);
+  vtkTypeMacro(vtkOrientedBoxWidget, vtkBoxWidget);
 
   vtkGetObjectMacro (OrientationMatrix, vtkMatrix4x4);
   virtual void SetOrientationMatrix (vtkMatrix4x4* matrix);

@@ -42,7 +42,7 @@ class VTK_EXPORT vtkEllipsoidalTransformController : public vtkPolyDataAlgorithm
 {
 public:
   static vtkEllipsoidalTransformController* New();
-  vtkTypeRevisionMacro(vtkEllipsoidalTransformController, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkEllipsoidalTransformController, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   typedef itk::DoubleLandmarkSetToDomainImageFilter DomainFilterType;

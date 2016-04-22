@@ -118,7 +118,7 @@ class VTK_EXPORT vtkImageView : public vtkObject
 {
  public:
   //static vtkImageView* New(); // pure virtual class
-  vtkTypeRevisionMacro(vtkImageView, vtkObject);
+  vtkTypeMacro(vtkImageView, vtkObject);
   void PrintSelf (ostream& os, vtkIndent indent);
   
   // Override vtkObject - return the maximum mtime of this and any objects owned by this.

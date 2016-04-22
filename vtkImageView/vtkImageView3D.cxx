@@ -48,12 +48,11 @@
 #include <vtkSmartPointer.h>
 #include <vtkDataSetCollection.h>
 #include <vtkProp3DCollection.h>
-#include <vtkVolumeTextureMapper3D.h>
+#include <vtkSmartVolumeMapper.h>
 #include <vtkImageView3DCroppingBoxCallback.h>
 #include <vtkObjectFactory.h>
 
 
-vtkCxxRevisionMacro(vtkImageView3D, "$Revision: 1324 $");
 vtkStandardNewMacro(vtkImageView3D);
 
 //----------------------------------------------------------------------------
@@ -61,7 +60,7 @@ vtkImageView3D::vtkImageView3D()
 {
   this->VolumeProperty = vtkVolumeProperty::New();
   this->VolumeActor    = vtkVolume::New();
-  this->VolumeMapper   = vtkVolumeTextureMapper3D::New();
+  this->VolumeMapper   = vtkSmartVolumeMapper::New();
   this->OpacityTransferFunction = vtkPiecewiseFunction::New();
   this->ColorTransferFunction = vtkColorTransferFunction::New();
   this->Callback       = vtkImageView3DCroppingBoxCallback::New();

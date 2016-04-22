@@ -42,7 +42,7 @@ class VTK_EXPORT vtkDataManager: public vtkObject
  public:
 
   static vtkDataManager* New();
-  vtkTypeRevisionMacro(vtkDataManager,vtkObject);
+  vtkTypeMacro(vtkDataManager,vtkObject);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   /**

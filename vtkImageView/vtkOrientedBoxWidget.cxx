@@ -24,7 +24,6 @@
 #include "vtkTransform.h"
 #include "vtkReverseSense.h"
 
-vtkCxxRevisionMacro(vtkOrientedBoxWidget, "$Revision: 2 $");
 vtkStandardNewMacro(vtkOrientedBoxWidget);
 
 

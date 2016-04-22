@@ -25,7 +25,7 @@ public:
 
   // Description:
   // Standard VTK class macros.
-  vtkTypeRevisionMacro(vtkAxes2DWidget,vtkObject);
+  vtkTypeMacro(vtkAxes2DWidget,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

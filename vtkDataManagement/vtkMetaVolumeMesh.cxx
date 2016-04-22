@@ -39,7 +39,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkMetaVolumeMesh );
-vtkCxxRevisionMacro(vtkMetaVolumeMesh, "$Revision: 838 $");
 
 //----------------------------------------------------------------------------
 vtkMetaVolumeMesh::vtkMetaVolumeMesh()
