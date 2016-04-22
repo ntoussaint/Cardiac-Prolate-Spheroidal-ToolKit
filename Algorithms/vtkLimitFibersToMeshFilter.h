@@ -25,7 +25,7 @@ class vtkLimitFibersToMeshFilter: public vtkPolyDataAlgorithm
 
  public:
   static vtkLimitFibersToMeshFilter *New();
-  vtkTypeRevisionMacro(vtkLimitFibersToMeshFilter, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkLimitFibersToMeshFilter, vtkPolyDataAlgorithm);
     
   void PrintSelf (ostream& os, vtkIndent indent){};
   

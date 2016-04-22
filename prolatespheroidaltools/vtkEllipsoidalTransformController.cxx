@@ -23,7 +23,6 @@
 
 #include <itkImageFileWriter.h>
 
-vtkCxxRevisionMacro(vtkEllipsoidalTransformController, "$Revision: 1315 $");
 vtkStandardNewMacro(vtkEllipsoidalTransformController);
 
 //----------------------------------------------------------------------------

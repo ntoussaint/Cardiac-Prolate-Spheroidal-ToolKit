@@ -39,7 +39,7 @@ class VTK_EXPORT vtkImageView3D : public vtkImageView
 public:
 
   static vtkImageView3D* New();
-  vtkTypeRevisionMacro(vtkImageView3D, vtkImageView);
+  vtkTypeMacro(vtkImageView3D, vtkImageView);
   
   // Override vtkObject - return the maximum mtime of this and any objects owned by this.
   unsigned long GetMTime();

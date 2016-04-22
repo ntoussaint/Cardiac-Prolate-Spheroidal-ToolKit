@@ -28,7 +28,7 @@ class vtkLimitTensorsToMeshFilter: public vtkUnstructuredGridAlgorithm
 
  public:
   static vtkLimitTensorsToMeshFilter *New();
-  vtkTypeRevisionMacro(vtkLimitTensorsToMeshFilter, vtkUnstructuredGridAlgorithm);
+  vtkTypeMacro(vtkLimitTensorsToMeshFilter, vtkUnstructuredGridAlgorithm);
     
   void PrintSelf (ostream& os, vtkIndent indent){};
   

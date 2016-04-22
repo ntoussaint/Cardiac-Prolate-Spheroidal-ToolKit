@@ -23,7 +23,6 @@
 
 #include <itkImageFileWriter.h>
 
-vtkCxxRevisionMacro(vtkProlateSpheroidalTransformController, "$Revision: 1315 $");
 vtkStandardNewMacro(vtkProlateSpheroidalTransformController);
 
 //----------------------------------------------------------------------------

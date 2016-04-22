@@ -32,7 +32,6 @@
 #include "vtkCommand.h"
 #include "vtkImageView2DCommand.h"
 
-vtkCxxRevisionMacro(vtkImageView, "$Revision: 1 $");
 // vtkStandardNewMacro(vtkImageView); // pure virtual class
 
 vtkImageView::vtkImageView()

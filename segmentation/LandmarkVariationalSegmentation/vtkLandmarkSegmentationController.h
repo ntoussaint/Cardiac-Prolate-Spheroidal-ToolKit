@@ -41,7 +41,7 @@ class VTK_EXPORT vtkLandmarkSegmentationController : public vtkPolyDataAlgorithm
 {
 public:
   static vtkLandmarkSegmentationController* New();
-  vtkTypeRevisionMacro(vtkLandmarkSegmentationController, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkLandmarkSegmentationController, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   typedef double ScalarType;

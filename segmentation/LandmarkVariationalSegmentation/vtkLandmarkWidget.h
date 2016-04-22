@@ -30,7 +30,7 @@ class VTK_EXPORT vtkLandmarkWidget : public vtkSphereWidget
 {
  public:
   static vtkLandmarkWidget* New();
-  vtkTypeRevisionMacro(vtkLandmarkWidget, vtkSphereWidget);
+  vtkTypeMacro(vtkLandmarkWidget, vtkSphereWidget);
   vtkGetObjectMacro (Command, vtkLandmarkWidgetCommand);
   vtkGetMacro (Value, double);
   vtkSetMacro (Value, double);  

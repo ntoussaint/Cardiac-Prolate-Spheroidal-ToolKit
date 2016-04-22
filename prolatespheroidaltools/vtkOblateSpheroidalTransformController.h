@@ -42,7 +42,7 @@ class VTK_EXPORT vtkOblateSpheroidalTransformController : public vtkPolyDataAlgo
 {
 public:
   static vtkOblateSpheroidalTransformController* New();
-  vtkTypeRevisionMacro(vtkOblateSpheroidalTransformController, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkOblateSpheroidalTransformController, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   typedef itk::DoubleLandmarkSetToDomainImageFilter DomainFilterType;

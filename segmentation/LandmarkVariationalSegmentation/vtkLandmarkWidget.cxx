@@ -7,7 +7,6 @@
 #include <vtkRenderWindow.h>
 
 vtkStandardNewMacro(vtkLandmarkWidget);
-vtkCxxRevisionMacro(vtkLandmarkWidget, "$Revision: 1315 $");
 
 
 ////----------------------------------------------------------------------------

@@ -23,7 +23,7 @@ class VTK_EXPORT vtkInteractorStyleImageView2D : public vtkInteractorStyleImage
 {
  public:
   static vtkInteractorStyleImageView2D *New();
-  vtkTypeRevisionMacro (vtkInteractorStyleImageView2D, vtkInteractorStyleImage);
+  vtkTypeMacro (vtkInteractorStyleImageView2D, vtkInteractorStyleImage);
  
   //BTX
   enum InteractionTypeIds

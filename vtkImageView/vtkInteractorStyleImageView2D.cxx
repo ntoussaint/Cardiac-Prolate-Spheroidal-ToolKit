@@ -16,7 +16,6 @@
 
 
 
-vtkCxxRevisionMacro (vtkInteractorStyleImageView2D, "$Revision: 1 $");
 vtkStandardNewMacro (vtkInteractorStyleImageView2D);
 
 

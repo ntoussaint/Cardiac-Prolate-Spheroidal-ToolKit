@@ -24,7 +24,6 @@
 #include <vtkMath.h>
 #include <vtkRenderer.h>
 
-vtkCxxRevisionMacro(vtkAxes2DWidget, "$Revision: 1.9 $");
 vtkStandardNewMacro(vtkAxes2DWidget);
 
 //----------------------------------------------------------------------------------

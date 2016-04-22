@@ -62,7 +62,6 @@
 #include <sstream>
 #include <cmath>
 
-vtkCxxRevisionMacro(vtkImageView2D, "$Revision: 3 $");
 vtkStandardNewMacro(vtkImageView2D);
 
 //----------------------------------------------------------------------------

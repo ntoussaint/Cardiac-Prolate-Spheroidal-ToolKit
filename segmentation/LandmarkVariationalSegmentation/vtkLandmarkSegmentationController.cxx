@@ -24,7 +24,6 @@
 #include <vtkFloatArray.h>
 #include <vtkPointData.h>
 
-vtkCxxRevisionMacro(vtkLandmarkSegmentationController, "$Revision: 1315 $");
 vtkStandardNewMacro(vtkLandmarkSegmentationController);
 
 //----------------------------------------------------------------------------

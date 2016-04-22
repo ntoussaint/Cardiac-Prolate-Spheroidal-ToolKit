@@ -23,7 +23,6 @@
 #include <cmath>
 
 vtkStandardNewMacro(vtkImageViewCornerAnnotation);
-vtkCxxRevisionMacro(vtkImageViewCornerAnnotation, "$Revision: 1 $");
 
 
 vtkImageViewCornerAnnotation::vtkImageViewCornerAnnotation()

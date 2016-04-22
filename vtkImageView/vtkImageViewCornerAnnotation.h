@@ -26,7 +26,7 @@ class VTK_EXPORT vtkImageViewCornerAnnotation : public vtkCornerAnnotation
 {
 
  public:
-  vtkTypeRevisionMacro(vtkImageViewCornerAnnotation, vtkCornerAnnotation);
+  vtkTypeMacro(vtkImageViewCornerAnnotation, vtkCornerAnnotation);
   static vtkImageViewCornerAnnotation *New();
   
   void SetImageView (vtkImageView* arg)

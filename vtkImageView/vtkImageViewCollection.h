@@ -100,7 +100,7 @@ class VTK_EXPORT vtkImageViewCollection : public vtkCollection
  public:
 
   static vtkImageViewCollection* New();
-  vtkTypeRevisionMacro(vtkImageViewCollection, vtkCollection);
+  vtkTypeMacro(vtkImageViewCollection, vtkCollection);
 
 
   // Description:
