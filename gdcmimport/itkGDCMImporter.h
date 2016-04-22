@@ -60,7 +60,7 @@ namespace itk
     typedef std::pair <std::string, std::string> DicomEntry;
     typedef std::vector<DicomEntry> DicomEntryList;
     
-    itkStaticConstMacro (ImageDimension, unsigned int, ImageType::ImageDimension);
+    itkStaticConstMacro (ImageDimension, unsigned int, 4);
 
     itkNewMacro  (Self);
     itkTypeMacro (GDCMVolume, Superclass);
