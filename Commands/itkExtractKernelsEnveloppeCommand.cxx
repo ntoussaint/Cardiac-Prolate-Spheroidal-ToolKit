@@ -137,7 +137,7 @@ namespace itk
     {
       std::string line = "";
       itksys::SystemTools::GetLineFromStream(inputliststream, line);
-      itksys_ios::istringstream parse ( line );
+      std::istringstream parse ( line );
       double* kernel = new double[3];
       for (unsigned int i=0; i<3; i++)
 	parse >> kernel[i];
